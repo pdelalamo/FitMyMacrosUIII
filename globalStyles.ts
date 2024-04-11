@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const globalStyles = StyleSheet.create({
     container: {
         flex: 1,
     },
@@ -13,19 +13,6 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-    },
-    contentContainerFeatures: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 0,
-    },
-    containerFeaturesText: {
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingTop: 0,
-        width: '70%',
-        marginTop: '-15%'
     },
     contentContainerBottom: {
         position: 'absolute',
@@ -41,26 +28,12 @@ export const styles = StyleSheet.create({
         resizeMode: 'contain',
         alignSelf: 'center',
     },
-    middleImageFeatures: {
-        flex: 0.8,
-        width: '100%',
-        resizeMode: 'contain',
-        alignSelf: 'center',
-        marginTop: '35%',
-        marginBottom: 0,
-        padding: 0
-    },
     buttonContainer: {
         flexDirection: 'column',
         justifyContent: 'center',
     },
-    buttonContainerFeatures: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        marginTop: '10%'
-    },
     buttonGreen: {
-        backgroundColor: 'green',
+        backgroundColor: '#5cdb5c',
         padding: '3%',
         borderRadius: 10,
         margin: '3%',
@@ -80,8 +53,9 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20
     },
-    featureText: {
-        textAlign: 'center',
-        fontSize: 18
+    buttonContainerFeatures: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        marginTop: '10%'
     },
 });
