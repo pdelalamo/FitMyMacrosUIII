@@ -5,7 +5,8 @@ import HomeScreen from '../screens/HomeScreen';
 import RecipeFeature from '../screens/productFeatures/RecipeFeature';
 import GoalsFeature from '../screens/productFeatures/GoalsFeature';
 import RestaurantFeature from '../screens/productFeatures/RestaurantFeature';
-import AiFeature from '../screens/productFeatures/AIFeature';
+import AiFeature from '../screens/productFeatures/AiFeature';
+import ChooseDiet from '../screens/initialQuestions/ChooseDiet';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ const Navigation: React.FC = () => {
                 <Stack.Screen name="GoalsFeature" component={GoalsFeature} />
                 <Stack.Screen name="AiFeature" component={AiFeature} />
                 <Stack.Screen name="RestaurantFeature" component={RestaurantFeature} />
+                <Stack.Screen name="ChooseDiet" component={ChooseDiet} />
             </Stack.Navigator>
         </NavigationContainer>
     );
