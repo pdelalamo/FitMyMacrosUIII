@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, Button, ImageBackground } from 'react-native';
 import { globalStyles } from '../../globalStyles';
 import { initialQuestionsStyles } from './initialQuestionsStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n';
 import { t } from 'i18next';
-import { useUserPreferences } from '../../context/UserPreferencesContext';
+import { UserPreferencesProvider, useUserPreferences } from '../../context/UserPreferencesContext';
 import Toast from 'react-native-root-toast';
 
 const dietOptions = ['Omnivore', 'Carnivore', 'Vegan', 'Keto', 'Vegetarian', 'Paleo', 'PescoPollo'];
+
 
 interface Props {
     navigation: any;
 }
 
-const ChooseDiet: React.FC<Props> = ({ navigation }) => {
+const Equipment: React.FC<Props> = ({ navigation }) => {
+    //usage of the context. Basically allows to update the diet type in the context when calling the setDietType function
     const { setDietType } = useUserPreferences();
+    //initializes selectedDiet to null, and then updates it with each setSelectedDiet call 
     const [selectedDiet, setSelectedDiet] = useState<string | null>(null);
 
     const handleSelectDiet = (diet: string) => {
@@ -30,14 +33,15 @@ const ChooseDiet: React.FC<Props> = ({ navigation }) => {
             });
             return;
         }
-        navigation.navigate('Allergies');
+        navigation.navigate('AvailableIngredients');
     };
+
 
     return (
         <I18nextProvider i18n={i18n}>
             <ImageBackground source={require('../../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackground}>
                 <View style={initialQuestionsStyles.container}>
-                    <Text style={initialQuestionsStyles.title}>{t('chooseDiet')}</Text>
+                    <Text style={initialQuestionsStyles.title}>{t('anyAllergies')}</Text>
                     {dietOptions.map((diet) => (
                         <TouchableOpacity
                             key={diet}
@@ -58,4 +62,4 @@ const ChooseDiet: React.FC<Props> = ({ navigation }) => {
     );
 };
 
-export default ChooseDiet;
+export default Equipment;
