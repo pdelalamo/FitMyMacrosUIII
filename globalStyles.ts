@@ -41,7 +41,7 @@ export const globalStyles = StyleSheet.create({
         alignSelf: 'center'
     },
     buttonGrey: {
-        backgroundColor: 'grey',
+        backgroundColor: '#BDBDBD',
         padding: '3%',
         borderRadius: 10,
         margin: '3%',
@@ -49,7 +49,7 @@ export const globalStyles = StyleSheet.create({
         alignSelf: 'center'
     },
     buttonText: {
-        color: 'white',
+        color: 'black',
         textAlign: 'center',
         fontSize: 20
     },

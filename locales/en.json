@@ -8,6 +8,7 @@
     "restaurantFeature": "Easily upload restaurant menus in PDF, and let our personalized assistant choose the best options to match your calorie and macronutrient targets, or input your restaurant preferences and dietary needs for optimal choices on the go.",
     "chooseDiet": "Choose your diet",
     "anyAllergies": "Any allergies/\nintolerances?",
+    "selectMeasurementCategory": "Select your Measurement Preferences",
     "allergyOptions": [
         "Dairy",
         "Gluten",
@@ -26,8 +27,21 @@
         "Paleo",
         "PescoPollo"
     ],
+    "measurementCategories": {
+        "Weight": [
+            "Grams",
+            "Ounces",
+            "Pounds"
+        ],
+        "Fluids": [
+            "Milliliters",
+            "Liters",
+            "Fluid Ounces",
+            "Gallons"
+        ]
+    },
     "ingredientsByType": {
-        "meat": [
+        "Meat": [
             "Chicken breast",
             "Lean ground beef",
             "Pork loin",
@@ -131,7 +145,7 @@
             "Bison hooves",
             "Bison horns"
         ],
-        "vegetables": [
+        "Vegetables": [
             "Carrots",
             "Broccoli",
             "Spinach",
@@ -225,7 +239,7 @@
             "Scotch bonnet peppers",
             "Carolina Reaper peppers"
         ],
-        "oils": [
+        "Oils": [
             "Olive oil",
             "Canola oil",
             "Vegetable oil",
@@ -275,7 +289,7 @@
             "Cottonseed oil",
             "Grape seed oil"
         ],
-        "cereals": [
+        "Cereals": [
             "Rice",
             "Wheat",
             "Corn",
@@ -391,7 +405,7 @@
             "Spelt bran",
             "Corn bran"
         ],
-        "nuts": [
+        "Nuts": [
             "Almonds",
             "Walnuts",
             "Peanuts",
@@ -486,7 +500,7 @@
             "Unsalted poppy seeds",
             "Dry roasted poppy seeds"
         ],
-        "dairy": [
+        "Dairy": [
             "Milk",
             "Butter",
             "Cheese",
@@ -529,7 +543,7 @@
             "Queso de cabra cheese",
             "Queso de leon cheese"
         ],
-        "eggs": [
+        "Eggs": [
             "Chicken eggs",
             "Duck eggs",
             "Quail eggs",
@@ -538,7 +552,7 @@
             "Ostrich eggs",
             "Emu eggs"
         ],
-        "fish": [
+        "Fish": [
             "Salmon",
             "Tuna",
             "Cod",
@@ -617,7 +631,7 @@
             "Salvelinus",
             "Thymallus"
         ],
-        "seafood": [
+        "Seafood": [
             "Shrimp",
             "Crab",
             "Lobster",
@@ -722,7 +736,7 @@
             "Squilloides leptosquilla",
             "Squilla empusa"
         ],
-        "fruits": [
+        "Fruits": [
             "Apple",
             "Banana",
             "Orange",

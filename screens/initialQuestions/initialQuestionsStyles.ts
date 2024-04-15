@@ -8,11 +8,31 @@ export const initialQuestionsStyles = StyleSheet.create({
         padding: 20,
         marginTop: '15%'
     },
+    scroll: {
+        marginTop: '15%',
+        paddingBottom: 0
+    },
+    scrollViewContent: {
+        flexGrow: 1
+    },
+    categoryTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    arrowIcon: {
+        marginLeft: 5,
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: '3%',
-        marginTop: '15%',
+        marginTop: '16%',
+    },
+    titleIngredients: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: '3%',
+        marginTop: '20%',
     },
     button: {
         backgroundColor: '#E0E0E0',
@@ -34,7 +54,6 @@ export const initialQuestionsStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: 'black',
-        marginTop: 10,
         marginBottom: 5,
     },
     ingredientRow: {
@@ -48,11 +67,33 @@ export const initialQuestionsStyles = StyleSheet.create({
         color: 'black'
     },
     quantityInput: {
-        backgroundColor: '#FFFFFF', // Change the background color as needed
+        backgroundColor: '#F2F2F2', // Change the background color as needed
         width: 100,
         height: 40,
         borderRadius: 5,
         textAlign: 'center',
         fontSize: 16,
-    }
+    },
+    categoryContainer: {
+        maxHeight: 400,
+        overflow: 'scroll',
+    },
+
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+    },
+    modalItem: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
 });

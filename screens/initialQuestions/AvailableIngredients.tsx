@@ -6,6 +6,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n';
 import { t } from 'i18next';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const ingredientsByType: { [key: string]: string[] } = t('ingredientsByType', { returnObjects: true });
 
@@ -41,33 +42,46 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
     return (
         <I18nextProvider i18n={i18n}>
             <ImageBackground source={require('../../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackground}>
-                <ScrollView contentContainerStyle={initialQuestionsStyles.container}>
-                    <Text style={initialQuestionsStyles.title}>{t('selectIngredients')}</Text>
-                    {Object.entries(ingredientsByType).map(([category, ingredients]) => (
-                        <View key={category}>
-                            <TouchableOpacity onPress={() => handleToggleCategory(category)}>
-                                <Text style={initialQuestionsStyles.categoryTitle}>{t(category)}</Text>
-                            </TouchableOpacity>
-                            {expandedCategory === category &&
-                                ingredients.map((ingredient) => (
-                                    <View key={ingredient} style={initialQuestionsStyles.ingredientRow}>
-                                        <Text style={initialQuestionsStyles.ingredientText}>{ingredient}</Text>
-                                        <TextInput
-                                            style={initialQuestionsStyles.quantityInput}
-                                            keyboardType="numeric"
-                                            placeholder={t('quantity')}
-                                            onChangeText={(quantity) => handleSelectIngredient(ingredient, quantity)}
+                <View style={initialQuestionsStyles.container}>
+                    <Text style={initialQuestionsStyles.titleIngredients}>{t('selectIngredients')}</Text>
+                    <ScrollView contentContainerStyle={initialQuestionsStyles.scrollViewContent}>
+                        {Object.entries(ingredientsByType).map(([category, ingredients]) => (
+                            <View key={category} style={initialQuestionsStyles.scroll}>
+                                <TouchableOpacity onPress={() => handleToggleCategory(category)}>
+                                    <View style={initialQuestionsStyles.categoryTitleContainer}>
+                                        <Text style={initialQuestionsStyles.categoryTitle}>{t(category)}</Text>
+                                        <Ionicons
+                                            name={expandedCategory === category ? 'arrow-up' : 'arrow-down'}
+                                            size={20}
+                                            color="black"
+                                            style={initialQuestionsStyles.arrowIcon}
                                         />
                                     </View>
-                                ))}
-                        </View>
-                    ))}
+                                </TouchableOpacity>
+                                {expandedCategory === category && (
+                                    <View>
+                                        {ingredients.map((ingredient) => (
+                                            <View key={ingredient} style={initialQuestionsStyles.ingredientRow}>
+                                                <Text style={initialQuestionsStyles.ingredientText}>{ingredient}</Text>
+                                                <TextInput
+                                                    style={initialQuestionsStyles.quantityInput}
+                                                    keyboardType="numeric"
+                                                    placeholder={t('quantity')}
+                                                    onChangeText={(quantity) => handleSelectIngredient(ingredient, quantity)}
+                                                />
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
+                            </View>
+                        ))}
+                    </ScrollView>
                     <View style={globalStyles.buttonContainerFeatures}>
                         <TouchableOpacity style={globalStyles.buttonGreen} onPress={handleContinue}>
                             <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                         </TouchableOpacity>
                     </View>
-                </ScrollView>
+                </View>
             </ImageBackground>
         </I18nextProvider>
     );

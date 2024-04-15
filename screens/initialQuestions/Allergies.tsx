@@ -45,7 +45,7 @@ const Allergies: React.FC<Props> = ({ navigation }) => {
                         </TouchableOpacity>
                     ))}
                     <View style={globalStyles.buttonContainerFeatures}>
-                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('AvailableIngredients')}>
+                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('MeasurementPreferences')}>
                             <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                         </TouchableOpacity>
                     </View>

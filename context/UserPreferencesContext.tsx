@@ -1,10 +1,17 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
+import MeasurementPreferences from '../screens/initialQuestions/MeasurementPreferences';
+
+interface MeasurementPreferences {
+    weight: string | null;
+    fluids: string | null;
+}
 
 interface UserPreferences {
     dietType: string;
     ingredientsMap: Map<string, string>;
     allergies: string[];
     equipment: string[];
+    measurementPreferences: MeasurementPreferences;
 }
 
 interface UserPreferencesContextType {
@@ -12,6 +19,7 @@ interface UserPreferencesContextType {
     setDietType: (diet: string) => void;
     addIngredientToMap: (key: string, value: string) => void;
     removeIngredientFromMap: (key: string) => void;
+    setMeasurementPreference: (category: keyof MeasurementPreferences, preference: string) => void;
     addAllergy: (allergy: string) => void;
     removeAllergy: (allergy: string) => void;
     addEquipment: (equipment: string) => void;
@@ -35,6 +43,17 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
     const [ingredientsMap, setIngredientsMap] = useState<Map<string, string>>(new Map());
     const [allergies, setAllergies] = useState<string[]>([]);
     const [equipment, setEquipment] = useState<string[]>([]);
+    const [measurementPreferences, setMeasurementPreferences] = useState<MeasurementPreferences>({
+        weight: null,
+        fluids: null,
+    });
+
+    const setMeasurementPreference = (category: keyof MeasurementPreferences, preference: string) => {
+        setMeasurementPreferences(prev => ({
+            ...prev,
+            [category]: preference,
+        }));
+    };
 
     const addIngredientToMap = (key: string, value: string) => {
         setIngredientsMap(prev => new Map(prev).set(key, value));
@@ -67,11 +86,13 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
     const value = {
         preferences: {
             dietType,
+            measurementPreferences,
             ingredientsMap,
             allergies,
             equipment,
         },
         setDietType,
+        setMeasurementPreference,
         addIngredientToMap,
         removeIngredientFromMap,
         addAllergy,

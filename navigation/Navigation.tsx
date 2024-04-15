@@ -11,6 +11,7 @@ import { UserPreferencesProvider } from '../context/UserPreferencesContext';
 import AvailableIngredients from '../screens/initialQuestions/AvailableIngredients';
 import Equipment from '../screens/initialQuestions/Equipment';
 import Allergies from '../screens/initialQuestions/Allergies';
+import MeasurementPreferences from '../screens/initialQuestions/MeasurementPreferences';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="RestaurantFeature" component={RestaurantFeature} />
                     <Stack.Screen name="ChooseDiet" component={ChooseDiet} />
                     <Stack.Screen name="Allergies" component={Allergies} />
+                    <Stack.Screen name="MeasurementPreferences" component={MeasurementPreferences} />
                     <Stack.Screen name="AvailableIngredients" component={AvailableIngredients} />
                     <Stack.Screen name="Equipment" component={Equipment} />
                 </Stack.Navigator>
