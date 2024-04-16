@@ -2,6 +2,7 @@
     "getStarted": "Get Started",
     "signIn": "Already an user? Sign in",
     "continue": "Continue",
+    "skip": "Skip",
     "recipeFeature": "Instantly tailor-made recipes to suit user preferences and dietary requirements, ensuring a limitless array of personalized meal options at your fingertips.",
     "goalsFeature": "Enjoy customized dishes perfectly calibrated to your unique dietary preferences, including macronutrient balance, calorie targets, cooking duration, and dietary restrictions. Experience culinary delight while staying in sync with your health goals effortlessly.",
     "aiFeature": "Transform your meal snapshots into detailed macronutrient and calorie estimates with our custom AI assistant. Experience hassle-free dietary tracking by simply taking a picture of your food.",
@@ -9,6 +10,9 @@
     "chooseDiet": "Choose your diet",
     "anyAllergies": "Any allergies/\nintolerances?",
     "selectMeasurementCategory": "Select your Measurement Preferences",
+    "selectWeight": "Select Weight Measurement",
+    "selectFluid": "Select Fluid Measurement",
+    "selectEquipment": "Select Your Available Equipment",
     "allergyOptions": [
         "Dairy",
         "Gluten",
@@ -27,19 +31,28 @@
         "Paleo",
         "PescoPollo"
     ],
-    "measurementCategories": {
-        "Weight": [
-            "Grams",
-            "Ounces",
-            "Pounds"
-        ],
-        "Fluids": [
-            "Milliliters",
-            "Liters",
-            "Fluid Ounces",
-            "Gallons"
-        ]
-    },
+    "weightOptions": [
+        "grams",
+        "ounces",
+        "pounds"
+    ],
+    "fluidOptions": [
+        "milliliters",
+        "liters",
+        "fluid ounces",
+        "gallons"
+    ],
+    "equipmentOptions": [
+        "Oven",
+        "Microwave",
+        "Stove",
+        "Rice cooker",
+        "Grill",
+        "Air fryer",
+        "Juicer",
+        "Pot",
+        "Pan"
+    ],
     "ingredientsByType": {
         "Meat": [
             "Chicken breast",
@@ -825,5 +838,8 @@
             "Yuzu"
         ]
     },
-    "selectIngredients": "Your available ingredients"
+    "selectIngredients": "Your available ingredients",
+    "dietAlert": "Please select a diet before continuing",
+    "ingredientsAlert": "Please fill in the quantities of some ingredients, or click on the skip button",
+    "measurementAlert": "Please select both weight and fluid preferences before continuing"
 }

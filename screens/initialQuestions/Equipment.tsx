@@ -1,58 +1,74 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, Button, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import { globalStyles } from '../../globalStyles';
 import { initialQuestionsStyles } from './initialQuestionsStyles';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
+import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { t } from 'i18next';
-import { UserPreferencesProvider, useUserPreferences } from '../../context/UserPreferencesContext';
-import Toast from 'react-native-root-toast';
 
-const dietOptions = ['Omnivore', 'Carnivore', 'Vegan', 'Keto', 'Vegetarian', 'Paleo', 'PescoPollo'];
-
+const equipmentOptions: string[] = t('equipmentOptions', { returnObjects: true });
 
 interface Props {
     navigation: any;
 }
 
-const Equipment: React.FC<Props> = ({ navigation }) => {
-    //usage of the context. Basically allows to update the diet type in the context when calling the setDietType function
-    const { setDietType } = useUserPreferences();
-    //initializes selectedDiet to null, and then updates it with each setSelectedDiet call 
-    const [selectedDiet, setSelectedDiet] = useState<string | null>(null);
+const EquipmentSelection: React.FC<Props> = ({ navigation }) => {
+    const { addEquipment, removeEquipment } = useUserPreferences();
+    const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+    const { t } = useTranslation();
 
-    const handleSelectDiet = (diet: string) => {
-        setSelectedDiet(diet);
-        setDietType(diet);
-    };
-
-    const handleContinue = () => {
-        if (!selectedDiet) {
-            let toast = Toast.show('Please select a diet before continuing', {
-                duration: Toast.durations.LONG,
-            });
-            return;
+    const handleSelectEquipment = (equipment: string) => {
+        if (selectedEquipment.includes(equipment)) {
+            setSelectedEquipment(prev => prev.filter(item => item !== equipment));
+            removeEquipment(equipment);
+        } else {
+            setSelectedEquipment(prev => [...prev, equipment]);
+            addEquipment(equipment);
         }
-        navigation.navigate('AvailableIngredients');
     };
 
+    const renderEquipmentButtons = () => {
+        const buttons = [];
+        for (let i = 0; i < equipmentOptions.length; i += 2) {
+            const firstEquipment = equipmentOptions[i];
+            const secondEquipment = equipmentOptions[i + 1];
+            buttons.push(
+                <View style={initialQuestionsStyles.rowContainer} key={i}>
+                    <TouchableOpacity
+                        style={[
+                            initialQuestionsStyles.buttonSmall,
+                            selectedEquipment.includes(firstEquipment) ? initialQuestionsStyles.selectedButtonSmall : null,
+                        ]}
+                        onPress={() => handleSelectEquipment(firstEquipment)}
+                    >
+                        <Text style={globalStyles.buttonText}>{firstEquipment}</Text>
+                    </TouchableOpacity>
+                    {secondEquipment && (
+                        <TouchableOpacity
+                            style={[
+                                initialQuestionsStyles.buttonSmall,
+                                selectedEquipment.includes(secondEquipment) ? initialQuestionsStyles.selectedButtonSmall : null,
+                            ]}
+                            onPress={() => handleSelectEquipment(secondEquipment)}
+                        >
+                            <Text style={globalStyles.buttonText}>{secondEquipment}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            );
+        }
+        return buttons;
+    };
 
     return (
         <I18nextProvider i18n={i18n}>
             <ImageBackground source={require('../../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackground}>
                 <View style={initialQuestionsStyles.container}>
-                    <Text style={initialQuestionsStyles.title}>{t('anyAllergies')}</Text>
-                    {dietOptions.map((diet) => (
-                        <TouchableOpacity
-                            key={diet}
-                            style={selectedDiet === diet ? initialQuestionsStyles.selectedButton : initialQuestionsStyles.button}
-                            onPress={() => handleSelectDiet(diet)}
-                        >
-                            <Text style={globalStyles.buttonText}>{diet}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    <Text style={initialQuestionsStyles.titleEquipment}>{t('selectEquipment')}</Text>
+                    {renderEquipmentButtons()}
                     <View style={globalStyles.buttonContainerFeatures}>
-                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={handleContinue}>
+                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('NextScreen')}>
                             <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -62,4 +78,4 @@ const Equipment: React.FC<Props> = ({ navigation }) => {
     );
 };
 
-export default Equipment;
+export default EquipmentSelection;

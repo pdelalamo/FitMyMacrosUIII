@@ -7,6 +7,7 @@ import i18n from '../../i18n';
 import { t } from 'i18next';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-root-toast';
 
 const ingredientsByType: { [key: string]: string[] } = t('ingredientsByType', { returnObjects: true });
 
@@ -19,6 +20,9 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
     const [selectedIngredients, setSelectedIngredients] = useState<{ [key: string]: string }>({});
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
+    const { preferences } = useUserPreferences();
+    const { measurementPreferences } = preferences;
+
     const handleSelectIngredient = (ingredient: string, quantity: string) => {
         setSelectedIngredients({ ...selectedIngredients, [ingredient]: quantity });
     };
@@ -29,6 +33,9 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
 
     const handleContinue = () => {
         if (Object.keys(selectedIngredients).length === 0) {
+            let toast = Toast.show(t('ingredientsAlert'), {
+                duration: Toast.durations.LONG,
+            });
             return;
         }
 
@@ -36,7 +43,7 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
             addIngredientToMap(ingredient, quantity);
         });
 
-        navigation.navigate('NextScreen');
+        navigation.navigate('Equipment');
     };
 
     return (
@@ -66,7 +73,7 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
                                                 <TextInput
                                                     style={initialQuestionsStyles.quantityInput}
                                                     keyboardType="numeric"
-                                                    placeholder={t('quantity')}
+                                                    placeholder={measurementPreferences.weight != null ? measurementPreferences.weight : undefined}
                                                     onChangeText={(quantity) => handleSelectIngredient(ingredient, quantity)}
                                                 />
                                             </View>
@@ -79,6 +86,9 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
                     <View style={globalStyles.buttonContainerFeatures}>
                         <TouchableOpacity style={globalStyles.buttonGreen} onPress={handleContinue}>
                             <Text style={globalStyles.buttonText}>{t('continue')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={globalStyles.buttonGrey} onPress={() => navigation.navigate('Equipment')}>
+                            <Text style={globalStyles.buttonText}>{t('skip')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

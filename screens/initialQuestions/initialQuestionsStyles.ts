@@ -34,6 +34,18 @@ export const initialQuestionsStyles = StyleSheet.create({
         marginBottom: '3%',
         marginTop: '20%',
     },
+    titleEquipment: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: '3%',
+        marginTop: '10%',
+    },
+    titleMeasurement: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: '3%',
+        marginTop: '5%',
+    },
     button: {
         backgroundColor: '#E0E0E0',
         padding: 10,
@@ -49,6 +61,27 @@ export const initialQuestionsStyles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 10,
         borderRadius: 10,
+    },
+    buttonSmall: {
+        backgroundColor: '#E0E0E0',
+        padding: 10,
+        width: '30%',
+        alignItems: 'center',
+        margin: '3%',
+        borderRadius: 10
+    },
+    selectedButtonSmall: {
+        backgroundColor: '#f0e4af',
+        padding: 10,
+        width: '30%',
+        alignItems: 'center',
+        margin: '2%',
+        borderRadius: 10,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10, // Adjust as needed
     },
     categoryTitle: {
         fontSize: 18,

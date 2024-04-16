@@ -8,7 +8,7 @@ import { t } from 'i18next';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import Toast from 'react-native-root-toast';
 
-const dietOptions = ['Omnivore', 'Carnivore', 'Vegan', 'Keto', 'Vegetarian', 'Paleo', 'PescoPollo'];
+const dietOptions: string[] = t('dietOptions', { returnObjects: true });
 
 interface Props {
     navigation: any;
@@ -25,7 +25,7 @@ const ChooseDiet: React.FC<Props> = ({ navigation }) => {
 
     const handleContinue = () => {
         if (!selectedDiet) {
-            let toast = Toast.show('Please select a diet before continuing', {
+            let toast = Toast.show(t('dietAlert'), {
                 duration: Toast.durations.LONG,
             });
             return;
