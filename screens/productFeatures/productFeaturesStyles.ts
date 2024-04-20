@@ -12,7 +12,6 @@ export const productFeaturesStyles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 0,
         width: '70%',
-        marginTop: '-15%'
     },
     middleImageFeatures: {
         flex: 0.8,
@@ -25,6 +24,6 @@ export const productFeaturesStyles = StyleSheet.create({
     },
     featureText: {
         textAlign: 'center',
-        fontSize: 18
+        fontSize: 14
     }
 });

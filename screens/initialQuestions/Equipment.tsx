@@ -68,7 +68,7 @@ const EquipmentSelection: React.FC<Props> = ({ navigation }) => {
                     <Text style={initialQuestionsStyles.titleEquipment}>{t('selectEquipment')}</Text>
                     {renderEquipmentButtons()}
                     <View style={globalStyles.buttonContainerFeatures}>
-                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('NextScreen')}>
+                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('FreeTrialScreen')}>
                             <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                         </TouchableOpacity>
                     </View>

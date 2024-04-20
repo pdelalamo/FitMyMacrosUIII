@@ -51,11 +51,123 @@ export const globalStyles = StyleSheet.create({
     buttonText: {
         color: 'black',
         textAlign: 'center',
-        fontSize: 20
+        fontSize: 16
     },
     buttonContainerFeatures: {
         flexDirection: 'column',
         justifyContent: 'center',
         marginTop: '10%'
+    },
+    containerFree: {
+        flex: 1,
+    },
+    topHalf: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '40%'
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    stepsContainer: {
+        width: '80%',
+        alignItems: 'flex-start',
+    },
+    featuresContainer: {
+        marginTop: '3%',
+        alignItems: 'flex-start',
+        width: '90%'
+    },
+    stepText: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    stepSubText: {
+        fontSize: 12,
+        marginBottom: '3%',
+    },
+    strikeThrough: {
+        textDecorationLine: 'line-through',
+    },
+    bottomHalf: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    trialText: {
+        marginBottom: '2%',
+    },
+    pickPlanText: {
+        marginBottom: '2%',
+        fontSize: 23,
+        fontWeight: 'bold',
+        alignSelf: 'center'
+    },
+    trialButton: {
+        backgroundColor: '#5cdb5c',
+        paddingVertical: '4%',
+        paddingHorizontal: '3%',
+        borderRadius: 5,
+        width: '80%'
+    },
+    buttonTextFree: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    optionButton: {
+        backgroundColor: 'lightblue',
+        padding: '2%',
+        borderRadius: 5,
+    },
+    continueButton: {
+        backgroundColor: 'blue',
+        paddingVertical: '2%',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    stepContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: '3%',
+    },
+    icon: {
+        marginRight: '3%',
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: '4%',
+        width: '90%',
+        maxHeight: '90%',
+    },
+    subscriptionOptions: {
+        marginTop: '5%',
+        marginBottom: '5%',
+    },
+    subscriptionOption: {
+        backgroundColor: '#f0f0f0',
+        padding: '4%',
+        borderRadius: 5,
+        marginBottom: '3%',
+    },
+    subscriptionTitle: {
+        fontWeight: 'bold',
+        marginBottom: '2%',
+    },
+    subscriptionPrice: {
+        color: '#555',
+    },
+    selectedSubscriptionOption: {
+        backgroundColor: '#65C6F0',
+        borderColor: '#65C6F0',
     },
 });

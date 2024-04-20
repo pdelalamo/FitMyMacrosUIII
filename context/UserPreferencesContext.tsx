@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import MeasurementPreferences from '../screens/initialQuestions/MeasurementPreferences';
 
 interface MeasurementPreferences {
     weight: string | null;
