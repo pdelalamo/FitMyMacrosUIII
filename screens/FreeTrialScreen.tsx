@@ -1,18 +1,108 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, ImageBackground, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, ImageBackground, TouchableWithoutFeedback, Platform, Alert } from 'react-native';
 import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Product, finishTransaction, getProducts, purchaseErrorListener, purchaseUpdatedListener, requestPurchase } from 'react-native-iap';
+import { constants } from '../utils/constants';
+import DeviceInfo from 'react-native-device-info'
 
-const FreeTrialScreen = () => {
+interface Props {
+    navigation: any;
+}
+
+const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [isLoading, setLoading] = useState(true);
+    // Check if running on iOS emulator
+    const isIOSEmulator = Platform.OS === 'ios' && Platform.constants.interfaceIdiom === 'handset';
+
+    // Check if running on Android emulator
+    const isAndroidEmulator = Platform.OS === 'android' && (
+        Platform.constants.Model.includes('sdk') || // Android emulator model name
+        Platform.constants.Manufacturer.toLowerCase() === 'generic' // Generic manufacturer name
+    );
 
     const handleOptionPress = (option: string) => {
         setSelectedOption(option);
     };
+
+    function setPurchaseLoading(arg0: boolean) {
+        throw new Error('Function not implemented.');
+    }
+
+    if (!isIOSEmulator && !isAndroidEmulator) {
+        // useEffect(() => {
+        //     if (Platform.OS === 'android' || Platform.OS === 'ios') {
+        //         const purchaseUpdateSubscription = purchaseUpdatedListener(
+        //             async (purchase) => {
+        //                 if (Platform.OS === 'android' || Platform.OS === 'ios') {
+        //                     const receipt = purchase.transactionReceipt;
+        //                     if (receipt) {
+        //                         try {
+        //                             await finishTransaction({ purchase, isConsumable: false });
+        //                         } catch (error) {
+        //                             console.error("An error occurred while completing transaction", error);
+        //                         }
+        //                         notifySuccessfulPurchase();
+        //                     }
+        //                 }
+        //             });
+        //         const purchaseErrorSubscription = purchaseErrorListener((error) =>
+        //             console.error('Purchase error', error.message));
+        //         const fetchProducts = async () => {
+        //             if (Platform.OS === 'android' || Platform.OS === 'ios') {
+        //                 try {
+        //                     const result = await getProducts({ skus: constants.productSkus! });
+        //                     setProducts(result);
+        //                     setLoading(false);
+        //                 }
+        //                 catch (error) {
+        //                     Alert.alert('Error fetching products')
+        //                 }
+        //             }
+        //         }
+        //         fetchProducts();
+        //         return () => {
+        //             purchaseUpdateSubscription.remove();
+        //             purchaseErrorSubscription.remove();
+        //         }
+        //     }
+        // }, [])
+    }
+
+    const notifySuccessfulPurchase = () => {
+        Alert.alert("Success", "Purchase successful", [
+            {
+                text: 'Logins',
+                onPress: () => navigation.navigate('Login')
+            }
+        ])
+    }
+
+    const handlePurchase = async (productId: string | null) => {
+        if (productId === null) {
+            Alert.alert('Please, select one plan')
+        }
+        else {
+            //TODO: Load the Products array in the modal, instead of the manual touchables that I created
+            setModalVisible(false);
+            setLoading(true)
+            try {
+                await requestPurchase({ skus: [productId] });
+            } catch (error) {
+                Alert.alert('Error occurred while making purchase')
+            }
+            finally {
+                //TODO: implement the loading spinner if it's not already implemented
+                setLoading(false);
+            }
+        }
+    }
 
     return (
         <I18nextProvider i18n={i18n}>
@@ -102,7 +192,7 @@ const FreeTrialScreen = () => {
                                             <Text style={globalStyles.subscriptionPrice}>{t('yearlyPrice')}</Text>
                                         </TouchableOpacity>
                                     </View>
-                                    <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => setModalVisible(false)}>
+                                    <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => handlePurchase(selectedOption)}>
                                         <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -116,3 +206,4 @@ const FreeTrialScreen = () => {
 };
 
 export default FreeTrialScreen;
+
