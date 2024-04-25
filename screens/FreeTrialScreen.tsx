@@ -145,6 +145,9 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
                         <TouchableOpacity style={globalStyles.trialButton} onPress={() => setModalVisible(true)}>
                             <Text style={globalStyles.buttonText}>{t('startFree')}</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RegisterScreen')}>
+                            <Text style={globalStyles.buttonText}>{t('skip')}</Text>
+                        </TouchableOpacity>
                     </View>
                     <Modal
                         animationType="slide"
@@ -193,9 +196,6 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
                                     </View>
                                     <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => handlePurchase(selectedOption)}>
                                         <Text style={globalStyles.buttonText}>{t('continue')}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RegisterScreen')}>
-                                        <Text style={globalStyles.buttonText}>{t('skip')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

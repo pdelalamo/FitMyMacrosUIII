@@ -8,6 +8,12 @@ export const globalStyles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    imageBackgroundFull: {
+        flex: 1,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     contentContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -169,5 +175,21 @@ export const globalStyles = StyleSheet.create({
     selectedSubscriptionOption: {
         backgroundColor: '#65C6F0',
         borderColor: '#65C6F0',
+    },
+    registerContainer: {
+        flex: 1,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+    },
+    input: {
+        width: '80%',
+        height: '6%',
+        marginBottom: '3%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: '2%'
     },
 });
