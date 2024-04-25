@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-native",
     "target": "es2016",
     "module": "commonjs",
     "esModuleInterop": true,

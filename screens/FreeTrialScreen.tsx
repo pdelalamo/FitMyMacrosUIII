@@ -7,7 +7,6 @@ import { t } from 'i18next';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Product, finishTransaction, getProducts, purchaseErrorListener, purchaseUpdatedListener, requestPurchase } from 'react-native-iap';
 import { constants } from '../utils/constants';
-import DeviceInfo from 'react-native-device-info'
 
 interface Props {
     navigation: any;
@@ -52,7 +51,7 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
         //                     }
         //                 }
         //             });
-        //         const purchaseErrorSubscription = purchaseErrorListener((error) =>
+        //         const purchaseErrorSubscription = purchaseErrorListener((error: { message: any; }) =>
         //             console.error('Purchase error', error.message));
         //         const fetchProducts = async () => {
         //             if (Platform.OS === 'android' || Platform.OS === 'ios') {
