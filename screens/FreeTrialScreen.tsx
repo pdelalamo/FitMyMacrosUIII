@@ -194,6 +194,9 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
                                     <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => handlePurchase(selectedOption)}>
                                         <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RegisterScreen')}>
+                                        <Text style={globalStyles.buttonText}>{t('skip')}</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                         </TouchableWithoutFeedback>
