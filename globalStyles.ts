@@ -181,7 +181,7 @@ export const globalStyles = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        marginTop: '20%'
     },
     input: {
         width: '80%',

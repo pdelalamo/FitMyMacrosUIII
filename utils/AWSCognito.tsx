@@ -6,12 +6,18 @@ AWS.config.region = 'eu-west-3';
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
 // Function to sign up a new user
-const signUpUser = async (username: string, password: string) => {
+const signUpUser = async (email: string, password: string) => {
     try {
         const params = {
             ClientId: '6v7ucl1ti0g39pqnfco6r3llp0',
-            Username: username,
-            Password: password
+            Username: email,
+            Password: password,
+            UserAttributes: [
+                {
+                    Name: 'email',
+                    Value: email
+                }
+            ]
         };
 
         await cognitoIdentityServiceProvider.signUp(params).promise();
@@ -22,13 +28,13 @@ const signUpUser = async (username: string, password: string) => {
 };
 
 // Function to sign in a user
-const signInUser = async (username: string, password: string) => {
+const signInUser = async (email: string, password: string) => {
     try {
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
             ClientId: '6v7ucl1ti0g39pqnfco6r3llp0',
             AuthParameters: {
-                'USERNAME': username,
+                'USERNAME': email,
                 'PASSWORD': password
             }
         };

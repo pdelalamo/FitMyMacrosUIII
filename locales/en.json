@@ -862,8 +862,15 @@
     "ingredientsAlert": "Please fill in the quantities of some ingredients, or click on the skip button",
     "measurementAlert": "Please select both weight and fluid preferences before continuing",
     "hideEmailPassword": "Hide Email/Password",
-    "registerEmailPwd": "Register with Email/Password",
-    "registerGoogle": "Register with Google",
-    "registerFacebook": "Register with Facebook",
-    "registerApple": "Register with Apple"
+    "registerEmailPwd": "Sign up with Email/Password",
+    "registerGoogle": "Sign up with Google",
+    "registerFacebook": "Sign up with Facebook",
+    "registerApple": "Sign up with Apple",
+    "or": "OR",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "emptyAlert": "Please fill in all fields",
+    "nMatchPwd": "Passwords do not match",
+    "invalidEmailFormat": "Invalid email format"
 }
