@@ -9,8 +9,8 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 const signUpUser = async (email: string, password: string) => {
     try {
         const params = {
-            ClientId: '6v7ucl1ti0g39pqnfco6r3llp0',
-            Username: email,
+            ClientId: '11tdf482ao63ga4r2katsaedd0',
+            Username: toUsername(email),
             Password: password,
             UserAttributes: [
                 {
@@ -32,9 +32,9 @@ const signInUser = async (email: string, password: string) => {
     try {
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
-            ClientId: '6v7ucl1ti0g39pqnfco6r3llp0',
+            ClientId: '11tdf482ao63ga4r2katsaedd0',
             AuthParameters: {
-                'USERNAME': email,
+                'USERNAME': toUsername(email),
                 'PASSWORD': password
             }
         };
@@ -45,5 +45,13 @@ const signInUser = async (email: string, password: string) => {
         console.error('Error signing in user:', error);
     }
 };
+
+function toUsername(email: string) {
+    return email.replace('@', '-at-');
+}
+
+function toEmail(email: string) {
+    return email.replace('-at-', '@');
+}
 
 export { signUpUser, signInUser };

@@ -7,8 +7,13 @@ import { t } from 'i18next';
 import { AntDesign, FontAwesome, Entypo } from '@expo/vector-icons';
 import { federatedStyles } from '../federatedStyles';
 import { signUpUser } from '../utils/AWSCognito';
+import GoogleSignInUtility from 'utils/GoogleSignIn';
 
-const RegisterScreen = () => {
+interface Props {
+    navigation: any;
+}
+
+const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,7 +24,13 @@ const RegisterScreen = () => {
     };
 
     const registerWithGoogle = async () => {
-        // Implement Google Sign-In and federatedSignIn with AWS Cognito
+        const userExists = await GoogleSignInUtility.signInWithGoogle();
+        if (userExists) {
+            //TODO: redirect to the first functional page of the app
+            navigation.navigate('MainScreen')
+        } else {
+            Alert.alert('User does not exist in Cognito user pool');
+        }
     };
 
     const registerWithFacebook = async () => {
@@ -42,6 +53,10 @@ const RegisterScreen = () => {
         }
         else if (email.trim() && password.trim() && !confirmPassword.trim()) {
             Alert.alert(t('confirmPassword'));
+            return;
+        }
+        else if (password.length < 8) {
+            Alert.alert(t('passwordTooShort'));
             return;
         }
         else if (password !== confirmPassword) {

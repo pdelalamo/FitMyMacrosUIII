@@ -872,5 +872,6 @@
     "confirmPassword": "Confirm Password",
     "emptyAlert": "Please fill in all fields",
     "nMatchPwd": "Passwords do not match",
-    "invalidEmailFormat": "Invalid email format"
+    "invalidEmailFormat": "Invalid email format",
+    "passwordTooShort": "Password must be at least 8 characters long"
 }
