@@ -1,15 +1,16 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ANDROID_CLIENT_ID, IOS_CLIENT_ID, WEB_CLIENT_ID } from '@env';
 import AWS from 'aws-sdk';
+import { makeRedirectUri } from 'expo-auth-session';
+
+const config = {
+    androidClientId: '868426694791-ij8mdj7pfb564t72mlughov5tdbf334i.apps.googleusercontent.com',
+    iosClientId: '868426694791-7hkokdrjblj8juvi4qpbu2s3stgts7fo.apps.googleusercontent.com',
+    webClientId: '868426694791-f8245bib57s9csg4c4ole5higbdqj2c9.apps.googleusercontent.com',
+};
 
 class GoogleSignInUtility {
-    static config = {
-        androidClientId: ANDROID_CLIENT_ID,
-        iosClientId: IOS_CLIENT_ID,
-        webClientId: WEB_CLIENT_ID,
-    };
 
     /**
      * Tries to sign in the user with their Google account
@@ -17,7 +18,12 @@ class GoogleSignInUtility {
      */
     static async signInWithGoogle() {
         WebBrowser.maybeCompleteAuthSession();
-        const [request, response, promptAsync] = Google.useAuthRequest(GoogleSignInUtility.config);
+        const [request, response, promptAsync] = Google.useAuthRequest({
+            clientId: 'f8245bib57s9csg4c4ole5higbdqj2c9',
+            iosClientId:
+                '7hkokdrjblj8juvi4qpbu2s3stgts7fo',
+            redirectUri: makeRedirectUri()
+        });
 
         if (response?.type === 'success') {
             const user = await GoogleSignInUtility.getUserInfo(response.authentication!.accessToken);

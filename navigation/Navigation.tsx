@@ -14,6 +14,7 @@ import Allergies from '../screens/initialQuestions/Allergies';
 import MeasurementPreferences from '../screens/initialQuestions/MeasurementPreferences';
 import FreeTrialScreen from '../screens/FreeTrialScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import MainScreen from 'screens/MainScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="Equipment" component={Equipment} />
                     <Stack.Screen name="FreeTrialScreen" component={FreeTrialScreen} />
                     <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+                    <Stack.Screen name="MainScreen" component={MainScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

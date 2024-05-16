@@ -1,6 +1,14 @@
 import AWS from 'aws-sdk';
+import { t } from 'i18next';
+import { Alert } from 'react-native';
 
 AWS.config.region = 'eu-west-3';
+AWS.config.update({
+    accessKeyId: 'AKIA4CI5KSJHVAMN4IXC',
+    secretAccessKey: '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',
+    region: 'eu-west-3'
+});
+
 
 // Initialize CognitoIdentityServiceProvider
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
@@ -54,4 +62,26 @@ function toEmail(email: string) {
     return email.replace('-at-', '@');
 }
 
-export { signUpUser, signInUser };
+/**
+* Checks whether the user exists in the cognito user pool
+* @param email 
+* @returns 
+*/
+async function checkCognitoUser(email: string) {
+    try {
+        const params = {
+            UserPoolId: 'eu-west-3_dczxHeKz4',
+            Username: toUsername(email),
+        };
+        const user = await cognitoIdentityServiceProvider.adminGetUser(params).promise();
+        // User exists in Cognito user pool
+        console.log('User exists in Cognito:', user);
+        return true;
+    } catch (error) {
+        // User does not exist in Cognito user pool
+        console.log('User does not exist in Cognito:', error);
+        return false;
+    }
+}
+
+export { signUpUser, signInUser, checkCognitoUser };

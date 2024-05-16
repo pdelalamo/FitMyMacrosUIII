@@ -16,7 +16,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.fitMyMacrosUI"
+      "bundleIdentifier": "com.anonymous.fitMyMacrosUI",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.868426694791-7hkokdrjblj8juvi4qpbu2s3stgts7fo"
+            ]
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,10 +37,16 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "scheme": [
+      "com.anonymous.fitMyMacrosUI",
+      "fitMyMacrosUI",
+      "fb340273652494315"
+    ],
     "extra": {
       "eas": {
         "projectId": "a42addbf-5da5-41b0-b80d-9d41f89ceb66"
       }
-    }
+    },
+    "owner": "pabloskixd23"
   }
 }

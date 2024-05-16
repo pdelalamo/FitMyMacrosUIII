@@ -873,5 +873,6 @@
     "emptyAlert": "Please fill in all fields",
     "nMatchPwd": "Passwords do not match",
     "invalidEmailFormat": "Invalid email format",
-    "passwordTooShort": "Password must be at least 8 characters long"
+    "passwordTooShort": "Password must be at least 8 characters long",
+    "alreadyExistingUser": "Already existing user, please re open the app and sign in."
 }

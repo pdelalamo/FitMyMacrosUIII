@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitmymacrosui-dev-9dda8-authRole",
+      "UnauthRoleArn": "arn:aws:iam::829527069263:role/amplify-fitmymacrosui-dev-9dda8-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::829527069263:role/amplify-fitmymacrosui-dev-9dda8-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-fitmymacrosui-dev-9dda8-deployment",
+      "UnauthRoleName": "amplify-fitmymacrosui-dev-9dda8-unauthRole",
+      "StackName": "amplify-fitmymacrosui-dev-9dda8",
+      "StackId": "arn:aws:cloudformation:eu-west-3:829527069263:stack/amplify-fitmymacrosui-dev-9dda8/63c109b0-00e9-11ef-bc36-0a22ee1772bd",
+      "AmplifyAppId": "dlszadzska29n"
+    }
+  }
+}
