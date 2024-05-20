@@ -5,7 +5,6 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Product, finishTransaction, getProducts, purchaseErrorListener, purchaseUpdatedListener, requestPurchase } from 'react-native-iap';
 import { constants } from '../utils/constants';
 
 interface Props {
@@ -15,7 +14,7 @@ interface Props {
 const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
+    // const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setLoading] = useState(true);
     // Check if running on iOS emulator
     const isIOSEmulator = Platform.OS === 'ios' && Platform.constants.interfaceIdiom === 'handset';
@@ -92,7 +91,7 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
             setModalVisible(false);
             setLoading(true)
             try {
-                await requestPurchase({ skus: [productId] });
+                // await requestPurchase({ skus: [productId] });
             } catch (error) {
                 Alert.alert('Error occurred while making purchase')
             }
