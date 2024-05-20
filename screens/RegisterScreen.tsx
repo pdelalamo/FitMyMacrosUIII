@@ -57,23 +57,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     useEffect(() => {
-        if (responseF?.type === 'success' && responseF.authentication) {
-            (async () => {
-                const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${responseF.authentication?.accessToken}&fields=id,email,name,picture.type(large)`);
-                const userInfo = await userInfoResponse.json();
-                setUserInfo(userInfo);
-                if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((userExistsInPool)) {
-                        console.log("Already registered user");
-                        Alert.alert(t('alreadyExistingUser'));
-                    } else {
-                        signUpUser(user.email, generateRandomPassword(10));
-                        navigation.navigate('MainScreen');
-                    }
-                }
-            })();
-        }
+        handleFacebookLogin();
     }, [responseF]);
 
 
@@ -103,11 +87,23 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         }
     };
 
-    const handleFacebookLogin = async () => {
-        const result = await promptAsyncF();
-        if (result.type !== "success") {
-            Alert.alert('Facebook Sign-In is not available at the moment. Please try again later.');
-            return;
+    async function handleFacebookLogin() {
+        if (responseF?.type === 'success' && responseF.authentication) {
+            (async () => {
+                const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${responseF.authentication?.accessToken}&fields=id,email,name,picture.type(large)`);
+                const userInfo = await userInfoResponse.json();
+                setUserInfo(userInfo);
+                if (userInfo) {
+                    const userExistsInPool = await checkCognitoUser(user.email);
+                    if ((userExistsInPool)) {
+                        console.log("Already registered user");
+                        Alert.alert(t('alreadyExistingUser'));
+                    } else {
+                        signUpUser(user.email, generateRandomPassword(10));
+                        navigation.navigate('MainScreen');
+                    }
+                }
+            })();
         }
     };
 
@@ -195,7 +191,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                             <Text style={federatedStyles.buttonText}>{t('registerGoogle')}</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#1877f2' }]} onPress={handleFacebookLogin}>
+                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#1877f2' }]} onPress={() => { promptAsyncF() }}>
                         <View style={federatedStyles.buttonContent}>
                             <FontAwesome name="facebook" size={24} color="#fff" style={federatedStyles.icon} />
                             <Text style={federatedStyles.buttonText}>{t('registerFacebook')}</Text>
