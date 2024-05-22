@@ -20,7 +20,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                             <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RecipeFeature')}>
                                 <Text style={globalStyles.buttonText}>{t('getStarted')}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={globalStyles.buttonGrey} onPress={() => navigation.navigate('SignIn')}>
+                            <TouchableOpacity style={globalStyles.buttonGrey} onPress={() => navigation.navigate('SignInScreen')}>
                                 <Text style={globalStyles.buttonText}>{t('signIn')}</Text>
                             </TouchableOpacity>
                         </View>

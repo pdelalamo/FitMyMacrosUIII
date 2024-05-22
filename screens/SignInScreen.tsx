@@ -6,7 +6,7 @@ import i18n from '../i18n';
 import { t } from 'i18next';
 import { AntDesign, FontAwesome, Entypo } from '@expo/vector-icons';
 import { federatedStyles } from '../federatedStyles';
-import { checkCognitoUser, signUpUser } from '../utils/AWSCognito';
+import { checkCognitoUser, signInUser, signUpUser } from '../utils/AWSCognito';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
@@ -25,7 +25,7 @@ interface Props {
     navigation: any;
 }
 
-const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -73,11 +73,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 console.log("email from user from google: " + user.email);
                 if (userInfo) {
                     const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((userExistsInPool)) {
-                        console.log("user aalready exists");
-                        Alert.alert(t('alreadyExistingUser'));
+                    if ((!userExistsInPool)) {
+                        Alert.alert(t('nonExistingUser'));
                     } else {
-                        signUpUser(user.email, generateRandomPassword(10));
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -95,11 +93,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 setUserInfo(userInfo);
                 if (userInfo) {
                     const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((userExistsInPool)) {
-                        console.log("Already registered user");
-                        Alert.alert(t('alreadyExistingUser'));
+                    if ((!userExistsInPool)) {
+                        Alert.alert(t('nonExistingUser'));
                     } else {
-                        signUpUser(user.email, generateRandomPassword(10));
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -111,47 +107,19 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         // Implement Apple Sign-In and federatedSignIn with AWS Cognito
     };
 
-    async function registerWithEmailPassword() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
-            Alert.alert(t('emptyAlert'));
-            return;
-        }
-        else if (!emailRegex.test(email)) {
-            Alert.alert(t('invalidEmailFormat'));
-            return;
-        }
-        else if (email.trim() && password.trim() && !confirmPassword.trim()) {
-            Alert.alert(t('confirmPassword'));
-            return;
-        }
-        else if (password.length < 8) {
-            Alert.alert(t('passwordTooShort'));
-            return;
-        }
-        else if (password !== confirmPassword) {
-            Alert.alert(t('nMatchPwd'));
-            return;
-        }
+    async function loginWithEmailPassword() {
         const userExistsInPool = await checkCognitoUser(email);
-        if ((userExistsInPool)) {
-            console.log("user already exists");
-            Alert.alert(t('alreadyExistingUser'));
+        if ((!userExistsInPool)) {
+            Alert.alert(t('nonExistingUser'));
         } else {
-            signUpUser(email, generateRandomPassword(10));
-            navigation.navigate('MainScreen');
+            const response = await signInUser(email, password);
+            if ((response === 'ok')) {
+                navigation.navigate('MainScreen');
+            } else {
+                Alert.alert(t('incorrectPassword'));
+            }
         }
     };
-
-    function generateRandomPassword(length: number) {
-        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
-        let password = '';
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * charset.length);
-            password += charset[randomIndex];
-        }
-        return password;
-    }
 
     return (
         <I18nextProvider i18n={i18n}>
@@ -170,15 +138,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         onChangeText={setPassword}
                         value={password}
                     />
-                    <TextInput
-                        style={globalStyles.input}
-                        placeholder={t('confirmPassword')}
-                        secureTextEntry
-                        onChangeText={setConfirmPassword}
-                        value={confirmPassword}
-                    />
-                    <TouchableOpacity style={styles.confirmButton} onPress={registerWithEmailPassword}>
-                        <Text style={styles.confirmButtonText}>{t('registerEmailPwd')}</Text>
+                    <TouchableOpacity style={styles.confirmButton} onPress={() => { loginWithEmailPassword() }}>
+                        <Text style={styles.confirmButtonText}>{t('signInEmailPwd')}</Text>
                     </TouchableOpacity>
                     <View style={federatedStyles.separator}>
                         <View style={federatedStyles.line} />
@@ -188,13 +149,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#DB4437' }]} onPress={() => { promptAsync() }}>
                         <View style={federatedStyles.buttonContent}>
                             <AntDesign name="google" size={24} color="#fff" style={federatedStyles.icon} />
-                            <Text style={federatedStyles.buttonText}>{t('registerGoogle')}</Text>
+                            <Text style={federatedStyles.buttonText}>{t('signInGoogle')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#1877f2' }]} onPress={() => { promptAsyncF() }}>
                         <View style={federatedStyles.buttonContent}>
                             <FontAwesome name="facebook" size={24} color="#fff" style={federatedStyles.icon} />
-                            <Text style={federatedStyles.buttonText}>{t('registerFacebook')}</Text>
+                            <Text style={federatedStyles.buttonText}>{t('signInFacebook')}</Text>
                         </View>
                     </TouchableOpacity>
                     {/* <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#000000' }]} onPress={handleAppleLogin}>
@@ -224,6 +185,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    resetButton: {
+        width: '80%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        borderRadius: 5,
+        backgroundColor: '#f44336',
+    },
+    resetButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
-export default RegisterScreen;
+export default SignInScreen;

@@ -49,8 +49,10 @@ const signInUser = async (email: string, password: string) => {
 
         const data = await cognitoIdentityServiceProvider.initiateAuth(params).promise();
         console.log('User signed in successfully:', data.AuthenticationResult);
+        return 'ok';
     } catch (error) {
         console.error('Error signing in user:', error);
+        return error;
     }
 };
 
@@ -83,5 +85,6 @@ async function checkCognitoUser(email: string) {
         return false;
     }
 }
+
 
 export { signUpUser, signInUser, checkCognitoUser };
