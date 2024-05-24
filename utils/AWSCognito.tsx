@@ -23,7 +23,7 @@ const signUpUser = async (email: string, password: string) => {
             UserAttributes: [
                 {
                     Name: 'email',
-                    Value: email
+                    Value: email.toLowerCase()
                 }
             ]
         };
@@ -57,11 +57,11 @@ const signInUser = async (email: string, password: string) => {
 };
 
 function toUsername(email: string) {
-    return email.replace('@', '-at-');
+    return email.replace('@', '-at-').toLowerCase();;
 }
 
 function toEmail(email: string) {
-    return email.replace('-at-', '@');
+    return email.replace('-at-', '@').toLowerCase();
 }
 
 /**

@@ -43,37 +43,39 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     });
 
     useEffect(() => {
-        handleGoogleSignIn();
+        console.log('useEffect triggered with response:', response);
+        if (response) {
+            handleGoogleSignIn();
+        }
     }, [response]);
 
     async function handleGoogleSignIn() {
-        if (response?.type === 'success' && response.authentication) {
-            console.log("response token : " + response.authentication.accessToken);
-            setGoogleAccessToken(response.authentication.accessToken);
-            await fetchUserInfo();
-        } else {
-            return;
+        try {
+            if (response?.type === 'success' && response.authentication) {
+                console.log("response token : " + response.authentication.accessToken);
+                setGoogleAccessToken(response.authentication.accessToken);
+                await fetchUserInfo(response.authentication.accessToken); // Pass the token directly
+            } else {
+                console.log('Google sign-in not successful or no authentication response ');
+            }
+        } catch (error) {
+            console.error('Error in handleGoogleSignIn:', error);
         }
     };
 
-    useEffect(() => {
-        handleFacebookLogin();
-    }, [responseF]);
-
-
-    const fetchUserInfo = async () => {
-        if (googleAccessToken) {
+    const fetchUserInfo = async (token: string) => {
+        if (token) {
             try {
                 const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-                    headers: { Authorization: `Bearer ${googleAccessToken}` },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 const userInfo = await response.json();
                 await AsyncStorage.setItem("@user", JSON.stringify(userInfo));
                 setUserInfo(userInfo);
-                console.log("email from user from google: " + user.email);
+                console.log("email from user from google: " + userInfo.email);
                 if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((!userExistsInPool)) {
+                    const userExistsInPool = await checkCognitoUser(userInfo.email); // Changed user.email to userInfo.email
+                    if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
                         navigation.navigate('MainScreen');
@@ -85,23 +87,29 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    useEffect(() => {
+        handleFacebookLogin();
+    }, [responseF]);
+
     async function handleFacebookLogin() {
-        if (responseF?.type === 'success' && responseF.authentication) {
-            (async () => {
+        try {
+            if (responseF?.type === 'success' && responseF.authentication) {
                 const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${responseF.authentication?.accessToken}&fields=id,email,name,picture.type(large)`);
                 const userInfo = await userInfoResponse.json();
                 setUserInfo(userInfo);
                 if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((!userExistsInPool)) {
+                    const userExistsInPool = await checkCognitoUser(userInfo.email); // Changed user.email to userInfo.email
+                    if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
                         navigation.navigate('MainScreen');
                     }
                 }
-            })();
+            }
+        } catch (error) {
+            console.error('Error during Facebook login:', error);
         }
-    };
+    }
 
     const handleAppleLogin = async () => {
         // Implement Apple Sign-In and federatedSignIn with AWS Cognito
