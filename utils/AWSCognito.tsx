@@ -57,7 +57,7 @@ const signInUser = async (email: string, password: string) => {
 };
 
 function toUsername(email: string) {
-    return email.replace('@', '-at-').toLowerCase();;
+    return email.replace('@', '-at-').toLowerCase();
 }
 
 function toEmail(email: string) {
@@ -86,5 +86,27 @@ async function checkCognitoUser(email: string) {
     }
 }
 
+const verifyEmail = async (email: any) => {
+    const params = {
+        UserPoolId: 'eu-west-3_dczxHeKz4',
+        Username: toUsername(email),
+        UserAttributes: [
+            {
+                Name: 'email_verified',
+                Value: 'true'
+            }
+        ]
+    };
 
-export { signUpUser, signInUser, checkCognitoUser };
+    try {
+        await cognitoIdentityServiceProvider.adminUpdateUserAttributes(params).promise();
+        console.log('Email verified successfully');
+        return true;
+    } catch (error) {
+        console.error('Error verifying email:', error);
+        return false;
+    }
+};
+
+
+export { signUpUser, signInUser, checkCognitoUser, verifyEmail };

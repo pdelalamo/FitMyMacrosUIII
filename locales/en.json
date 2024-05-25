@@ -879,5 +879,9 @@
     "passwordTooShort": "Password must be at least 8 characters long",
     "alreadyExistingUser": "Already existing user, please re open the app and sign in.",
     "nonExistingUser": "Non existing account, please go back and click on get started.",
-    "incorrectPassword": "Incorrect password, please try again or reset your password"
+    "incorrectPassword": "Incorrect password, please try again or reset your password",
+    "succesfulReset": "Password reset code sent successfully!",
+    "failedReset": "Password reset failed",
+    "resetPassword": "Reset Password",
+    "passResetError": "There was an error reseting your password. Please try again later or contact technical support."
 }

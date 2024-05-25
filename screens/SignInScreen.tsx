@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert, Modal } from 'react-native';
 import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
 import { AntDesign, FontAwesome, Entypo } from '@expo/vector-icons';
 import { federatedStyles } from '../federatedStyles';
-import { checkCognitoUser, signInUser, signUpUser } from '../utils/AWSCognito';
+import { checkCognitoUser, signInUser, signUpUser, verifyEmail } from '../utils/AWSCognito';
+import { CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
@@ -25,6 +26,13 @@ interface Props {
     navigation: any;
 }
 
+const poolData = {
+    UserPoolId: 'eu-west-3_dczxHeKz4',
+    ClientId: '11tdf482ao63ga4r2katsaedd0',
+};
+
+const userPool = new CognitoUserPool(poolData);
+
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -41,6 +49,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
         clientId: "340273652494315",
     });
+    const [modalVisible, setModalVisible] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
 
     useEffect(() => {
         console.log('useEffect triggered with response:', response);
@@ -54,7 +64,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             if (response?.type === 'success' && response.authentication) {
                 console.log("response token : " + response.authentication.accessToken);
                 setGoogleAccessToken(response.authentication.accessToken);
-                await fetchUserInfo(response.authentication.accessToken); // Pass the token directly
+                await fetchUserInfo(response.authentication.accessToken);
             } else {
                 console.log('Google sign-in not successful or no authentication response ');
             }
@@ -74,7 +84,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 setUserInfo(userInfo);
                 console.log("email from user from google: " + userInfo.email);
                 if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(userInfo.email); // Changed user.email to userInfo.email
+                    const userExistsInPool = await checkCognitoUser(userInfo.email);
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
@@ -129,6 +139,32 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    async function resetPassword() {
+        const userData = {
+            Username: resetEmail.replace('@', '-at-').toLowerCase(),
+            Pool: userPool,
+        };
+
+        const cognitoUser = new CognitoUser(userData);
+        const verified = await verifyEmail(resetEmail);
+
+        if (verified) {
+            cognitoUser.forgotPassword({
+                onSuccess: (data) => {
+                    console.log('Password reset code sent:', data);
+                    Alert.alert(t('succesfulReset'));
+                    setModalVisible(false);
+                },
+                onFailure: (err) => {
+                    console.error('Password reset failed:', err);
+                    Alert.alert(t('passResetError'), err.message || JSON.stringify(err));
+                },
+            });
+        } else {
+            Alert.alert(t('passResetError'));
+        }
+    };
+
     return (
         <I18nextProvider i18n={i18n}>
             <ImageBackground source={require('../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackgroundFull}>
@@ -149,6 +185,9 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     <TouchableOpacity style={styles.confirmButton} onPress={() => { loginWithEmailPassword() }}>
                         <Text style={styles.confirmButtonText}>{t('signInEmailPwd')}</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.resetButton} onPress={() => setModalVisible(true)}>
+                        <Text style={styles.resetButtonText}>{t('resetPassword')}</Text>
+                    </TouchableOpacity>
                     <View style={federatedStyles.separator}>
                         <View style={federatedStyles.line} />
                         <Text style={federatedStyles.orText}>{t('or')}</Text>
@@ -166,14 +205,40 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                             <Text style={federatedStyles.buttonText}>{t('signInFacebook')}</Text>
                         </View>
                     </TouchableOpacity>
-                    {/* <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#000000' }]} onPress={handleAppleLogin}>
-                        <View style={federatedStyles.buttonContent}>
-                            <FontAwesome name="apple" size={24} color="#fff" style={federatedStyles.icon} />
-                            <Text style={federatedStyles.buttonText}>{t('registerApple')}</Text>
-                        </View>
-                    </TouchableOpacity> */}
                 </View>
             </ImageBackground>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>{t('resetPassword')}</Text>
+                        <TextInput
+                            style={globalStyles.input}
+                            placeholder={t('email')}
+                            onChangeText={setResetEmail}
+                            value={resetEmail}
+                        />
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => resetPassword()}
+                        >
+                            <Text style={styles.textStyle}>{t('submit')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={styles.textStyle}>{t('cancel')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </I18nextProvider>
     );
 };
@@ -200,12 +265,51 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
         borderRadius: 5,
-        backgroundColor: '#f44336',
+        backgroundColor: '#BDBDBD',
     },
     resetButtonText: {
-        color: '#fff',
+        color: 'black',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginTop: 10,
+    },
+    buttonClose: {
+        backgroundColor: '#2196F3',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
     },
 });
 
