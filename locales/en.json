@@ -883,5 +883,13 @@
     "succesfulReset": "Password reset code sent successfully!",
     "failedReset": "Password reset failed",
     "resetPassword": "Reset Password",
-    "passResetError": "There was an error reseting your password. Please try again later or contact technical support."
+    "passResetError": "There was an error reseting your password. Please try again later or contact technical support.",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "sendCode": "Send Reset Code",
+    "enterCodeNewPassword": "Enter received code and new password",
+    "changePassword": "Change Password",
+    "verificationCode": "Verification Code",
+    "newPassword": "New Password",
+    "wrongEmail": "Non registered email address. Please provide an already registered email address."
 }

@@ -38,19 +38,19 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showEmailPasswordFields, setShowEmailPasswordFields] = useState(false);
-
-    const toggleEmailPasswordFields = () => {
-        setShowEmailPasswordFields(!showEmailPasswordFields);
-    };
+    const [modalVisible, setModalVisible] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [isCodeSent, setIsCodeSent] = useState(false);
     const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
     const [user, setUserInfo] = useState<any>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [request, response, promptAsync] = Google.useAuthRequest(config);
     const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
         clientId: "340273652494315",
     });
-    const [modalVisible, setModalVisible] = useState(false);
-    const [resetEmail, setResetEmail] = useState('');
 
     useEffect(() => {
         console.log('useEffect triggered with response:', response);
@@ -140,6 +140,11 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     async function resetPassword() {
+        const userExistsInPool = await checkCognitoUser(resetEmail);
+        if ((!userExistsInPool)) {
+            Alert.alert(t('wrongEmail'));
+            return
+        }
         const userData = {
             Username: resetEmail.replace('@', '-at-').toLowerCase(),
             Pool: userPool,
@@ -153,16 +158,39 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 onSuccess: (data) => {
                     console.log('Password reset code sent:', data);
                     Alert.alert(t('succesfulReset'));
-                    setModalVisible(false);
+                    setIsCodeSent(true);
                 },
                 onFailure: (err) => {
                     console.error('Password reset failed:', err);
                     Alert.alert(t('passResetError'), err.message || JSON.stringify(err));
+                    setModalVisible(false);
                 },
             });
         } else {
             Alert.alert(t('passResetError'));
         }
+    };
+
+    const confirmNewPassword = async () => {
+        const userData = {
+            Username: resetEmail,
+            Pool: userPool,
+        };
+
+        const cognitoUser = new CognitoUser(userData);
+
+        cognitoUser.confirmPassword(verificationCode, newPassword, {
+            onSuccess: (result) => {
+                console.log('Password reset successfully:', result);
+                Alert.alert('Password reset successfully!');
+                setModalVisible(false);
+                setIsCodeSent(false);
+            },
+            onFailure: (err) => {
+                console.log('Password reset confirmation failed:', err);
+                Alert.alert('Password reset confirmation failed', err.message || JSON.stringify(err));
+            },
+        });
     };
 
     return (
@@ -217,22 +245,49 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>{t('resetPassword')}</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder={t('email')}
-                            onChangeText={setResetEmail}
-                            value={resetEmail}
-                        />
+                        {!isCodeSent ? (
+                            <>
+                                <Text style={styles.modalText}>{t('resetPassword')}</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('email')}
+                                    onChangeText={setResetEmail}
+                                    value={resetEmail}
+                                />
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={resetPassword}
+                                >
+                                    <Text style={styles.textStyle}>{t('sendCode')}</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <>
+                                <Text style={styles.modalText}>{t('enterCodeNewPassword')}</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('verificationCode')}
+                                    onChangeText={setVerificationCode}
+                                    value={verificationCode}
+                                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('newPassword')}
+                                    secureTextEntry
+                                    onChangeText={setNewPassword}
+                                    value={newPassword}
+                                />
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={confirmNewPassword}
+                                >
+                                    <Text style={styles.textStyle}>{t('changePassword')}</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
                         <TouchableOpacity
                             style={[styles.button, styles.buttonClose]}
-                            onPress={() => resetPassword()}
-                        >
-                            <Text style={styles.textStyle}>{t('submit')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
+                            onPress={() => { setModalVisible(!modalVisible), setIsCodeSent(false) }}
                         >
                             <Text style={styles.textStyle}>{t('cancel')}</Text>
                         </TouchableOpacity>
@@ -292,15 +347,29 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
+        height: '60%',
+        width: '70%',
     },
     button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-        marginTop: 10,
+        width: '80%',
+        height: '15%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        borderRadius: 5,
+        backgroundColor: '#3f51b5',
+    },
+    buttonOpen: {
+        backgroundColor: '#F194FF',
     },
     buttonClose: {
-        backgroundColor: '#2196F3',
+        width: '80%',
+        height: '15%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        borderRadius: 5,
+        backgroundColor: '#3f51b5',
     },
     textStyle: {
         color: 'white',
@@ -310,6 +379,11 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+    },
+    input: {
+        width: '80%',
+        height: '20%',
+        marginBottom: '3%',
     },
 });
 
