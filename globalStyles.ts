@@ -192,4 +192,55 @@ export const globalStyles = StyleSheet.create({
         borderRadius: 5,
         padding: '2%'
     },
+    containerMain: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    header: {
+        padding: 20,
+        backgroundColor: 'green',
+        alignItems: 'center',
+    },
+    headerText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    mealsContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
+        marginTop: 10,
+    },
+    mealBox: {
+        backgroundColor: '#f0f0f0',
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    mealName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    mealCalories: {
+        fontSize: 16,
+        color: 'gray',
+    },
+    addButton: {
+        backgroundColor: 'green',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        margin: 20,
+    },
+    addButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: 'green',
+        paddingVertical: 10,
+    },
 });
