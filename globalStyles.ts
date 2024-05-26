@@ -198,7 +198,7 @@ export const globalStyles = StyleSheet.create({
     },
     header: {
         padding: 20,
-        backgroundColor: 'green',
+        backgroundColor: '#A3D977',
         alignItems: 'center',
     },
     headerText: {
@@ -241,6 +241,27 @@ export const globalStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         backgroundColor: 'green',
-        paddingVertical: 10,
+        height: '10%',
+        paddingVertical: 20,
+    },
+    caloriesContainer: {
+        alignItems: 'center',
+    },
+    caloriesText: {
+        color: 'black',
+        fontSize: 14,
+        marginTop: 5,
+    },
+    macrosContainer: {
+        flexDirection: 'row',
+    },
+    macroBox: {
+        alignItems: 'center',
+        marginLeft: 10,
+    },
+    macroText: {
+        color: 'black',
+        fontSize: 12,
+        marginTop: 5,
     },
 });
