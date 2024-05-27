@@ -6,6 +6,7 @@ import { I18nextProvider, useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import Toast from 'react-native-root-toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
     navigation: any;
@@ -22,6 +23,7 @@ const MeasurementPreferences: React.FC<Props> = ({ navigation }) => {
 
 
     const handleSelectWeightPreference = (preference: string) => {
+        AsyncStorage.setItem("measurementSolid", preference);
         setWeightPreference(preference);
     };
 

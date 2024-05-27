@@ -29,6 +29,7 @@
     "expo-status-bar": "~1.11.1",
     "expo-web-browser": "~12.8.2",
     "i18next": "^23.11.2",
+    "node-schedule": "^2.1.1",
     "react": "18.2.0",
     "react-circle-progress-bar": "^0.1.4",
     "react-dom": "18.2.0",

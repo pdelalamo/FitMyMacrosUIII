@@ -891,5 +891,7 @@
     "changePassword": "Change Password",
     "verificationCode": "Verification Code",
     "newPassword": "New Password",
-    "wrongEmail": "Non registered email address. Please provide an already registered email address."
+    "wrongEmail": "Non registered email address. Please provide an already registered email address.",
+    "addMeal": "Add New Meal",
+    "of": "of"
 }

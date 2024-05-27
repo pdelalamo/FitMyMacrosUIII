@@ -192,15 +192,6 @@ export const globalStyles = StyleSheet.create({
         borderRadius: 5,
         padding: '2%'
     },
-    containerMain: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
-    header: {
-        padding: 20,
-        backgroundColor: '#A3D977',
-        alignItems: 'center',
-    },
     headerText: {
         color: 'white',
         fontSize: 20,
@@ -211,26 +202,68 @@ export const globalStyles = StyleSheet.create({
         paddingHorizontal: 20,
         marginTop: 10,
     },
+    containerMain: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        padding: 20,
+        paddingTop: 40,
+        backgroundColor: 'white',
+    },
+    headerWithBackground: {
+        padding: 20,
+        paddingTop: 40,
+        backgroundColor: 'linear-gradient(to right, #e0f7fa, #e1bee7)', // Light gradient background
+    },
+    caloriesContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    caloriesText: {
+        marginTop: 10,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    macrosContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    macroBox: {
+        alignItems: 'center',
+    },
+    macroText: {
+        marginTop: 5,
+        fontSize: 14,
+        color: '#333',
+    },
     mealBox: {
-        backgroundColor: '#f0f0f0',
         padding: 15,
-        borderRadius: 10,
         marginBottom: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 2,
     },
     mealName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
+        color: '#333',
     },
     mealCalories: {
-        fontSize: 16,
-        color: 'gray',
+        fontSize: 14,
+        color: '#666',
     },
     addButton: {
-        backgroundColor: 'green',
+        margin: 20,
         padding: 15,
+        backgroundColor: '#4caf50',
         borderRadius: 10,
         alignItems: 'center',
-        margin: 20,
     },
     addButtonText: {
         color: 'white',
@@ -240,28 +273,7 @@ export const globalStyles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        backgroundColor: 'green',
-        height: '10%',
-        paddingVertical: 20,
-    },
-    caloriesContainer: {
-        alignItems: 'center',
-    },
-    caloriesText: {
-        color: 'black',
-        fontSize: 14,
-        marginTop: 5,
-    },
-    macrosContainer: {
-        flexDirection: 'row',
-    },
-    macroBox: {
-        alignItems: 'center',
-        marginLeft: 10,
-    },
-    macroText: {
-        color: 'black',
-        fontSize: 12,
-        marginTop: 5,
+        padding: 15,
+        backgroundColor: '#4caf50',
     },
 });

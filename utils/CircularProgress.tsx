@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Text as SvgText, TSpan } from 'react-native-svg';
 import { View, ViewStyle } from 'react-native';
 
 type CircularProgressProps = {
@@ -51,12 +51,12 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
                     x={size / 2}
                     y={size / 2}
                     textAnchor="middle"
-                    dy=".3em"
-                    fontSize={Math.min(size / 4, 30)} // Adjust font size based on circle size
+                    alignmentBaseline="middle"
+                    fontSize={size / 5} // Adjust font size based on circle size
                     fill={color}
-                    fontWeight="bold" // Make the text bold
+                    fontWeight="bold"
                 >
-                    {Math.round(percentage)}%
+                    {`${Math.round(percentage)}%`}
                 </SvgText>
             </Svg>
         </View>
