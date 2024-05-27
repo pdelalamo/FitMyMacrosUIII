@@ -4,6 +4,8 @@ import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
     navigation: any;

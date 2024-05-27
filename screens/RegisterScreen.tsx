@@ -78,6 +78,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         Alert.alert(t('alreadyExistingUser'));
                     } else {
                         signUpUser(user.email, generateRandomPassword(10));
+                        await AsyncStorage.setItem("isUserSignedIn", 'true');
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -100,6 +101,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         Alert.alert(t('alreadyExistingUser'));
                     } else {
                         signUpUser(user.email, generateRandomPassword(10));
+                        await AsyncStorage.setItem("isUserSignedIn", 'true');
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -139,6 +141,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             Alert.alert(t('alreadyExistingUser'));
         } else {
             signUpUser(email, generateRandomPassword(10));
+            await AsyncStorage.setItem("isUserSignedIn", 'true');
             navigation.navigate('MainScreen');
         }
     };

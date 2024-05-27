@@ -1,6 +1,8 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import HomeScreen from '../screens/HomeScreen';
 import RecipeFeature from '../screens/productFeatures/RecipeFeature';
 import GoalsFeature from '../screens/productFeatures/GoalsFeature';
@@ -14,17 +16,36 @@ import Allergies from '../screens/initialQuestions/Allergies';
 import MeasurementPreferences from '../screens/initialQuestions/MeasurementPreferences';
 import FreeTrialScreen from '../screens/FreeTrialScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import MainScreen from 'screens/MainScreen';
-import SignInScreen from 'screens/SignInScreen';
+import MainScreen from '../screens/MainScreen';
+import SignInScreen from '../screens/SignInScreen';
 
 const Stack = createNativeStackNavigator();
 
 const Navigation: React.FC = () => {
+    const [initialRoute, setInitialRoute] = useState<string | null>(null);
+
+    useEffect(() => {
+        const checkUserStatus = async () => {
+            const isUserSignedIn = await AsyncStorage.getItem('isUserSignedIn');
+            if (isUserSignedIn === 'true') {
+                setInitialRoute('MainScreen');
+            } else {
+                setInitialRoute('HomeScreen');
+            }
+        };
+
+        checkUserStatus();
+    }, []);
+
+    if (initialRoute === null) {
+        return null;
+    }
+
     return (
         <UserPreferencesProvider>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName="Home">
-                    <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Navigator initialRouteName={initialRoute}>
+                    <Stack.Screen name="HomeScreen" component={HomeScreen} />
                     <Stack.Screen name="RecipeFeature" component={RecipeFeature} />
                     <Stack.Screen name="GoalsFeature" component={GoalsFeature} />
                     <Stack.Screen name="AiFeature" component={AiFeature} />
@@ -42,6 +63,6 @@ const Navigation: React.FC = () => {
             </NavigationContainer>
         </UserPreferencesProvider>
     );
-}
+};
 
 export default Navigation;

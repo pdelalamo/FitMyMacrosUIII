@@ -88,6 +88,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        await AsyncStorage.setItem("isUserSignedIn", 'true');
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -112,6 +113,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        await AsyncStorage.setItem("isUserSignedIn", 'true');
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -132,6 +134,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         } else {
             const response = await signInUser(email, password);
             if ((response === 'ok')) {
+                await AsyncStorage.setItem("isUserSignedIn", 'true');
                 navigation.navigate('MainScreen');
             } else {
                 Alert.alert(t('incorrectPassword'));
