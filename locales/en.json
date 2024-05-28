@@ -893,5 +893,19 @@
     "newPassword": "New Password",
     "wrongEmail": "Non registered email address. Please provide an already registered email address.",
     "addMeal": "Add New Meal",
-    "of": "of"
+    "of": "of",
+    "generateRecipes": "Generate Recipes",
+    "proteinPercentage": "Protein Percentage",
+    "carbsPercentage": "Carbs Percentage",
+    "fatPercentage": "Fat Percentage",
+    "targetCalories": "Desired Calories",
+    "error": "Error",
+    "macrosError": "The sum of protein, carbs, and fat percentages should be equal to 100%. Please adjust the values.",
+    "ok": "OK",
+    "generateNewRecipe": "Generate New Recipe",
+    "percentageAlert": "Total percentage of protein, carbs, and fat should be 100%.",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "incorrectCalories": "Calories should be a number in between 0 and 5000."
 }

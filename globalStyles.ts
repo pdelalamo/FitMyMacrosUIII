@@ -276,4 +276,56 @@ export const globalStyles = StyleSheet.create({
         padding: 15,
         backgroundColor: '#4caf50',
     },
+    modalContainerRecipe: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContentRecipe: {
+        width: '90%',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    dropdown: {
+        width: '100%',
+        marginVertical: 10,
+    },
+    dropdownPicker: {
+        zIndex: 5000, // Ensure the dropdown is on top
+    },
+    inputRecipe: {
+        width: '100%',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 10,
+        marginVertical: 10,
+    },
+    sliderContainer: {
+        width: '100%',
+        marginVertical: 10,
+    },
+    slider: {
+        width: '100%',
+    },
+    modalButton: {
+        backgroundColor: '#4caf50',
+        padding: 15,
+        marginTop: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });
