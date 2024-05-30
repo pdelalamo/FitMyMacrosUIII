@@ -206,6 +206,11 @@ export const globalStyles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f5f5',
     },
+    containerMainGeneration: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+        padding: '5%'
+    },
     header: {
         padding: 20,
         paddingTop: 40,
@@ -308,6 +313,7 @@ export const globalStyles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         marginVertical: 10,
+        backgroundColor: 'white'
     },
     sliderContainer: {
         width: '100%',
@@ -328,4 +334,22 @@ export const globalStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
+    modalText: {
+        fontSize: 16,
+        lineHeight: 24,
+        marginBottom: '5%',
+        color: '#333',
+    },
+    checkboxContainer: {
+        marginTop: 20,
+    },
+    checkboxRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    expandIngredientsInfo: {
+        fontSize: 12,
+        color: '#666',
+    },
+
 });

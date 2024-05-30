@@ -907,5 +907,71 @@
     "protein": "Protein",
     "carbs": "Carbs",
     "fat": "Fat",
-    "incorrectCalories": "Calories should be a number in between 0 and 5000."
+    "incorrectCalories": "Calories should be a number in between 0 and 5000.",
+    "flavors": {
+        "any": "Any",
+        "spicy": "Spicy",
+        "sweet": "Sweet",
+        "savory": "Savory",
+        "sour": "Sour",
+        "bitter": "Bitter",
+        "umami": "Umami",
+        "salty": "Salty",
+        "fruity": "Fruity",
+        "herby": "Herby",
+        "earthy": "Earthy"
+    },
+    "cuisines": {
+        "any": "Any",
+        "african": "African",
+        "american": "American",
+        "mediterranean": "Mediterranean",
+        "asian": "Asian",
+        "european": "European",
+        "latinAmerican": "Latin American",
+        "middleEastern": "Middle Eastern",
+        "indian": "Indian",
+        "chinese": "Chinese",
+        "japanese": "Japanese",
+        "korean": "Korean",
+        "thai": "Thai"
+    },
+    "satietyLevel": {
+        "any": "Any",
+        "satiating": "Satiating",
+        "nonSatiating": "Not Satiating"
+    },
+    "dietaryRestrictions": {
+        "none": "None",
+        "vegan": "Vegan",
+        "vegetarian": "Vegetarian",
+        "glutenFree": "Gluten-Free",
+        "keto": "Keto",
+        "paleo": "Paleo",
+        "pescatarian": "Pescatarian",
+        "dairyFree": "Dairy-Free",
+        "nutFree": "Nut-Free",
+        "halal": "Halal",
+        "kosher": "Kosher"
+    },
+    "cookingTimes": {
+        "30min": "30 minutes",
+        "1h": "1 hour",
+        "moreThan1h": "More than 1 hour"
+    },
+    "occasions": {
+        "breakfast": "Breakfast",
+        "lunch": "Lunch",
+        "snack": "Snack",
+        "dinner": "Dinner",
+        "any": "Any"
+    },
+    "selectSatietyLevel": "Select satiety level",
+    "selectCuisineStyle": "Select a cuisine style",
+    "selectFlavorProfile": "Select a flavor profile",
+    "selectDietaryRestrictions": "Select dietary restrictions",
+    "selectCookingTime": "Select maximum cooking time",
+    "selectOccasion": "Select an occasion",
+    "expandIngredients": "Expand Ingredients",
+    "expandIngredientsInfo": "By checking this box, recipes will be generated using any ingredients, not just the ones the user has available at home."
 }
