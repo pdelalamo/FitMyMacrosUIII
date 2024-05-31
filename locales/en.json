@@ -901,6 +901,7 @@
     "targetCalories": "Desired Calories",
     "error": "Error",
     "macrosError": "The sum of protein, carbs, and fat percentages should be equal to 100%. Please adjust the values.",
+    "dropdownsError": "To continue, first select values ​​for all dropdowns please.",
     "ok": "OK",
     "generateNewRecipe": "Generate New Recipe",
     "percentageAlert": "Total percentage of protein, carbs, and fat should be 100%.",

@@ -120,6 +120,12 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 t('macrosError'),
                 [{ text: t('ok') }]
             );
+        } else if (cuisine === '' || flavor === '' || satiety === '' || diet === '' || cookingTime === '' || occasion === '') {
+            Alert.alert(
+                t('error'),
+                t('dropdownsError'),
+                [{ text: t('ok') }]
+            );
         } else {
             setModalVisible(!modalVisible);
             // Proceed with generating recipes
@@ -132,7 +138,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         if (!isNaN(value) && value >= 0 && value <= 100) {
             return value;
         }
-        return proteinPercentage; // Return previous value if input is invalid
+        return proteinPercentage;
     };
 
     return (
@@ -147,7 +153,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         setValue={setCuisine}
                         placeholder={t('selectCuisineStyle')}
                         containerStyle={globalStyles.dropdown}
-                        zIndex={5000}
+                        zIndex={6000}
                     />
                     <DropDownPicker
                         open={flavorOpen}
@@ -157,7 +163,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         placeholder={t('selectFlavorProfile')}
                         setValue={setFlavor}
                         containerStyle={globalStyles.dropdown}
-                        zIndex={4000}
+                        zIndex={5000}
                     />
                     <DropDownPicker
                         open={satietyOpen}
@@ -221,7 +227,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                                 onChangeText={(text) => setProteinPercentage(validatePercentageInput(text))}
                             />
                             <Slider
-                                style={{ flex: 3, marginLeft: 10 }} // Adjust flex and margin as needed
+                                style={{ flex: 3, marginLeft: 10 }}
                                 minimumValue={0}
                                 maximumValue={100}
                                 value={proteinPercentage}
@@ -301,7 +307,6 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity
                     style={globalStyles.modalButton}
                     onPress={() => {
-                        // Add your function to generate recipes
                         handleGenerateRecipes();
                     }}
                 >
