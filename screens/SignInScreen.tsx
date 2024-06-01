@@ -135,6 +135,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             const response = await signInUser(email, password);
             if ((response === 'ok')) {
                 await AsyncStorage.setItem("isUserSignedIn", 'true');
+                await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                 navigation.navigate('MainScreen');
             } else {
                 Alert.alert(t('incorrectPassword'));

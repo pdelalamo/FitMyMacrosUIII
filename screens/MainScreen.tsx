@@ -25,12 +25,20 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     const fatConsumed = meals.reduce((total, meal) => total + meal.fat, 0);
     const targetFat = 80;
 
+    const getWeightPreference = async () => {
+        const storedPreferences = await AsyncStorage.getItem('userPreferences');
+        if (storedPreferences) {
+            const parsedPreferences = JSON.parse(storedPreferences);
+            return parsedPreferences.measurementPreferences.weight;
+        }
+        return null;
+    };
 
     useEffect(() => {
         const loadDailyMeals = async () => {
             try {
                 const mealsData = await AsyncStorage.getItem('meals');
-                const measurementSolid = await AsyncStorage.getItem('measurementSolid');
+                const measurementSolid = await getWeightPreference();
                 setMeasurement(measurementSolid === null ? '' : measurementSolid);
                 if (mealsData) {
                     const parsedMeals: Meal[] = JSON.parse(mealsData);
@@ -60,15 +68,15 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                     <View style={globalStyles.macrosContainer}>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(proteinConsumed / targetProtein) * 100} color="blue" />
-                            <Text style={globalStyles.macroText}>{proteinConsumed}/{targetProtein}{measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>{proteinConsumed}/{targetProtein} {measurementUnit}</Text>
                         </View>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(carbsConsumed / targetCarbs) * 100} color="orange" />
-                            <Text style={globalStyles.macroText}>{carbsConsumed}/{targetCarbs}{measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>{carbsConsumed}/{targetCarbs} {measurementUnit}</Text>
                         </View>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(fatConsumed / targetFat) * 100} color="red" />
-                            <Text style={globalStyles.macroText}>{fatConsumed}/{targetFat}{measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>{fatConsumed}/{targetFat} {measurementUnit}</Text>
                         </View>
                     </View>
                 </View>

@@ -19,6 +19,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import MainScreen from '../screens/MainScreen';
 import SignInScreen from '../screens/SignInScreen';
 import RecipeGeneration from 'screens/features/RecipeGeneration';
+import GeneratedRecipesList from 'screens/features/GeneratedRecipesList';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +62,7 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="MainScreen" component={MainScreen} />
                     <Stack.Screen name="SignInScreen" component={SignInScreen} />
                     <Stack.Screen name="RecipeGeneration" component={RecipeGeneration} />
+                    <Stack.Screen name="GeneratedRecipesList" component={GeneratedRecipesList} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

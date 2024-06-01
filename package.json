@@ -21,6 +21,7 @@
     "@types/i18next": "^13.0.0",
     "amazon-cognito-identity-js": "^6.3.12",
     "aws-sdk": "^2.1607.0",
+    "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "expo": "~50.0.15",
     "expo-auth-session": "~5.4.0",

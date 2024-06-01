@@ -7,6 +7,9 @@ import i18n from 'i18n';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Slider from '@react-native-community/slider';
 import CheckBox from '@react-native-community/checkbox';
+import SecurityApiService from 'services/SecurityApiService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 
 interface Props {
     navigation: any;
@@ -31,7 +34,8 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const [occasionOpen, setOccasionOpen] = useState(false);
     const [occasion, setOccasion] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
-    const windowHeight = Dimensions.get('window').height;
+    const [username, setUsername] = useState('');
+    const [opId, setOpId] = useState('');
 
     const flavorItems = [
         { label: t('flavors.any'), value: 'any' },
@@ -92,6 +96,19 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         { label: t('occasions.any'), value: 'any' },
     ];
 
+    useEffect(() => {
+        const loadDailyMeals = async () => {
+            try {
+                const uname = await AsyncStorage.getItem('username');
+                setUsername(uname === null ? '' : uname);
+            } catch (error) {
+                console.error('Error loading username', error);
+            }
+        };
+
+        loadDailyMeals();
+    }, []);
+
     const calculateMacros = () => {
         const total = parseInt(recipeTargetCalories, 10) || 0;
         const proteinGrams = Math.round((total * proteinPercentage) / 400);
@@ -102,7 +119,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
 
     const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
 
-    const handleGenerateRecipes = () => {
+    const handleGenerateRecipes = async () => {
         if (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 0 || Number(recipeTargetCalories) >= 5000) {
             // Show alert if calories is not a number in between 0 and 5000
             Alert.alert(
@@ -128,9 +145,57 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             );
         } else {
             setModalVisible(!modalVisible);
-            // Proceed with generating recipes
-            // Your code for generating recipes goes here
+            const username = 'pabloskixd23-at-gmail.com';
+            const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
+            const token = tokenResponse.body;
+            console.log('token: ' + token);
+
+            FitMyMacrosApiService.setAuthToken(token);
+            setOpId(generateRandomString(20));
+            const recipesResponse = await FitMyMacrosApiService.getRecipes({
+                measureUnit: getWeightPreference(),
+                calories: Number(recipeTargetCalories),
+                protein: proteinPercentage,
+                carbs: carbsPercentage,
+                fat: fatPercentage,
+                satietyLevel: satiety,
+                anyIngredientsMode: toggleCheckBox,
+                expandIngredients: false,
+                glutenFree: diet === 'glutenFree' ? true : false,
+                vegan: diet === 'vegan' ? true : false,
+                vegetarian: diet === 'vegetarian' ? true : false,
+                cuisineStyle: cuisine,
+                cookingTime: cookingTime,
+                flavor: flavor,
+                occasion: occasion,
+                userId: username,
+                precision: 'exactly',
+                opId: opId
+            });
+            const recipes = JSON.parse(recipesResponse.body);
+            await AsyncStorage.setItem('recipesList', recipes);
+            console.log('recipes: ' + recipes);
+            navigation.navigate('GeneratedRecipesList');
         }
+    };
+
+    function generateRandomString(length: number) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    const getWeightPreference = async () => {
+        const storedPreferences = await AsyncStorage.getItem('userPreferences');
+        if (storedPreferences) {
+            const parsedPreferences = JSON.parse(storedPreferences);
+            return parsedPreferences.measurementPreferences.weight;
+        }
+        return null;
     };
 
     const validatePercentageInput = (text: string): number => {
