@@ -87,7 +87,8 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
         savePreferences(preferences);
     }, [preferences]);
 
-    const setDietType = (diet: string) => {
+    const setDietType = async (diet: string) => {
+        await AsyncStorage.setItem('dietType', diet);
         setPreferences(prev => ({ ...prev, dietType: diet }));
     };
 
@@ -101,12 +102,20 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
         }));
     };
 
-    const addIngredientToMap = (key: string, value: string) => {
+    const addIngredientToMap = async (key: string, value: string) => {
         setPreferences(prev => {
             const newMap = new Map(prev.ingredientsMap);
             newMap.set(key, value);
             return { ...prev, ingredientsMap: newMap };
         });
+        try {
+            const updatedMap = new Map(preferences.ingredientsMap);
+            updatedMap.set(key, value);
+            const mapObject = Object.fromEntries(updatedMap);
+            await AsyncStorage.setItem('ingredientsMap', JSON.stringify(mapObject));
+        } catch (error) {
+            console.error('Error saving ingredients map to AsyncStorage:', error);
+        }
     };
 
     const removeIngredientFromMap = (key: string) => {
@@ -117,20 +126,47 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
         });
     };
 
-    const addAllergy = (allergy: string) => {
-        setPreferences(prev => ({ ...prev, allergies: [...prev.allergies, allergy] }));
+    const addAllergy = async (allergy: string) => {
+        const updatedAllergies = [...preferences.allergies, allergy];
+        setPreferences(prev => ({ ...prev, allergies: updatedAllergies }));
+
+        try {
+            await AsyncStorage.setItem('allergiesList', JSON.stringify(updatedAllergies));
+        } catch (error) {
+            console.error('Error saving allergies list to AsyncStorage:', error);
+        }
     };
 
-    const removeAllergy = (allergy: string) => {
-        setPreferences(prev => ({ ...prev, allergies: prev.allergies.filter(a => a !== allergy) }));
+    const removeAllergy = async (allergy: string) => {
+        const updatedAllergies = preferences.allergies.filter(a => a !== allergy);
+        setPreferences(prev => ({ ...prev, allergies: updatedAllergies }));
+
+        try {
+            await AsyncStorage.setItem('allergiesList', JSON.stringify(updatedAllergies));
+        } catch (error) {
+            console.error('Error saving allergies list to AsyncStorage:', error);
+        }
     };
 
-    const addEquipment = (equip: string) => {
+
+    const addEquipment = async (equip: string) => {
+        const updatedEquipment = [...preferences.equipment, equip];
         setPreferences(prev => ({ ...prev, equipment: [...prev.equipment, equip] }));
+        try {
+            await AsyncStorage.setItem('equipmentList', JSON.stringify(updatedEquipment));
+        } catch (error) {
+            console.error('Error saving equipment list to AsyncStorage:', error);
+        }
     };
 
-    const removeEquipment = (equip: string) => {
+    const removeEquipment = async (equip: string) => {
+        const updatedEquipment = preferences.equipment.filter(a => a !== equip);
         setPreferences(prev => ({ ...prev, equipment: prev.equipment.filter(e => e !== equip) }));
+        try {
+            await AsyncStorage.setItem('equipmentList', JSON.stringify(updatedEquipment));
+        } catch (error) {
+            console.error('Error saving equipment list to AsyncStorage:', error);
+        }
     };
 
     const value = {

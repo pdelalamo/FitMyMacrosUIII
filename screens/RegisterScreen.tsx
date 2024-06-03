@@ -11,6 +11,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 
 const config = {
     expoClientId: '868426694791-390ntagtjqcln514p6km7q9hr5tm0s5g.apps.googleusercontent.com',
@@ -41,6 +42,58 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
         clientId: "340273652494315",
     });
+
+    const [ingredientsMap, setIngredientsMap] = useState<Map<string, any>>(new Map());
+    const [allergies, setAllergies] = useState<string[]>([]);
+    const [equipment, setEquipment] = useState<string[]>([]);
+    const [dietType, setDietType] = useState<string | null>('');
+
+    useEffect(() => {
+        const loadPreferences = async () => {
+            try {
+                const savedMap = await AsyncStorage.getItem('ingredientsMap');
+                if (savedMap) {
+                    const parsedMap = new Map(Object.entries(JSON.parse(savedMap)));
+                    setIngredientsMap(parsedMap);
+                }
+            } catch (error) {
+                console.error('Error loading ingredients map from AsyncStorage:', error);
+            }
+        };
+        const loadAllergies = async () => {
+            try {
+                const savedAllergies = await AsyncStorage.getItem('allergiesList');
+                if (savedAllergies) {
+                    setAllergies(JSON.parse(savedAllergies));
+                }
+            } catch (error) {
+                console.error('Error loading allergies list from AsyncStorage:', error);
+            }
+        };
+        const loadDietType = async () => {
+            try {
+                const diet = await AsyncStorage.getItem('dietType');
+                setDietType(diet);
+            } catch (error) {
+                console.error('Error loading diet type list from AsyncStorage:', error);
+            }
+        };
+        const loadEquipment = async () => {
+            try {
+                const savedAEq = await AsyncStorage.getItem('equipmentList');
+                if (savedAEq) {
+                    setEquipment(JSON.parse(savedAEq));
+                }
+            } catch (error) {
+                console.error('Error loading equipment list from AsyncStorage:', error);
+            }
+        };
+
+        loadDietType();
+        loadAllergies();
+        loadEquipment();
+        loadPreferences();
+    }, []);
 
     useEffect(() => {
         handleGoogleSignIn();
@@ -79,6 +132,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     } else {
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await sendUserData();
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -102,6 +156,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     } else {
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await sendUserData();
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -142,6 +197,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         } else {
             signUpUser(email, generateRandomPassword(10));
             await AsyncStorage.setItem("isUserSignedIn", 'true');
+            await sendUserData();
             navigation.navigate('MainScreen');
         }
     };
@@ -154,6 +210,23 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             password += charset[randomIndex];
         }
         return password;
+    }
+
+    async function sendUserData() {
+        const userData = {
+            userId: email.replace('@', '-at-').toLowerCase(),
+            food: ingredientsMap,
+            "allergies-intolerances": allergies,
+            vegan: dietType === 'vegan',
+            vegetarian: dietType === 'vegetarian',
+            equipment: equipment
+        };
+        try {
+            const result = await FitMyMacrosApiService.updateUserData(userData);
+            console.log('User data updated successfully:', result);
+        } catch (error) {
+            console.error('Failed to update user data:', error);
+        }
     }
 
     return (

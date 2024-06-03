@@ -8,6 +8,7 @@ import { t } from 'i18next';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-root-toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ingredientsByType: { [key: string]: string[] } = t('ingredientsByType', { returnObjects: true });
 
@@ -31,11 +32,17 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
         setExpandedCategory(expandedCategory === category ? null : category);
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (Object.keys(selectedIngredients).length === 0) {
             let toast = Toast.show(t('ingredientsAlert'), {
                 duration: Toast.durations.LONG,
             });
+            try {
+                await AsyncStorage.setItem('ingredientsMap', JSON.stringify({}));
+            } catch (error) {
+                console.error('Error saving empty ingredients map to AsyncStorage:', error);
+            }
+
             return;
         }
 

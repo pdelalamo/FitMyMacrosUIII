@@ -145,7 +145,6 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             );
         } else {
             setModalVisible(!modalVisible);
-            const username = 'pabloskixd23-at-gmail.com';
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
             const token = tokenResponse.body;
             console.log('token: ' + token);
@@ -153,7 +152,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             FitMyMacrosApiService.setAuthToken(token);
             setOpId(generateRandomString(20));
             const recipesResponse = await FitMyMacrosApiService.getRecipes({
-                measureUnit: getWeightPreference(),
+                measureUnit: await getWeightPreference(),
                 calories: Number(recipeTargetCalories),
                 protein: proteinPercentage,
                 carbs: carbsPercentage,
