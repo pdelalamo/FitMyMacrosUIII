@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
 import { AntDesign, FontAwesome, Entypo } from '@expo/vector-icons';
 import { federatedStyles } from '../federatedStyles';
-import { checkCognitoUser, signUpUser } from '../utils/AWSCognito';
+import { checkCognitoUser, signUpUser, verifyEmail } from '../utils/AWSCognito';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
+import SecurityApiService from 'services/SecurityApiService';
+import { BlurView } from 'expo-blur';
 
 const config = {
     expoClientId: '868426694791-390ntagtjqcln514p6km7q9hr5tm0s5g.apps.googleusercontent.com',
@@ -47,6 +49,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [allergies, setAllergies] = useState<string[]>([]);
     const [equipment, setEquipment] = useState<string[]>([]);
     const [dietType, setDietType] = useState<string | null>('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const loadPreferences = async () => {
@@ -130,9 +133,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         console.log("user aalready exists");
                         Alert.alert(t('alreadyExistingUser'));
                     } else {
+                        setLoading(true);
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
                         await sendUserData();
+                        setLoading(false);
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -154,9 +159,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         console.log("Already registered user");
                         Alert.alert(t('alreadyExistingUser'));
                     } else {
+                        setLoading(true);
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
                         await sendUserData();
+                        setLoading(false);
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -195,9 +202,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             console.log("user already exists");
             Alert.alert(t('alreadyExistingUser'));
         } else {
-            signUpUser(email, generateRandomPassword(10));
+            setLoading(true);
+            await signUpUser(email, generateRandomPassword(10));
             await AsyncStorage.setItem("isUserSignedIn", 'true');
             await sendUserData();
+            setLoading(false);
             navigation.navigate('MainScreen');
         }
     };
@@ -222,6 +231,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             equipment: equipment
         };
         try {
+            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
+            const token = tokenResponse.body;
+            console.log('token: ' + token);
+
+            FitMyMacrosApiService.setAuthToken(token);
             const result = await FitMyMacrosApiService.updateUserData(userData);
             console.log('User data updated successfully:', result);
         } catch (error) {
@@ -273,12 +287,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                             <Text style={federatedStyles.buttonText}>{t('registerFacebook')}</Text>
                         </View>
                     </TouchableOpacity>
-                    {/* <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#000000' }]} onPress={handleAppleLogin}>
-                        <View style={federatedStyles.buttonContent}>
-                            <FontAwesome name="apple" size={24} color="#fff" style={federatedStyles.icon} />
-                            <Text style={federatedStyles.buttonText}>{t('registerApple')}</Text>
+                    {loading && (
+                        <View style={styles.loadingOverlay}>
+                            <TouchableWithoutFeedback>
+                                <BlurView intensity={50} style={styles.blurView}>
+                                    <ActivityIndicator size="large" color="#0000ff" />
+                                </BlurView>
+                            </TouchableWithoutFeedback>
                         </View>
-                    </TouchableOpacity> */}
+                    )}
                 </View>
             </ImageBackground>
         </I18nextProvider>
@@ -299,6 +316,23 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    blurView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
     },
 });
 

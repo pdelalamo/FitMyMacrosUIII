@@ -33,6 +33,8 @@ const signUpUser = async (email: string, password: string) => {
     } catch (error) {
         console.error('Error signing up user:', error);
     }
+    await verifyEmail(email);
+    await confirmAccount(email);
 };
 
 // Function to sign in a user
@@ -104,6 +106,22 @@ const verifyEmail = async (email: any) => {
         return true;
     } catch (error) {
         console.error('Error verifying email:', error);
+        return false;
+    }
+};
+
+const confirmAccount = async (email: any) => {
+    const params = {
+        UserPoolId: 'eu-west-3_dczxHeKz4',
+        Username: toUsername(email),
+    };
+
+    try {
+        await cognitoIdentityServiceProvider.adminConfirmSignUp(params).promise();
+        console.log('User account confirmed successfully');
+        return true;
+    } catch (error) {
+        console.error('Error confirming user account:', error);
         return false;
     }
 };
