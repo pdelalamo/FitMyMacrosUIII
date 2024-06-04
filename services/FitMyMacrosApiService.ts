@@ -18,6 +18,8 @@ class FitMyMacrosApiService {
     public async getRecipes(params: Record<string, any>): Promise<any> {
         try {
             const response = await this.client.get('/recipes', { params });
+            console.log('response status: ' + response.status);
+            console.log('response data: ' + response.data);
             if (response.status === 200) {
                 return response.data;
             } else {

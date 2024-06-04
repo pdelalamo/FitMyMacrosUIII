@@ -145,6 +145,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             );
         } else {
             setModalVisible(!modalVisible);
+            console.log('username: ' + username);
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
             const token = tokenResponse.body;
             console.log('token: ' + token);
@@ -171,7 +172,8 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 precision: 'exactly',
                 opId: opId
             });
-            const recipes = JSON.parse(recipesResponse.body);
+            console.log('recipesResponse: ' + recipesResponse);
+            const recipes = await JSON.parse(recipesResponse.body);
             await AsyncStorage.setItem('recipesList', recipes);
             console.log('recipes: ' + recipes);
             navigation.navigate('GeneratedRecipesList');

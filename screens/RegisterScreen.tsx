@@ -136,6 +136,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         setLoading(true);
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                         await sendUserData();
                         setLoading(false);
                         navigation.navigate('MainScreen');
@@ -162,6 +163,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         setLoading(true);
                         signUpUser(user.email, generateRandomPassword(10));
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                         await sendUserData();
                         setLoading(false);
                         navigation.navigate('MainScreen');
@@ -205,6 +207,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             setLoading(true);
             await signUpUser(email, generateRandomPassword(10));
             await AsyncStorage.setItem("isUserSignedIn", 'true');
+            await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
             await sendUserData();
             setLoading(false);
             navigation.navigate('MainScreen');
@@ -226,6 +229,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             userId: email.replace('@', '-at-').toLowerCase(),
             food: ingredientsMap,
             "allergies-intolerances": allergies,
+            "previous_recipes": [],
             vegan: dietType === 'vegan',
             vegetarian: dietType === 'vegetarian',
             equipment: equipment
