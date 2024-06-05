@@ -10,30 +10,43 @@ interface Props {
 }
 
 const GeneratedRecipesList: React.FC<Props> = ({ navigation }) => {
-
-    const [recipes, setRecipes] = useState('');
+    const [recipes, setRecipes] = useState<string | null>(null);
 
     useEffect(() => {
         const loadDailyMeals = async () => {
             try {
-                const recipes = await AsyncStorage.getItem('recipesList');
-                setRecipes(recipes !== null ? recipes : '');
+                const storedRecipes = await AsyncStorage.getItem('recipesList');
+                console.log('recipes from async storage: ', storedRecipes);
+                setRecipes(storedRecipes);
             } catch (error) {
-                console.error('Error loading username', error);
+                console.error('Error loading recipes', error);
             }
         };
 
         loadDailyMeals();
     }, []);
 
-    const parsedRecipes: string[] = JSON.parse(recipes);
+    if (recipes === null) {
+        return (
+            <I18nextProvider i18n={i18n}>
+                <View style={globalStyles.containerMainGeneration}>
+                    <Text>Loading...</Text>
+                </View>
+            </I18nextProvider>
+        );
+    }
 
-    const renderItem = ({ item }: { item: string }) => ( // Explicitly type the item parameter
+    let parsedRecipes: string[] = [];
+    try {
+        parsedRecipes = JSON.parse(recipes);
+    } catch (error) {
+        console.error('Error parsing recipes', error);
+    }
+
+    const renderItem = ({ item }: { item: string }) => (
         <View style={styles.itemContainer}>
             <Text style={styles.recipeName}>{item}</Text>
-            {/* Placeholder image, replace with actual images */}
             <Image
-                source={{ uri: 'https://via.placeholder.com/150' }}
                 style={styles.recipeImage}
             />
         </View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Alert, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Alert, Dimensions, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { t } from 'i18next';
 import { globalStyles } from 'globalStyles';
@@ -10,6 +10,7 @@ import CheckBox from '@react-native-community/checkbox';
 import SecurityApiService from 'services/SecurityApiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
+import { BlurView } from 'expo-blur';
 
 interface Props {
     navigation: any;
@@ -36,6 +37,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [username, setUsername] = useState('');
     const [opId, setOpId] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const flavorItems = [
         { label: t('flavors.any'), value: 'any' },
@@ -146,6 +148,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         } else {
             setModalVisible(!modalVisible);
             console.log('username: ' + username);
+            setLoading(true);
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
             const token = tokenResponse.body;
             console.log('token: ' + token);
@@ -174,8 +177,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             });
             console.log('recipesResponse: ' + recipesResponse);
             const recipes = await JSON.parse(recipesResponse.body);
-            await AsyncStorage.setItem('recipesList', recipes);
+            await AsyncStorage.setItem('recipesList', JSON.stringify(recipes));
             console.log('recipes: ' + recipes);
+            setLoading(false);
             navigation.navigate('GeneratedRecipesList');
         }
     };
@@ -378,6 +382,15 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 >
                     <Text style={globalStyles.modalButtonText}>{t('generateRecipes')}</Text>
                 </TouchableOpacity>
+                {loading && (
+                    <View style={globalStyles.loadingOverlay}>
+                        <TouchableWithoutFeedback>
+                            <BlurView intensity={50} style={globalStyles.blurView}>
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            </BlurView>
+                        </TouchableWithoutFeedback>
+                    </View>
+                )}
             </View>
         </I18nextProvider>
     );
