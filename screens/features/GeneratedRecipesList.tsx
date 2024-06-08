@@ -1,19 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { globalStyles } from 'globalStyles';
 import i18n from 'i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { t } from 'i18next';
 import { Ionicons } from '@expo/vector-icons';
+import SecurityApiService from 'services/SecurityApiService';
+import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
+import { generateRandomString, removeLeadingTrailingCommasAndQuotes } from 'utils/UtilFunctions';
+import { BlurView } from 'expo-blur';
 
 interface Props {
     navigation: any;
+    route: any;
 }
 
-const GeneratedRecipesList: React.FC<Props> = ({ navigation }) => {
+const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
     const [recipes, setRecipes] = useState<{ [key: string]: string } | null>(null);
     const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null);
+    const [opId, setOpId] = useState('');
+    const [username, setUsername] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    const {
+        measureUnit,
+        calories,
+        protein,
+        carbs,
+        fat,
+        anyIngredientsMode,
+        glutenFree,
+        vegan,
+        vegetarian,
+        cookingTime,
+        userId,
+        precision,
+        recipeName
+    } = route.params;
 
     useEffect(() => {
         const loadDailyMeals = async () => {
@@ -25,8 +49,15 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation }) => {
                 console.error('Error loading recipes', error);
             }
         };
-
+        const loadPreferences = async () => {
+            try {
+                setUsername(await AsyncStorage.getItem('username'));
+            } catch (error) {
+                console.error('Error loading preferences', error);
+            }
+        };
         loadDailyMeals();
+        loadPreferences();
     }, []);
 
     if (recipes === null) {
@@ -39,8 +70,34 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation }) => {
         );
     }
 
-    const handleGenerateRecipe = (recipeName: string) => {
-        navigation.navigate('RecipeDetails');
+    const handleGenerateRecipe = async (recipeName: string) => {
+        setLoading(true);
+        const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
+        const token = tokenResponse.body;
+        console.log('token: ' + token);
+
+        FitMyMacrosApiService.setAuthToken(token);
+        //FitMyMacrosApiService.setAsyncInvocationMode(true);
+        setOpId(generateRandomString(20));
+        const recipeDetail = await FitMyMacrosApiService.getRecipeDetail({
+            measureUnit,
+            calories,
+            protein,
+            carbs,
+            fat,
+            anyIngredientsMode,
+            glutenFree,
+            vegan,
+            vegetarian,
+            cookingTime,
+            userId,
+            precision,
+            opId,
+            recipeName
+        });
+        console.log('recipe detail from openAI: ' + removeLeadingTrailingCommasAndQuotes(recipeDetail.body));
+        setLoading(false);
+        navigation.navigate('RecipeDetail', { recipeData: removeLeadingTrailingCommasAndQuotes(recipeDetail.body) });
     };
 
     const renderItem = ({ item }: { item: [string, string] }) => {
@@ -80,6 +137,15 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation }) => {
                     keyExtractor={(item, index) => index.toString()}
                     contentContainerStyle={styles.listContent}
                 />
+                {loading && (
+                    <View style={globalStyles.loadingOverlay}>
+                        <TouchableWithoutFeedback>
+                            <BlurView intensity={50} style={globalStyles.blurView}>
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            </BlurView>
+                        </TouchableWithoutFeedback>
+                    </View>
+                )}
             </View>
         </I18nextProvider>
     );
@@ -137,3 +203,7 @@ const styles = StyleSheet.create({
 });
 
 export default GeneratedRecipesList;
+function getWeightPreference(): any {
+    throw new Error('Function not implemented.');
+}
+

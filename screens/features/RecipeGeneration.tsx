@@ -11,6 +11,7 @@ import SecurityApiService from 'services/SecurityApiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { BlurView } from 'expo-blur';
+import { generateRandomString, getWeightPreference } from 'utils/UtilFunctions';
 
 interface Props {
     navigation: any;
@@ -38,6 +39,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [opId, setOpId] = useState('');
     const [loading, setLoading] = useState(false);
+    const [weightPreference, setWeightPreference] = useState('');
 
     const flavorItems = [
         { label: t('flavors.any'), value: 'any' },
@@ -107,8 +109,15 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 console.error('Error loading username', error);
             }
         };
-
+        const loadPreferences = async () => {
+            try {
+                setWeightPreference(await getWeightPreference());
+            } catch (error) {
+                console.error('Error loading preferences', error);
+            }
+        };
         loadDailyMeals();
+        loadPreferences();
     }, []);
 
     const calculateMacros = () => {
@@ -156,7 +165,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             FitMyMacrosApiService.setAuthToken(token);
             setOpId(generateRandomString(20));
             const recipesResponse = await FitMyMacrosApiService.getRecipes({
-                measureUnit: await getWeightPreference(),
+                measureUnit: weightPreference,
                 calories: Number(recipeTargetCalories),
                 protein: proteinPercentage,
                 carbs: carbsPercentage,
@@ -180,27 +189,21 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             await AsyncStorage.setItem('recipesList', JSON.stringify(recipes));
             console.log('recipes: ' + recipes);
             setLoading(false);
-            navigation.navigate('GeneratedRecipesList');
+            navigation.navigate('GeneratedRecipesList', {
+                measureUnit: weightPreference,
+                calories: Number(recipeTargetCalories),
+                protein: proteinPercentage,
+                carbs: carbsPercentage,
+                fat: fatPercentage,
+                anyIngredientsMode: toggleCheckBox,
+                glutenFree: diet === 'glutenFree' ? true : false,
+                vegan: diet === 'vegan' ? true : false,
+                vegetarian: diet === 'vegetarian' ? true : false,
+                cookingTime: cookingTime,
+                userId: username,
+                precision: 'exactly'
+            });
         }
-    };
-
-    function generateRandomString(length: number) {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    }
-
-    const getWeightPreference = async () => {
-        const storedPreferences = await AsyncStorage.getItem('userPreferences');
-        if (storedPreferences) {
-            const parsedPreferences = JSON.parse(storedPreferences);
-            return parsedPreferences.measurementPreferences.weight;
-        }
-        return null;
     };
 
     const validatePercentageInput = (text: string): number => {
@@ -397,3 +400,4 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
 };
 
 export default RecipeGeneration;
+

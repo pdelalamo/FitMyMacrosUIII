@@ -15,6 +15,11 @@ class FitMyMacrosApiService {
         this.client.defaults.headers.common['Authorization'] = token;
     }
 
+    setAsyncInvocationMode(async: boolean) {
+        if (async)
+            this.client.defaults.headers.common['InvocationType'] = 'Event';
+    }
+
     public async getRecipes(params: Record<string, any>): Promise<any> {
         try {
             const response = await this.client.get('/recipes', { params });
