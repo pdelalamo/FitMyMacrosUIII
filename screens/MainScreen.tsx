@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CircularProgress from 'utils/CircularProgress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Meal from 'model/Meal';
+import { useIsFocused } from '@react-navigation/native';
 
 interface Props {
     navigation: any;
@@ -24,6 +25,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     const targetCarbs = 300;
     const fatConsumed = meals.reduce((total, meal) => total + meal.fat, 0);
     const targetFat = 80;
+    const isFocused = useIsFocused();
 
     const getWeightPreference = async () => {
         const storedPreferences = await AsyncStorage.getItem('userPreferences');
@@ -50,8 +52,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         };
 
         loadDailyMeals();
-    }, []);
-
+    }, [isFocused]);
 
     function generateRecipes() {
         navigation.navigate('RecipeGeneration');

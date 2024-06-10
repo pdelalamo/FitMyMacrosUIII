@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { globalStyles } from 'globalStyles';
 import i18n from 'i18n';
+import { t } from 'i18next';
+import Meal from 'model/Meal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
     navigation: any;
@@ -23,7 +26,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         console.error('Failed to parse recipeData:', error);
         return (
             <View style={globalStyles.containerMainGeneration}>
-                <Text>Error loading recipe details.</Text>
+                <Text>{t('errorLoadingRecipes')}</Text>
             </View>
         );
     }
@@ -53,6 +56,64 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         </View>
     );
 
+    const saveMeal = async () => {
+        try {
+            // Create a new meal object
+            const newMeal = new Meal(
+                Date.now().toString(),
+                recipeName,
+                caloriesAndMacros.calories,
+                caloriesAndMacros.protein,
+                caloriesAndMacros.carbs,
+                caloriesAndMacros.fat,
+                cookingTime,
+                ingredientsAndQuantities,
+                cookingProcess
+            );
+
+            // Retrieve the existing meals from AsyncStorage
+            const existingMeals = await AsyncStorage.getItem('meals');
+            const meals = existingMeals && existingMeals !== '{}' ? JSON.parse(existingMeals) : [];
+
+            // Add the new meal to the list
+            meals.push(newMeal);
+
+            // Save the updated meals list back to AsyncStorage
+            await AsyncStorage.setItem('meals', JSON.stringify(meals));
+
+
+            // Retrieve the existing ingredients from AsyncStorage
+            const existingIngredients = await AsyncStorage.getItem('ingredientsMap');
+            const ingredients = existingIngredients ? JSON.parse(existingIngredients) : {};
+
+            // Subtract the used quantities of the ingredients
+            for (const [ingredient, usedQuantity] of Object.entries(ingredientsAndQuantities)) {
+                if (typeof usedQuantity === 'string') {
+                    // Extract numeric part from the usedQuantity
+                    const usedQuantityFloat = parseFloat(usedQuantity.replace(/[^0-9.-]/g, ''));
+                    if (!isNaN(usedQuantityFloat)) {
+                        if (ingredients[ingredient]) {
+                            const currentQuantity = parseFloat(ingredients[ingredient].replace(/[^0-9.-]/g, ''));
+                            if (!isNaN(currentQuantity)) {
+                                ingredients[ingredient] = (currentQuantity - usedQuantityFloat).toString();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Save the updated ingredients back to AsyncStorage
+            await AsyncStorage.setItem('ingredients', JSON.stringify(ingredients));
+
+            // Navigate to the MainScreen
+            navigation.navigate('MainScreen');
+
+        } catch (error) {
+            console.error(t('failedSavingMeal'), error);
+            Alert.alert(t('error') + ', ', t('failedMealAlert'));
+        }
+    };
+
     return (
         <I18nextProvider i18n={i18n}>
             <ScrollView style={globalStyles.containerMainGeneration}>
@@ -61,13 +122,13 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                     <Text style={styles.cookingTime}>{cookingTime}</Text>
                 </View>
                 <View style={styles.macrosContainer}>
-                    <Text style={styles.macrosText}>Calories: {caloriesAndMacros.calories}</Text>
-                    <Text style={styles.macrosText}>Protein: {caloriesAndMacros.protein}</Text>
-                    <Text style={styles.macrosText}>Carbs: {caloriesAndMacros.carbs}</Text>
-                    <Text style={styles.macrosText}>Fat: {caloriesAndMacros.fat}</Text>
+                    <Text style={styles.macrosText}>{t('calories')}: {caloriesAndMacros.calories}</Text>
+                    <Text style={styles.macrosText}>{t('protein')}: {caloriesAndMacros.protein}</Text>
+                    <Text style={styles.macrosText}>{t('carbs')}: {caloriesAndMacros.carbs}</Text>
+                    <Text style={styles.macrosText}>{t('fat')}: {caloriesAndMacros.fat}</Text>
                 </View>
                 <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionTitle}>Ingredients</Text>
+                    <Text style={styles.sectionTitle}>{t('ingredients')}</Text>
                     <FlatList
                         data={ingredients}
                         renderItem={renderIngredient}
@@ -75,7 +136,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                     />
                 </View>
                 <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionTitle}>Cooking Process</Text>
+                    <Text style={styles.sectionTitle}>{t('cookingProcess')}</Text>
                     <FlatList
                         data={cookingProcess}
                         renderItem={renderStep}
@@ -84,9 +145,9 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 </View>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => navigation.goBack()}
+                    onPress={() => { saveMeal() }}
                 >
-                    <Text style={styles.buttonText}>Back to Recipes</Text>
+                    <Text style={styles.buttonText}>{t('useRecipe')}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </I18nextProvider>
@@ -153,7 +214,8 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
-        marginVertical: 20,
+        marginTop: 20,
+        marginBottom: 60,
         marginHorizontal: 20,
     },
     buttonText: {

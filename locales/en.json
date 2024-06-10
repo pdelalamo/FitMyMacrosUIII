@@ -977,5 +977,12 @@
     "expandIngredientsInfo": "By checking this box, recipes will be generated using any ingredients, not just the ones the user has available at home.",
     "generateRecipe": "Generate this recipe",
     "selectRecipe": "Select a Recipe",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "ingredients": "Ingredients",
+    "calories": "Calories",
+    "cookingProcess": "Cooking Process",
+    "errorLoadingRecipes": "Error loading recipe details.",
+    "useRecipe": "Use this Recipe",
+    "failedSavingMeal": "Failed to save the meal:",
+    "failedMealAlert": "Failed to save the meal. Please try again."
 }
