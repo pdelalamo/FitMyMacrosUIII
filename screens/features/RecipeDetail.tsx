@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { globalStyles } from 'globalStyles';
@@ -6,6 +6,8 @@ import i18n from 'i18n';
 import { t } from 'i18next';
 import Meal from 'model/Meal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SecurityApiService from 'services/SecurityApiService';
+import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 
 interface Props {
     navigation: any;
@@ -14,6 +16,18 @@ interface Props {
 
 const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     const { recipeData } = route.params;
+    const [username, setUsername] = useState<string | null>(null);
+
+    useEffect(() => {
+        const loadUsername = async () => {
+            try {
+                setUsername(await AsyncStorage.getItem('username'));
+            } catch (error) {
+                console.error('Error loading username', error);
+            }
+        };
+        loadUsername();
+    }, []);
 
     // Debugging: Log the incoming recipeData
     console.log('Received recipeData:', recipeData);
@@ -56,6 +70,10 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         </View>
     );
 
+    /**
+     * This function saves the generated meal to the async storage, and updates the available ingredients and quantities, both
+     * in the async storage and in dynamoDB
+     */
     const saveMeal = async () => {
         try {
             // Create a new meal object
@@ -104,6 +122,8 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
 
             // Save the updated ingredients back to AsyncStorage
             await AsyncStorage.setItem('ingredients', JSON.stringify(ingredients));
+            //update ingredients and recipes in dynamoDB
+            await updateDynamoIngredients();
 
             // Navigate to the MainScreen
             navigation.navigate('MainScreen');
@@ -111,6 +131,39 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         } catch (error) {
             console.error(t('failedSavingMeal'), error);
             Alert.alert(t('error') + ', ', t('failedMealAlert'));
+        }
+    };
+
+    /**
+     * This function invokes the function that will update the available ingredients and quantities of the user in dynamoDB
+     */
+    const updateDynamoIngredients = async () => {
+        const data = {
+            userId: username,
+            recipe: {
+                recipeName: recipeName,
+                cookingTime: cookingTime,
+                caloriesAndMacros: {
+                    calories: caloriesAndMacros.calories,
+                    protein: caloriesAndMacros.protein,
+                    carbs: caloriesAndMacros.carbs,
+                    fat: caloriesAndMacros.fat,
+                },
+                ingredientsAndQuantities: ingredientsAndQuantities,
+                cookingProcess: cookingProcess,
+            }
+        };
+
+        try {
+            console.log('username: ' + username);
+            const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
+            const token = tokenResponse.body;
+            console.log('token: ' + token);
+
+            FitMyMacrosApiService.setAuthToken(token);
+            await FitMyMacrosApiService.updateRecipes(data);
+        } catch (error) {
+            console.error('Error updating recipe:', error);
         }
     };
 

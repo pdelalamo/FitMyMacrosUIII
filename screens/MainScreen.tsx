@@ -17,13 +17,13 @@ interface Props {
 const MainScreen: React.FC<Props> = ({ navigation }) => {
     const [meals, setMeals] = useState<Meal[]>([]);
     const [measurementUnit, setMeasurement] = useState<string>('');
-    const totalCalories = meals.reduce((total, meal) => total + meal.calories, 0);
+    const totalCalories = meals.reduce((total, meal) => total + parseFloat(meal.calories.replace(/[^0-9.-]/g, '')), 0);
     const targetCalories = 2500;
-    const proteinConsumed = meals.reduce((total, meal) => total + meal.protein, 0);
+    const proteinConsumed = meals.reduce((total, meal) => total + parseFloat(meal.protein.replace(/[^0-9.-]/g, '')), 0);
     const targetProtein = 250;
-    const carbsConsumed = meals.reduce((total, meal) => total + meal.carbs, 0);
+    const carbsConsumed = meals.reduce((total, meal) => total + parseFloat(meal.carbs.replace(/[^0-9.-]/g, '')), 0);
     const targetCarbs = 300;
-    const fatConsumed = meals.reduce((total, meal) => total + meal.fat, 0);
+    const fatConsumed = meals.reduce((total, meal) => total + parseFloat(meal.fat.replace(/[^0-9.-]/g, '')), 0);
     const targetFat = 80;
     const isFocused = useIsFocused();
 
@@ -69,14 +69,17 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                     <View style={globalStyles.macrosContainer}>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(proteinConsumed / targetProtein) * 100} color="blue" />
+                            <Text style={globalStyles.macroText}>{t('protein')}:</Text>
                             <Text style={globalStyles.macroText}>{proteinConsumed}/{targetProtein} {measurementUnit}</Text>
                         </View>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(carbsConsumed / targetCarbs) * 100} color="orange" />
+                            <Text style={globalStyles.macroText}>{t('carbs')}:</Text>
                             <Text style={globalStyles.macroText}>{carbsConsumed}/{targetCarbs} {measurementUnit}</Text>
                         </View>
                         <View style={globalStyles.macroBox}>
                             <CircularProgress size={60} strokeWidth={6} percentage={(fatConsumed / targetFat) * 100} color="red" />
+                            <Text style={globalStyles.macroText}>{t('fat')}:</Text>
                             <Text style={globalStyles.macroText}>{fatConsumed}/{targetFat} {measurementUnit}</Text>
                         </View>
                     </View>
