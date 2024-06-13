@@ -40,6 +40,12 @@ export const initialQuestionsStyles = StyleSheet.create({
         marginBottom: '3%',
         marginTop: '10%',
     },
+    titleTarget: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: '10%',
+        marginTop: '10%',
+    },
     titleMeasurement: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -128,5 +134,69 @@ export const initialQuestionsStyles = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+    },
+    input: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 20,
+    },
+    sliderContainer: {
+        width: '100%',
+        marginBottom: 20,
+    },
+    sliderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    sliderInput: {
+        flex: 3,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 5,
+        paddingHorizontal: 20,
+        paddingVertical: 2,
+        marginRight: 10,
+    },
+    slider: {
+        flex: 4,
+    },
+    macroText: {
+        fontSize: 16,
+        marginVertical: 5,
+    },
+    checkboxContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        marginTop: 20,
+    },
+    checkboxRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    checkboxLabel: {
+        marginLeft: 10,
+        fontSize: 16,
+    },
+    expandIngredientsInfo: {
+        color: 'gray',
+        fontSize: 14,
+        marginTop: 10,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 18,
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    blurView: {
+        ...StyleSheet.absoluteFillObject,
     },
 });

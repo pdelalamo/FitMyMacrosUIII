@@ -21,6 +21,7 @@ import SignInScreen from '../screens/SignInScreen';
 import RecipeGeneration from 'screens/features/RecipeGeneration';
 import GeneratedRecipesList from 'screens/features/GeneratedRecipesList';
 import RecipeDetail from 'screens/features/RecipeDetail';
+import TargetCaloriesAndMacros from 'screens/initialQuestions/TargetCaloriesAndMacros';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +66,7 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="RecipeGeneration" component={RecipeGeneration} />
                     <Stack.Screen name="GeneratedRecipesList" component={GeneratedRecipesList} />
                     <Stack.Screen name="RecipeDetail" component={RecipeDetail} />
+                    <Stack.Screen name="TargetCaloriesAndMacros" component={TargetCaloriesAndMacros} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

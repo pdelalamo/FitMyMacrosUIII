@@ -984,5 +984,8 @@
     "errorLoadingRecipes": "Error loading recipe details.",
     "useRecipe": "Use this Recipe",
     "failedSavingMeal": "Failed to save the meal:",
-    "failedMealAlert": "Failed to save the meal. Please try again."
+    "failedMealAlert": "Failed to save the meal. Please try again.",
+    "setupTargetCalories": "Set Daily Target Calories",
+    "saveSettings": "Save Settings",
+    "incorrectCaloriesTarget": "Calories should be a number in between 1000 and 10000."
 }

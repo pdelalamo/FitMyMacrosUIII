@@ -17,14 +17,15 @@ interface Props {
 const MainScreen: React.FC<Props> = ({ navigation }) => {
     const [meals, setMeals] = useState<Meal[]>([]);
     const [measurementUnit, setMeasurement] = useState<string>('');
+    const [targetCalories, setTargetCalories] = useState<number>(0);
+    const [targetProtein, setTargetProtein] = useState<number>(0);
+    const [targetCarbs, setTargetCarbs] = useState<number>(0);
+    const [targetFat, setTargetFat] = useState<number>(0);
+
     const totalCalories = meals.reduce((total, meal) => total + parseFloat(meal.calories.replace(/[^0-9.-]/g, '')), 0);
-    const targetCalories = 2500;
     const proteinConsumed = meals.reduce((total, meal) => total + parseFloat(meal.protein.replace(/[^0-9.-]/g, '')), 0);
-    const targetProtein = 250;
     const carbsConsumed = meals.reduce((total, meal) => total + parseFloat(meal.carbs.replace(/[^0-9.-]/g, '')), 0);
-    const targetCarbs = 300;
     const fatConsumed = meals.reduce((total, meal) => total + parseFloat(meal.fat.replace(/[^0-9.-]/g, '')), 0);
-    const targetFat = 80;
     const isFocused = useIsFocused();
 
     const getWeightPreference = async () => {
@@ -35,6 +36,33 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         }
         return null;
     };
+
+    useEffect(() => {
+        const loadTargetCalsAndMacros = async () => {
+            try {
+                //TODO: save this data to dynamoDB when registering the user
+                const storedTargetCalories = await AsyncStorage.getItem('targetCalories');
+                const storedTargetProtein = await AsyncStorage.getItem('proteinPercentage');
+                const storedTargetCarbs = await AsyncStorage.getItem('carbsPercentage');
+                const storedTargetFat = await AsyncStorage.getItem('fatPercentage');
+
+                const targetCalories = storedTargetCalories ? parseFloat(storedTargetCalories) : 0;
+                const targetProtein = storedTargetProtein ? parseFloat(storedTargetProtein) : 0;
+                const targetCarbs = storedTargetCarbs ? parseFloat(storedTargetCarbs) : 0;
+                const targetFat = storedTargetFat ? parseFloat(storedTargetFat) : 0;
+
+                // Ensure that no value is Infinity or NaN
+                setTargetCalories(isFinite(targetCalories) ? targetCalories : 0);
+                setTargetProtein(isFinite(targetProtein) ? targetProtein : 0);
+                setTargetCarbs(isFinite(targetCarbs) ? targetCarbs : 0);
+                setTargetFat(isFinite(targetFat) ? targetFat : 0);
+            } catch (error) {
+                console.error('Error loading calories and macronutrients:', error);
+            }
+        };
+
+        loadTargetCalsAndMacros();
+    }, []);
 
     useEffect(() => {
         const loadDailyMeals = async () => {
