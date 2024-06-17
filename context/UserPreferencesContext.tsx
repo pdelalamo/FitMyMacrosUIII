@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface MeasurementPreferences {
     weight: string | null;
     fluids: string | null;
+    energy: string | null;
 }
 
 interface UserPreferences {
@@ -53,6 +54,7 @@ const loadPreferences = async (): Promise<UserPreferences> => {
         measurementPreferences: {
             weight: null,
             fluids: null,
+            energy: null
         },
     };
 };
@@ -71,6 +73,7 @@ export const UserPreferencesProvider: React.FC<Props> = ({ children }) => {
         measurementPreferences: {
             weight: null,
             fluids: null,
+            energy: null
         },
     });
 

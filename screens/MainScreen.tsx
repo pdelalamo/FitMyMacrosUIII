@@ -17,6 +17,7 @@ interface Props {
 const MainScreen: React.FC<Props> = ({ navigation }) => {
     const [meals, setMeals] = useState<Meal[]>([]);
     const [measurementUnit, setMeasurement] = useState<string>('');
+    const [energyUnit, setEnergy] = useState<string>('');
     const [targetCalories, setTargetCalories] = useState<number>(0);
     const [targetProtein, setTargetProtein] = useState<number>(0);
     const [targetCarbs, setTargetCarbs] = useState<number>(0);
@@ -69,7 +70,9 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
             try {
                 const mealsData = await AsyncStorage.getItem('meals');
                 const measurementSolid = await getWeightPreference();
+                const energy = await AsyncStorage.getItem('measurementEnergy');
                 setMeasurement(measurementSolid === null ? '' : measurementSolid);
+                setEnergy(energy === null ? '' : energy);
                 if (mealsData) {
                     const parsedMeals: Meal[] = JSON.parse(mealsData);
                     setMeals(parsedMeals);
@@ -92,7 +95,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 <View style={globalStyles.headerWithBackground}>
                     <View style={globalStyles.caloriesContainer}>
                         <CircularProgress size={100} strokeWidth={10} percentage={(totalCalories / targetCalories) * 100} color="green" />
-                        <Text style={globalStyles.caloriesText}>{totalCalories} {t('of')} {targetCalories} kcal</Text>
+                        <Text style={globalStyles.caloriesText}>{totalCalories} {t('of')} {targetCalories} {energyUnit === 'kilocalories' ? 'kcal' : 'kJ'}</Text>
                     </View>
                     <View style={globalStyles.macrosContainer}>
                         <View style={globalStyles.macroBox}>

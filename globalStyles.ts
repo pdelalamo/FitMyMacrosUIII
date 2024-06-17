@@ -46,6 +46,15 @@ export const globalStyles = StyleSheet.create({
         width: 300,
         alignSelf: 'center'
     },
+    buttonGreenMarginTop: {
+        backgroundColor: '#5cdb5c',
+        padding: '3%',
+        borderRadius: 10,
+        margin: '3%',
+        marginTop: '10%',
+        width: 300,
+        alignSelf: 'center'
+    },
     buttonGrey: {
         backgroundColor: '#BDBDBD',
         padding: '3%',

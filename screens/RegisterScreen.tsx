@@ -50,6 +50,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [equipment, setEquipment] = useState<string[]>([]);
     const [dietType, setDietType] = useState<string | null>('');
     const [loading, setLoading] = useState(false);
+    const [energyUnit, setEnergyUnit] = useState('');
+    const [weightUnit, setWeightUnit] = useState('');
 
     useEffect(() => {
         const loadPreferences = async () => {
@@ -59,6 +61,10 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     const parsedMap = new Map(Object.entries(JSON.parse(savedMap)));
                     setIngredientsMap(parsedMap);
                 }
+                const energy = await AsyncStorage.getItem('measurementEnergy');
+                const weight = await AsyncStorage.getItem('measurementSolid');
+                setEnergyUnit(energy || '');
+                setWeightUnit(weight || '');
             } catch (error) {
                 console.error('Error loading ingredients map from AsyncStorage:', error);
             }
@@ -230,9 +236,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             food: ingredientsMap,
             "allergies-intolerances": allergies,
             "previous_recipes": [],
-            vegan: dietType === 'vegan',
-            vegetarian: dietType === 'vegetarian',
-            equipment: equipment
+            vegan: dietType === 'Vegan',
+            vegetarian: dietType === 'Vegetarian',
+            carnivore: dietType === 'Carnivore',
+            keto: dietType === 'Keto',
+            paleo: dietType === 'Paleo',
+            pesoPollo: dietType === 'PescoPollo',
+            equipment: equipment,
+            weightUnit: weightUnit,
+            energyUnit: energyUnit
         };
         try {
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);

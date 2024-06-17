@@ -50,6 +50,7 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
             addIngredientToMap(ingredient, quantity);
         });
 
+        await AsyncStorage.setItem('ingredientsMap', JSON.stringify(selectedIngredients));
         navigation.navigate('Equipment');
     };
 

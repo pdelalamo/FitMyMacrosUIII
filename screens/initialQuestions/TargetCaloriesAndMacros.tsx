@@ -16,6 +16,8 @@ interface Props {
 const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
     const { t } = useTranslation();
 
+    const [energyUnit, setEnergyUnit] = useState('');
+    const [weightUnit, setWeightUnit] = useState('');
     const [targetCalories, setTargetCalories] = useState('');
     const [proteinPercentage, setProteinPercentage] = useState(30);
     const [carbsPercentage, setCarbsPercentage] = useState(50);
@@ -26,16 +28,20 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
     useEffect(() => {
         const loadUserData = async () => {
             const uname = await AsyncStorage.getItem('username');
+            const energy = await AsyncStorage.getItem('measurementEnergy');
+            const weight = await AsyncStorage.getItem('measurementSolid');
             setUsername(uname || '');
+            setEnergyUnit(energy || '');
+            setWeightUnit(weight || '');
         };
         loadUserData();
     }, []);
 
     const calculateMacros = () => {
         const total = parseInt(targetCalories, 10) || 0;
-        const proteinGrams = Math.round((total * proteinPercentage) / 400);
-        const carbsGrams = Math.round((total * carbsPercentage) / 400);
-        const fatGrams = Math.round((total * fatPercentage) / 900);
+        const proteinGrams = weightUnit === 'grams' ? Math.round((total * proteinPercentage) / 400) : Math.round((total * proteinPercentage) / 400 * 0.03527396195);
+        const carbsGrams = weightUnit === 'grams' ? Math.round((total * carbsPercentage) / 400) : Math.round((total * carbsPercentage) / 400 * 0.03527396195);
+        const fatGrams = weightUnit === 'grams' ? Math.round((total * fatPercentage) / 900) : Math.round((total * fatPercentage) / 900 * 0.03527396195);
         return { proteinGrams, carbsGrams, fatGrams };
     };
 
@@ -47,8 +53,11 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleSaveSettings = async () => {
-        if (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000) {
+        if (energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000)) {
             Alert.alert(t('error'), t('incorrectCaloriesTarget'), [{ text: t('ok') }]);
+            return;
+        } else if (energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 4184 || Number(targetCalories) >= 41840)) {
+            Alert.alert(t('error'), t('incorrectKilojoulesTarget'), [{ text: t('ok') }]);
             return;
         }
 
@@ -77,16 +86,19 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
             <ImageBackground source={require('../../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackground}>
                 <View style={initialQuestionsStyles.container}>
                     <ScrollView contentContainerStyle={initialQuestionsStyles.scrollViewContent}>
-                        <Text style={initialQuestionsStyles.titleTarget}>{t('setupTargetCalories')}</Text>
+                        <Text style={initialQuestionsStyles.titleTarget}>{energyUnit === 'kilocalories' ? t('setupTargetCalories') : t('setupTargetKj')}</Text>
                         <TextInput
                             style={[globalStyles.input]}
-                            placeholder={t('targetCalories')}
+                            placeholder={energyUnit === 'kilocalories' ? t('targetCalories') : t('targetKj')}
                             keyboardType="numeric"
                             value={targetCalories}
                             onChangeText={text => setTargetCalories(text)}
                         />
-                        {(targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000) && (
+                        {(energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000)) && (
                             <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTarget')}</Text>
+                        )}
+                        {(energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 4184 || Number(targetCalories) >= 41840)) && (
+                            <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTarget')}</Text>
                         )}
                         <View style={globalStyles.sliderContainer}>
                             <Text style={{ flex: 1 }}>{t('protein')} (%)</Text>
@@ -151,9 +163,9 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
                                 />
                             </View>
                         </View>
-                        <Text style={globalStyles.macroText}>{t('protein')}: {proteinGrams}g</Text>
-                        <Text style={globalStyles.macroText}>{t('carbs')}: {carbsGrams}g</Text>
-                        <Text style={globalStyles.macroText}>{t('fat')}: {fatGrams}g</Text>
+                        <Text style={globalStyles.macroText}>{t('protein')}: {proteinGrams} {weightUnit === 'grams' ? 'g' : 'oz'}</Text>
+                        <Text style={globalStyles.macroText}>{t('carbs')}: {carbsGrams} {weightUnit === 'grams' ? 'g' : 'oz'}</Text>
+                        <Text style={globalStyles.macroText}>{t('fat')}: {fatGrams} {weightUnit === 'grams' ? 'g' : 'oz'}</Text>
                         {proteinPercentage + carbsPercentage + fatPercentage !== 100 && (
                             <Text style={{ color: 'red', marginTop: 10 }}>{t('percentageAlert')}</Text>
                         )}

@@ -12,6 +12,7 @@
     "selectMeasurementCategory": "Select your Measurement Preferences",
     "selectWeight": "Select Weight Measurement",
     "selectFluid": "Select Fluid Measurement",
+    "selectEnergy": "Select Energy Measurement",
     "selectEquipment": "Select Your\n Available Equipment",
     "unlockFree": "Unlock FitMyMacros for Free",
     "7DaysFree": "7 days free, then $12.95 per month",
@@ -52,14 +53,15 @@
     ],
     "weightOptions": [
         "grams",
-        "ounces",
-        "pounds"
+        "ounces"
     ],
     "fluidOptions": [
         "milliliters",
-        "liters",
-        "fluid ounces",
-        "gallons"
+        "fluid ounces"
+    ],
+    "energyOptions": [
+        "kilocalories",
+        "kilojoules"
     ],
     "equipmentOptions": [
         "Oven",
@@ -860,7 +862,7 @@
     "selectIngredients": "Your available ingredients",
     "dietAlert": "Please select a diet before continuing",
     "ingredientsAlert": "Please fill in the quantities of some ingredients, or click on the skip button",
-    "measurementAlert": "Please select both weight and fluid preferences before continuing",
+    "measurementAlert": "Please select weight, energy and fluid preferences before continuing",
     "hideEmailPassword": "Hide Email/Password",
     "registerEmailPwd": "Sign up with Email/Password",
     "registerGoogle": "Sign up with Google",
@@ -899,6 +901,7 @@
     "carbsPercentage": "Carbs Percentage",
     "fatPercentage": "Fat Percentage",
     "targetCalories": "Desired Calories",
+    "targetKj": "Desired Kilojoules",
     "error": "Error",
     "macrosError": "The sum of protein, carbs, and fat percentages should be equal to 100%. Please adjust the values.",
     "dropdownsError": "To continue, first select values ​​for all dropdowns please.",
@@ -986,6 +989,8 @@
     "failedSavingMeal": "Failed to save the meal:",
     "failedMealAlert": "Failed to save the meal. Please try again.",
     "setupTargetCalories": "Set Daily Target Calories",
+    "setupTargetKj": "Set Daily Target Kilojoules",
     "saveSettings": "Save Settings",
-    "incorrectCaloriesTarget": "Calories should be a number in between 1000 and 10000."
+    "incorrectCaloriesTarget": "Calories should be a number in between 1000 and 10000.",
+    "incorrectKilojoulesTarget": "Kilojoules should be a number in between 4184 and 41840."
 }

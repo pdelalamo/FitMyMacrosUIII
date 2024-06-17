@@ -40,6 +40,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const [opId, setOpId] = useState('');
     const [loading, setLoading] = useState(false);
     const [weightPreference, setWeightPreference] = useState('');
+    const [energyUnit, setEnergy] = useState<string>('');
 
     const flavorItems = [
         { label: t('flavors.any'), value: 'any' },
@@ -112,6 +113,8 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         const loadPreferences = async () => {
             try {
                 setWeightPreference(await getWeightPreference());
+                const energy = await AsyncStorage.getItem('measurementEnergy');
+                setEnergy(energy === null ? '' : energy);
             } catch (error) {
                 console.error('Error loading preferences', error);
             }
@@ -122,9 +125,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
 
     const calculateMacros = () => {
         const total = parseInt(recipeTargetCalories, 10) || 0;
-        const proteinGrams = Math.round((total * proteinPercentage) / 400);
-        const carbsGrams = Math.round((total * carbsPercentage) / 400);
-        const fatGrams = Math.round((total * fatPercentage) / 900);
+        const proteinGrams = weightPreference === 'grams' ? Math.round((total * proteinPercentage) / 400) : Math.round((total * proteinPercentage) / 400 * 0.03527396195);
+        const carbsGrams = weightPreference === 'grams' ? Math.round((total * carbsPercentage) / 400) : Math.round((total * carbsPercentage) / 400 * 0.03527396195);
+        const fatGrams = weightPreference === 'grams' ? Math.round((total * fatPercentage) / 900) : Math.round((total * fatPercentage) / 900 * 0.03527396195);
         return { proteinGrams, carbsGrams, fatGrams };
     };
 
@@ -280,15 +283,16 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                     />
                     <TextInput
                         style={globalStyles.inputRecipe}
-                        placeholder={t('targetCalories')}
+                        placeholder={energyUnit === 'kilocalories' ? t('targetCalories') : t('targetKj')}
                         keyboardType="numeric"
                         value={recipeTargetCalories}
                         onChangeText={text => setRecipeTargetCalories(text)}
                     />
-                    {(recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 0 || Number(recipeTargetCalories) >= 5000) && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>
-                            {t('incorrectCalories')}
-                        </Text>
+                    {(energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 1000 || Number(recipeTargetCalories) >= 10000)) && (
+                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTarget')}</Text>
+                    )}
+                    {(energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 4184 || Number(recipeTargetCalories) >= 41840)) && (
+                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTarget')}</Text>
                     )}
                     <View style={globalStyles.sliderContainer}>
                         <Text style={{ flex: 1 }}>{t('protein')} (%)</Text>
@@ -353,9 +357,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                             />
                         </View>
                     </View>
-                    <Text>{t('protein')}: {proteinGrams}g</Text>
-                    <Text>{t('carbs')}: {carbsGrams}g</Text>
-                    <Text>{t('fat')}: {fatGrams}g</Text>
+                    <Text>{t('protein')}: {proteinGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
+                    <Text>{t('carbs')}: {carbsGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
+                    <Text>{t('fat')}: {fatGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
                     {proteinPercentage + carbsPercentage + fatPercentage !== 100 && (
                         <Text style={{ color: 'red', marginTop: 10 }}>
                             {t('percentageAlert')}
