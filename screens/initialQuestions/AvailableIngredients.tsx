@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Button, ImageBackground, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, TextInput, ScrollView } from 'react-native';
 import { globalStyles } from '../../globalStyles';
 import { initialQuestionsStyles } from './initialQuestionsStyles';
 import { I18nextProvider } from 'react-i18next';
@@ -11,6 +11,13 @@ import Toast from 'react-native-root-toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ingredientsByType: { [key: string]: string[] } = t('ingredientsByType', { returnObjects: true });
+
+const fruitsList = [
+    "Apple", "Banana", "Orange", "Peach", "Kiwi", "Pear", "Cherry", "Plum", "Apricot", "Papaya", "Avocado",
+    "Grapefruit", "Lemon", "Lime", "Tangerine", "Cantaloupe", "Honeydew melon", "Nectarine", "Persimmon",
+    "Dragon fruit", "Jackfruit", "Star fruit", "Ackee", "Plantain", "Coconut", "Mangosteen", "Feijoa",
+    "Kumquat", "Pummelo", "Satsuma", "Ugli fruit"
+];
 
 interface Props {
     navigation: any;
@@ -25,7 +32,7 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
     const { measurementPreferences } = preferences;
 
     const handleSelectIngredient = (ingredient: string, quantity: string) => {
-        setSelectedIngredients({ ...selectedIngredients, [ingredient]: quantity });
+        setSelectedIngredients(prevState => ({ ...prevState, [ingredient]: quantity }));
     };
 
     const handleToggleCategory = (category: string) => {
@@ -52,6 +59,16 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
 
         await AsyncStorage.setItem('ingredientsMap', JSON.stringify(selectedIngredients));
         navigation.navigate('Equipment');
+    };
+
+    const getPlaceholder = (category: string, ingredient: string) => {
+        if (category === 'Oils') {
+            return measurementPreferences.fluids || 'ml';
+        } else if (category === 'Fruits' && fruitsList.includes(ingredient)) {
+            return t('units');
+        } else {
+            return measurementPreferences.weight || 'g';
+        }
     };
 
     return (
@@ -81,7 +98,8 @@ const AvailableIngredients: React.FC<Props> = ({ navigation }) => {
                                                 <TextInput
                                                     style={initialQuestionsStyles.quantityInput}
                                                     keyboardType="numeric"
-                                                    placeholder={measurementPreferences.weight != null ? measurementPreferences.weight : undefined}
+                                                    placeholder={getPlaceholder(category, ingredient)}
+                                                    value={selectedIngredients[ingredient] || ''}
                                                     onChangeText={(quantity) => handleSelectIngredient(ingredient, quantity)}
                                                 />
                                             </View>

@@ -52,6 +52,7 @@ class FitMyMacrosApiService {
 
     public async updateUserData(data: Record<string, any>): Promise<any> {
         try {
+            console.log('user data:', JSON.stringify(data, null, 2)); // Pretty print with indentation
             const response = await this.client.post('/userData', data);
             if (response.status === 200) {
                 return response.data;

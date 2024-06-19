@@ -992,5 +992,6 @@
     "setupTargetKj": "Set Daily Target Kilojoules",
     "saveSettings": "Save Settings",
     "incorrectCaloriesTarget": "Calories should be a number in between 1000 and 10000.",
-    "incorrectKilojoulesTarget": "Kilojoules should be a number in between 4184 and 41840."
+    "incorrectKilojoulesTarget": "Kilojoules should be a number in between 4184 and 41840.",
+    "units": "units"
 }

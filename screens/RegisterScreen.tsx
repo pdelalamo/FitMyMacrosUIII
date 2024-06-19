@@ -45,26 +45,23 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         clientId: "340273652494315",
     });
 
-    const [ingredientsMap, setIngredientsMap] = useState<Map<string, any>>(new Map());
     const [allergies, setAllergies] = useState<string[]>([]);
     const [equipment, setEquipment] = useState<string[]>([]);
     const [dietType, setDietType] = useState<string | null>('');
     const [loading, setLoading] = useState(false);
     const [energyUnit, setEnergyUnit] = useState('');
     const [weightUnit, setWeightUnit] = useState('');
+    const [fluidUnit, setFluidUnit] = useState('');
 
     useEffect(() => {
         const loadPreferences = async () => {
             try {
-                const savedMap = await AsyncStorage.getItem('ingredientsMap');
-                if (savedMap) {
-                    const parsedMap = new Map(Object.entries(JSON.parse(savedMap)));
-                    setIngredientsMap(parsedMap);
-                }
                 const energy = await AsyncStorage.getItem('measurementEnergy');
                 const weight = await AsyncStorage.getItem('measurementSolid');
+                const fluid = await AsyncStorage.getItem('measurementFluid');
                 setEnergyUnit(energy || '');
                 setWeightUnit(weight || '');
+                setFluidUnit(fluid || '');
             } catch (error) {
                 console.error('Error loading ingredients map from AsyncStorage:', error);
             }
@@ -231,22 +228,33 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     async function sendUserData() {
-        const userData = {
-            userId: email.replace('@', '-at-').toLowerCase(),
-            food: ingredientsMap,
-            "allergies-intolerances": allergies,
-            "previous_recipes": [],
-            vegan: dietType === 'Vegan',
-            vegetarian: dietType === 'Vegetarian',
-            carnivore: dietType === 'Carnivore',
-            keto: dietType === 'Keto',
-            paleo: dietType === 'Paleo',
-            pesoPollo: dietType === 'PescoPollo',
-            equipment: equipment,
-            weightUnit: weightUnit,
-            energyUnit: energyUnit
-        };
         try {
+            const savedMap = await AsyncStorage.getItem('ingredientsMap');
+            console.log('savedmap: ' + savedMap);
+            const parsedObject = await JSON.parse(savedMap !== null ? savedMap : '{}');
+            console.log('parsed object: ' + JSON.stringify(parsedObject, null, 2));
+
+            const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
+            parsedMap.forEach((value: string, key: string) => {
+                console.log(key, value);
+            });
+            const foodObject = Object.fromEntries(parsedMap);
+            const userData = {
+                userId: email.replace('@', '-at-').toLowerCase(),
+                food: foodObject,
+                "allergies-intolerances": [...new Set(allergies)],
+                "previous_recipes": [],
+                vegan: dietType === 'Vegan',
+                vegetarian: dietType === 'Vegetarian',
+                carnivore: dietType === 'Carnivore',
+                keto: dietType === 'Keto',
+                paleo: dietType === 'Paleo',
+                pescoPollo: dietType === 'PescoPollo',
+                equipment: equipment,
+                weightUnit: weightUnit,
+                fluidUnit: fluidUnit,
+                energyUnit: energyUnit
+            };
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;
             console.log('token: ' + token);
