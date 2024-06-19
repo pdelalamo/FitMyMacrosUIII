@@ -53,10 +53,10 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleSaveSettings = async () => {
-        if (energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000)) {
+        if (energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) < 1000 || Number(targetCalories) > 10000)) {
             Alert.alert(t('error'), t('incorrectCaloriesTarget'), [{ text: t('ok') }]);
             return;
-        } else if (energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 4184 || Number(targetCalories) >= 41840)) {
+        } else if (energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) < 4184 || Number(targetCalories) > 41840)) {
             Alert.alert(t('error'), t('incorrectKilojoulesTarget'), [{ text: t('ok') }]);
             return;
         }
@@ -94,10 +94,10 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
                             value={targetCalories}
                             onChangeText={text => setTargetCalories(text)}
                         />
-                        {(energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 1000 || Number(targetCalories) >= 10000)) && (
+                        {(energyUnit === 'kilocalories' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) < 1000 || Number(targetCalories) > 10000)) && (
                             <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTarget')}</Text>
                         )}
-                        {(energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) <= 4184 || Number(targetCalories) >= 41840)) && (
+                        {(energyUnit === 'kilojoules' && (targetCalories === '' || isNaN(Number(targetCalories)) || Number(targetCalories) < 4184 || Number(targetCalories) > 41840)) && (
                             <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTarget')}</Text>
                         )}
                         <View style={globalStyles.sliderContainer}>

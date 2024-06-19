@@ -134,11 +134,19 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
 
     const handleGenerateRecipes = async () => {
-        if (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 0 || Number(recipeTargetCalories) >= 5000) {
-            // Show alert if calories is not a number in between 0 and 5000
+        if (energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 200 || Number(recipeTargetCalories) > 5000)) {
+            // Show alert if calories is not a number in between 200 and 5000
             Alert.alert(
                 t('error'),
-                t('incorrectCalories'),
+                t('incorrectCaloriesTargetRecipe'),
+                [{ text: t('ok') }]
+            );
+            return;
+        } else if (energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 836 || Number(recipeTargetCalories) > 20900)) {
+            // Show alert if kJ is not a number in between 836 and 20900
+            Alert.alert(
+                t('error'),
+                t('incorrectKilojoulesTargetRecipe'),
                 [{ text: t('ok') }]
             );
             return;
@@ -288,11 +296,11 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         value={recipeTargetCalories}
                         onChangeText={text => setRecipeTargetCalories(text)}
                     />
-                    {(energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 1000 || Number(recipeTargetCalories) >= 10000)) && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTarget')}</Text>
+                    {(energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 200 || Number(recipeTargetCalories) > 3000)) && (
+                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTargetRecipe')}</Text>
                     )}
-                    {(energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) <= 4184 || Number(recipeTargetCalories) >= 41840)) && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTarget')}</Text>
+                    {(energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 836 || Number(recipeTargetCalories) > 12540)) && (
+                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTargetRecipe')}</Text>
                     )}
                     <View style={globalStyles.sliderContainer}>
                         <Text style={{ flex: 1 }}>{t('protein')} (%)</Text>
