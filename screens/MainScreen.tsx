@@ -41,7 +41,6 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     useEffect(() => {
         const loadTargetCalsAndMacros = async () => {
             try {
-                //TODO: save this data to dynamoDB when registering the user
                 const storedTargetCalories = await AsyncStorage.getItem('targetCalories');
                 const storedTargetProtein = await AsyncStorage.getItem('proteinPercentage');
                 const storedTargetCarbs = await AsyncStorage.getItem('carbsPercentage');
@@ -87,6 +86,11 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
 
     function generateRecipes() {
         navigation.navigate('RecipeGeneration');
+    }
+
+    // Safety check for percentages
+    const calculatePercentage = (consumed: number, target: number) => {
+        return target > 0 ? (consumed / target) * 100 : 0;
     };
 
     return (
@@ -94,24 +98,52 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
             <View style={globalStyles.containerMain}>
                 <View style={globalStyles.headerWithBackground}>
                     <View style={globalStyles.caloriesContainer}>
-                        <CircularProgress size={100} strokeWidth={10} percentage={(totalCalories / targetCalories) * 100} color="green" />
-                        <Text style={globalStyles.caloriesText}>{totalCalories} {t('of')} {targetCalories} {energyUnit === 'kilocalories' ? 'kcal' : 'kJ'}</Text>
+                        <CircularProgress
+                            size={100}
+                            strokeWidth={10}
+                            percentage={calculatePercentage(totalCalories, targetCalories)}
+                            color="green"
+                        />
+                        <Text style={globalStyles.caloriesText}>
+                            {totalCalories} {t('of')} {targetCalories} {energyUnit === 'kilocalories' ? 'kcal' : 'kJ'}
+                        </Text>
                     </View>
                     <View style={globalStyles.macrosContainer}>
                         <View style={globalStyles.macroBox}>
-                            <CircularProgress size={60} strokeWidth={6} percentage={(proteinConsumed / targetProtein) * 100} color="blue" />
+                            <CircularProgress
+                                size={60}
+                                strokeWidth={6}
+                                percentage={calculatePercentage(proteinConsumed, targetProtein)}
+                                color="blue"
+                            />
                             <Text style={globalStyles.macroText}>{t('protein')}:</Text>
-                            <Text style={globalStyles.macroText}>{proteinConsumed}/{targetProtein} {measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>
+                                {proteinConsumed}/{targetProtein} {measurementUnit}
+                            </Text>
                         </View>
                         <View style={globalStyles.macroBox}>
-                            <CircularProgress size={60} strokeWidth={6} percentage={(carbsConsumed / targetCarbs) * 100} color="orange" />
+                            <CircularProgress
+                                size={60}
+                                strokeWidth={6}
+                                percentage={calculatePercentage(carbsConsumed, targetCarbs)}
+                                color="orange"
+                            />
                             <Text style={globalStyles.macroText}>{t('carbs')}:</Text>
-                            <Text style={globalStyles.macroText}>{carbsConsumed}/{targetCarbs} {measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>
+                                {carbsConsumed}/{targetCarbs} {measurementUnit}
+                            </Text>
                         </View>
                         <View style={globalStyles.macroBox}>
-                            <CircularProgress size={60} strokeWidth={6} percentage={(fatConsumed / targetFat) * 100} color="red" />
+                            <CircularProgress
+                                size={60}
+                                strokeWidth={6}
+                                percentage={calculatePercentage(fatConsumed, targetFat)}
+                                color="red"
+                            />
                             <Text style={globalStyles.macroText}>{t('fat')}:</Text>
-                            <Text style={globalStyles.macroText}>{fatConsumed}/{targetFat} {measurementUnit}</Text>
+                            <Text style={globalStyles.macroText}>
+                                {fatConsumed}/{targetFat} {measurementUnit}
+                            </Text>
                         </View>
                     </View>
                 </View>

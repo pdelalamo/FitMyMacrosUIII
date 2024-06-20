@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Alert, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { globalStyles } from 'globalStyles';
 import i18n from 'i18n';
@@ -8,6 +8,7 @@ import Meal from 'model/Meal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SecurityApiService from 'services/SecurityApiService';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
+import { BlurView } from 'expo-blur';
 
 interface Props {
     navigation: any;
@@ -15,13 +16,17 @@ interface Props {
 }
 
 const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
+    const [loading, setLoading] = useState(false);
     const { recipeData } = route.params;
     const [username, setUsername] = useState<string | null>(null);
+    const [energyUnit, setEnergy] = useState('');
 
     useEffect(() => {
         const loadUsername = async () => {
             try {
                 setUsername(await AsyncStorage.getItem('username'));
+                const energy = await AsyncStorage.getItem('measurementEnergy');
+                setEnergy(energy === null ? '' : energy);
             } catch (error) {
                 console.error('Error loading username', error);
             }
@@ -76,6 +81,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
      */
     const saveMeal = async () => {
         try {
+            setLoading(true);
             // Create a new meal object
             const newMeal = new Meal(
                 Date.now().toString(),
@@ -125,6 +131,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             //update ingredients and recipes in dynamoDB
             await updateDynamoIngredients();
 
+            setLoading(false);
             // Navigate to the MainScreen
             navigation.navigate('MainScreen');
 
@@ -175,7 +182,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                     <Text style={styles.cookingTime}>{cookingTime}</Text>
                 </View>
                 <View style={styles.macrosContainer}>
-                    <Text style={styles.macrosText}>{t('calories')}: {caloriesAndMacros.calories}</Text>
+                    <Text style={styles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {caloriesAndMacros.calories}</Text>
                     <Text style={styles.macrosText}>{t('protein')}: {caloriesAndMacros.protein}</Text>
                     <Text style={styles.macrosText}>{t('carbs')}: {caloriesAndMacros.carbs}</Text>
                     <Text style={styles.macrosText}>{t('fat')}: {caloriesAndMacros.fat}</Text>
@@ -202,6 +209,15 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 >
                     <Text style={styles.buttonText}>{t('useRecipe')}</Text>
                 </TouchableOpacity>
+                {loading && (
+                    <View style={globalStyles.loadingOverlay}>
+                        <TouchableWithoutFeedback>
+                            <BlurView intensity={50} style={globalStyles.blurView}>
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            </BlurView>
+                        </TouchableWithoutFeedback>
+                    </View>
+                )}
             </ScrollView>
         </I18nextProvider>
     );

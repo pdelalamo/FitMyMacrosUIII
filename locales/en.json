@@ -983,6 +983,7 @@
     "loading": "Loading...",
     "ingredients": "Ingredients",
     "calories": "Calories",
+    "kilojoules": "Kilojoules",
     "cookingProcess": "Cooking Process",
     "errorLoadingRecipes": "Error loading recipe details.",
     "useRecipe": "Use this Recipe",
