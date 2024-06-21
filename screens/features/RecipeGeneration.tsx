@@ -80,7 +80,6 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         { label: t('dietaryRestrictions.vegan'), value: 'vegan' },
         { label: t('dietaryRestrictions.vegetarian'), value: 'vegetarian' },
         { label: t('dietaryRestrictions.glutenFree'), value: 'glutenFree' },
-        { label: t('dietaryRestrictions.keto'), value: 'keto' },
         { label: t('dietaryRestrictions.paleo'), value: 'paleo' },
         { label: t('dietaryRestrictions.pescatarian'), value: 'pescatarian' },
         { label: t('dietaryRestrictions.dairyFree'), value: 'dairyFree' },
@@ -159,7 +158,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 t('macrosError'),
                 [{ text: t('ok') }]
             );
-        } else if (cuisine === '' || flavor === '' || satiety === '' || diet === '' || cookingTime === '' || occasion === '') {
+        } else if (cuisine === '' || flavor === '' || satiety === '' || cookingTime === '' || occasion === '') {
             Alert.alert(
                 t('error'),
                 t('dropdownsError'),
@@ -184,9 +183,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 satietyLevel: satiety,
                 anyIngredientsMode: toggleCheckBox,
                 expandIngredients: false,
-                glutenFree: diet === 'glutenFree' ? true : false,
-                vegan: diet === 'vegan' ? true : false,
-                vegetarian: diet === 'vegetarian' ? true : false,
+                glutenFree: false,
+                vegan: false,
+                vegetarian: false,
                 cuisineStyle: cuisine,
                 cookingTime: cookingTime,
                 flavor: flavor,
@@ -207,9 +206,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 carbs: carbsGrams,
                 fat: fatGrams,
                 anyIngredientsMode: toggleCheckBox,
-                glutenFree: diet === 'glutenFree' ? true : false,
-                vegan: diet === 'vegan' ? true : false,
-                vegetarian: diet === 'vegetarian' ? true : false,
+                glutenFree: false,
+                vegan: false,
+                vegetarian: false,
                 cookingTime: cookingTime,
                 userId: username,
                 precision: 'exactly'
@@ -237,7 +236,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         setValue={setCuisine}
                         placeholder={t('selectCuisineStyle')}
                         containerStyle={globalStyles.dropdown}
-                        zIndex={6000}
+                        zIndex={5000}
                     />
                     <DropDownPicker
                         open={flavorOpen}
@@ -247,7 +246,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         placeholder={t('selectFlavorProfile')}
                         setValue={setFlavor}
                         containerStyle={globalStyles.dropdown}
-                        zIndex={5000}
+                        zIndex={4000}
                     />
                     <DropDownPicker
                         open={satietyOpen}
@@ -257,18 +256,9 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                         placeholder={t('selectSatietyLevel')}
                         setValue={setSatiety}
                         containerStyle={globalStyles.dropdown}
-                        zIndex={4000}
-                    />
-                    <DropDownPicker
-                        open={dietOpen}
-                        value={diet}
-                        items={dietItems}
-                        setOpen={setDietOpen}
-                        setValue={setDiet}
-                        placeholder={t('selectDietaryRestrictions')}
-                        containerStyle={globalStyles.dropdown}
                         zIndex={3000}
                     />
+
                     <DropDownPicker
                         open={cookingTimeOpen}
                         value={cookingTime}

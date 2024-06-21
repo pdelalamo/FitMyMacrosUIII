@@ -36,6 +36,22 @@ class FitMyMacrosApiService {
         }
     }
 
+    public async getRecipesFromDynamoDB(params: Record<string, any>): Promise<any> {
+        try {
+            const response = await this.client.get('/recipes', { params });
+            console.log('response status: ' + response.status);
+            console.log('response data: ' + response.data);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                throw new Error('Failed to fetch recipes');
+            }
+        } catch (error) {
+            console.error('Error fetching recipes:', error);
+            throw error;
+        }
+    }
+
     public async getRecipeDetail(params: Record<string, any>): Promise<any> {
         try {
             const response = await this.client.get('/recipes/detail', { params });

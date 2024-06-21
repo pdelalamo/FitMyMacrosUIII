@@ -47,9 +47,11 @@
         "Carnivore",
         "Vegan",
         "Keto",
+        "Halal",
         "Vegetarian",
         "Paleo",
-        "PescoPollo"
+        "PescoPollo",
+        "Kosher"
     ],
     "weightOptions": [
         "grams",
@@ -950,7 +952,6 @@
         "vegan": "Vegan",
         "vegetarian": "Vegetarian",
         "glutenFree": "Gluten-Free",
-        "keto": "Keto",
         "paleo": "Paleo",
         "pescatarian": "Pescatarian",
         "dairyFree": "Dairy-Free",
