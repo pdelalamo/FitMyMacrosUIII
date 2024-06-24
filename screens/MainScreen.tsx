@@ -9,6 +9,7 @@ import CircularProgress from 'utils/CircularProgress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Meal from 'model/Meal';
 import { useIsFocused } from '@react-navigation/native';
+import Footer from 'utils/Footer';
 
 interface Props {
     navigation: any;
@@ -158,13 +159,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity style={globalStyles.addButton} onPress={() => generateRecipes()}>
                     <Text style={globalStyles.addButtonText}>{t('addMeal')}</Text>
                 </TouchableOpacity>
-                <View style={globalStyles.footer}>
-                    <Ionicons name="home" size={35} color="white" />
-                    <Ionicons name="search" size={35} color="white" />
-                    <Ionicons name="add-circle" size={35} color="white" />
-                    <Ionicons name="notifications" size={35} color="white" />
-                    <Ionicons name="person" size={35} color="white" />
-                </View>
+                <Footer navigation={navigation} />
             </View>
         </I18nextProvider>
     );

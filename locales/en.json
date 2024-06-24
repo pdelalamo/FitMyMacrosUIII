@@ -997,5 +997,13 @@
     "incorrectKilojoulesTarget": "Kilojoules should be a number in between 4184 and 41840.",
     "incorrectCaloriesTargetRecipe": "Calories should be a number in between 200 and 3000.",
     "incorrectKilojoulesTargetRecipe": "Kilojoules should be a number in between 836 and 12540.",
-    "units": "units"
+    "units": "units",
+    "settings": {
+        "availableFood": "Available Food",
+        "allergiesIntolerances": "Allergies & Intolerances",
+        "dietType": "Diet Type",
+        "equipment": "Equipment",
+        "measurementPreferences": "Measurement Preferences",
+        "targetCaloriesMacros": "Target Calories & Macros"
+    }
 }

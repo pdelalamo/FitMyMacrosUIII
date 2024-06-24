@@ -209,16 +209,16 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 >
                     <Text style={styles.buttonText}>{t('useRecipe')}</Text>
                 </TouchableOpacity>
-                {loading && (
-                    <View style={globalStyles.loadingOverlay}>
-                        <TouchableWithoutFeedback>
-                            <BlurView intensity={50} style={globalStyles.blurView}>
-                                <ActivityIndicator size="large" color="#0000ff" />
-                            </BlurView>
-                        </TouchableWithoutFeedback>
-                    </View>
-                )}
             </ScrollView>
+            {loading && (
+                <View style={globalStyles.loadingOverlay}>
+                    <TouchableWithoutFeedback>
+                        <BlurView intensity={50} style={globalStyles.blurView}>
+                            <ActivityIndicator size="large" color="#0000ff" />
+                        </BlurView>
+                    </TouchableWithoutFeedback>
+                </View>
+            )}
         </I18nextProvider>
     );
 };
