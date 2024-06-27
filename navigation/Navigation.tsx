@@ -24,6 +24,13 @@ import RecipeDetail from 'screens/features/RecipeDetail';
 import TargetCaloriesAndMacros from 'screens/initialQuestions/TargetCaloriesAndMacros';
 import SettingsScreen from 'screens/settings/SettingsScreen';
 import Footer from 'utils/Footer';
+import AvailableIngredientsSettings from 'screens/settings/AvailableIngredientsSettings';
+import AllergiesSettings from 'screens/settings/AllergiesSettings';
+import DietSettings from 'screens/settings/DietSettings';
+import EquipmentSelection from '../screens/initialQuestions/Equipment';
+import EquipmentSettings from 'screens/settings/EquipmentSettings';
+import MeasurementSettings from 'screens/settings/MeasurementSettings';
+import TargetEnergyAndMacros from 'screens/settings/TargetEnergyAndMacros';
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +78,13 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="TargetCaloriesAndMacros" component={TargetCaloriesAndMacros} />
                     <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
                     <Stack.Screen name="Footer" component={Footer} />
+                    <Stack.Screen name="AvailableIngredientsSettings" component={AvailableIngredientsSettings} />
+                    <Stack.Screen name="AllergiesSettings" component={AllergiesSettings} />
+                    <Stack.Screen name="DietSettings" component={DietSettings} />
+                    <Stack.Screen name="EquipmentSettings" component={EquipmentSettings} />
+                    <Stack.Screen name="MeasurementSettings" component={MeasurementSettings} />
+                    <Stack.Screen name="TargetEnergyAndMacros" component={TargetEnergyAndMacros} />
+
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

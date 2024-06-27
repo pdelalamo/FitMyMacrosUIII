@@ -13,12 +13,12 @@ interface Props {
 }
 
 const settingsOptions = [
-    { key: 'availableFood', screen: 'AvailableFoodScreen' },
-    { key: 'allergiesIntolerances', screen: 'AllergiesScreen' },
-    { key: 'dietType', screen: 'DietTypeScreen' },
-    { key: 'equipment', screen: 'EquipmentScreen' },
-    { key: 'measurementPreferences', screen: 'MeasurementPreferencesScreen' },
-    { key: 'targetCaloriesMacros', screen: 'TargetCaloriesScreen' }
+    { key: 'availableFood', screen: 'AvailableIngredientsSettings' },
+    { key: 'allergiesIntolerances', screen: 'AllergiesSettings' },
+    { key: 'dietType', screen: 'DietSettings' },
+    { key: 'equipment', screen: 'EquipmentSettings' },
+    { key: 'measurementPreferences', screen: 'MeasurementSettings' },
+    { key: 'targetEnergyMacros', screen: 'TargetEnergyAndMacros' }
 ];
 
 const SettingsScreen: React.FC<Props> = ({ route, navigation }) => {

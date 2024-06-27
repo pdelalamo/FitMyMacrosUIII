@@ -993,6 +993,7 @@
     "setupTargetCalories": "Set Daily Target Calories",
     "setupTargetKj": "Set Daily Target Kilojoules",
     "saveSettings": "Save Settings",
+    "save": "Save",
     "incorrectCaloriesTarget": "Calories should be a number in between 1000 and 10000.",
     "incorrectKilojoulesTarget": "Kilojoules should be a number in between 4184 and 41840.",
     "incorrectCaloriesTargetRecipe": "Calories should be a number in between 200 and 3000.",
@@ -1004,6 +1005,6 @@
         "dietType": "Diet Type",
         "equipment": "Equipment",
         "measurementPreferences": "Measurement Preferences",
-        "targetCaloriesMacros": "Target Calories & Macros"
+        "targetEnergyMacros": "Target Energy & Macros"
     }
 }

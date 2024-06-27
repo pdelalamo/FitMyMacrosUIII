@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
+import SecurityApiService from './SecurityApiService';
 
 class FitMyMacrosApiService {
 
@@ -63,6 +65,51 @@ class FitMyMacrosApiService {
         } catch (error) {
             console.error('Error fetching recipe detail:', error);
             throw error;
+        }
+    }
+
+    public async sendUserData() {
+        try {
+            const asyncEmail = await AsyncStorage.getItem("username");
+            const email = asyncEmail === null ? '' : asyncEmail.toLowerCase()
+            const savedMap = await AsyncStorage.getItem('ingredientsMap');
+            const parsedObject = await JSON.parse(savedMap !== null ? savedMap : '{}');
+            const savedAllergies = await AsyncStorage.getItem('allergiesList');
+            const allergies = savedAllergies === null ? [] : JSON.parse(savedAllergies);
+            const diet = await AsyncStorage.getItem('dietType');
+            const dietType = diet === null ? '' : diet;
+            const savedAEq = await AsyncStorage.getItem('equipmentList');
+            const equipment = savedAEq === null ? [] : JSON.parse(savedAEq);
+            const energy = await AsyncStorage.getItem('measurementEnergy');
+            const weight = await AsyncStorage.getItem('measurementSolid');
+            const fluid = await AsyncStorage.getItem('measurementFluid');
+
+            const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
+            parsedMap.forEach((value: string, key: string) => {
+                console.log(key, value);
+            });
+            const foodObject = Object.fromEntries(parsedMap);
+            const userData = {
+                userId: email,
+                food: foodObject,
+                "allergies-intolerances": allergies,
+                vegan: dietType === 'Vegan',
+                vegetarian: dietType === 'Vegetarian',
+                dietType: dietType,
+                equipment: equipment,
+                weightUnit: weight,
+                fluidUnit: fluid,
+                energyUnit: energy
+            };
+            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
+            const token = tokenResponse.body;
+            console.log('token: ' + token);
+
+            this.setAuthToken(token);
+            const result = await this.updateUserData(userData);
+            console.log('User data updated successfully:', result);
+        } catch (error) {
+            console.error('Failed to update user data:', error);
         }
     }
 
