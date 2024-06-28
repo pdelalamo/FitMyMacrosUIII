@@ -17,7 +17,7 @@ interface Props {
 
 const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     const [loading, setLoading] = useState(false);
-    const { recipeData } = route.params;
+    const { recipeData, anyIngredientsMode } = route.params;
     const [username, setUsername] = useState<string | null>(null);
     const [energyUnit, setEnergy] = useState('');
 
@@ -110,16 +110,18 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             const existingIngredients = await AsyncStorage.getItem('ingredientsMap');
             const ingredients = existingIngredients ? JSON.parse(existingIngredients) : {};
 
-            // Subtract the used quantities of the ingredients
-            for (const [ingredient, usedQuantity] of Object.entries(ingredientsAndQuantities)) {
-                if (typeof usedQuantity === 'string') {
-                    // Extract numeric part from the usedQuantity
-                    const usedQuantityFloat = parseFloat(usedQuantity.replace(/[^0-9.-]/g, ''));
-                    if (!isNaN(usedQuantityFloat)) {
-                        if (ingredients[ingredient]) {
-                            const currentQuantity = parseFloat(ingredients[ingredient].replace(/[^0-9.-]/g, ''));
-                            if (!isNaN(currentQuantity)) {
-                                ingredients[ingredient] = (currentQuantity - usedQuantityFloat).toString();
+            if (anyIngredientsMode) {
+                // Subtract the used quantities of the ingredients
+                for (const [ingredient, usedQuantity] of Object.entries(ingredientsAndQuantities)) {
+                    if (typeof usedQuantity === 'string') {
+                        // Extract numeric part from the usedQuantity
+                        const usedQuantityFloat = parseFloat(usedQuantity.replace(/[^0-9.-]/g, ''));
+                        if (!isNaN(usedQuantityFloat)) {
+                            if (ingredients[ingredient]) {
+                                const currentQuantity = parseFloat(ingredients[ingredient].replace(/[^0-9.-]/g, ''));
+                                if (!isNaN(currentQuantity)) {
+                                    ingredients[ingredient] = (currentQuantity - usedQuantityFloat).toString();
+                                }
                             }
                         }
                     }

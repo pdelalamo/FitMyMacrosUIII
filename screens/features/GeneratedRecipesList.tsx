@@ -97,7 +97,7 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
         });
         console.log('recipe detail from openAI: ' + removeLeadingTrailingCommasAndQuotes(recipeDetail.body));
         setLoading(false);
-        navigation.navigate('RecipeDetail', { recipeData: removeLeadingTrailingCommasAndQuotes(recipeDetail.body) });
+        navigation.navigate('RecipeDetail', { recipeData: removeLeadingTrailingCommasAndQuotes(recipeDetail.body), anyIngredientsMode: anyIngredientsMode });
     };
 
     const renderItem = ({ item }: { item: [string, string] }) => {
