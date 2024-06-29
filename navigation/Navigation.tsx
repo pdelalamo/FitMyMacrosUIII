@@ -31,6 +31,8 @@ import EquipmentSelection from '../screens/initialQuestions/Equipment';
 import EquipmentSettings from 'screens/settings/EquipmentSettings';
 import MeasurementSettings from 'screens/settings/MeasurementSettings';
 import TargetEnergyAndMacros from 'screens/settings/TargetEnergyAndMacros';
+import OpenRecipeDetail from 'screens/features/OpenRecipeDetail';
+import FavoriteRecipes from 'screens/features/FavoriteRecipes';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,7 +86,8 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="EquipmentSettings" component={EquipmentSettings} />
                     <Stack.Screen name="MeasurementSettings" component={MeasurementSettings} />
                     <Stack.Screen name="TargetEnergyAndMacros" component={TargetEnergyAndMacros} />
-
+                    <Stack.Screen name="OpenRecipeDetail" component={OpenRecipeDetail} />
+                    <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipes} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

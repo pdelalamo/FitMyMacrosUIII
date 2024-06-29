@@ -1006,5 +1006,7 @@
         "equipment": "Equipment",
         "measurementPreferences": "Measurement Preferences",
         "targetEnergyMacros": "Target Energy & Macros"
-    }
+    },
+    "removedRecipe": "Recipe removed from favorites",
+    "addedRecipe": "Recipe added to favorites"
 }

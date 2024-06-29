@@ -15,7 +15,7 @@ const Footer: React.FC<FooterProps> = ({ navigation }) => {
             <Ionicons name="home" size={35} color="white" onPress={() => navigation.navigate('MainScreen')} />
             <Ionicons name="search" size={35} color="white" />
             <Ionicons name="add-circle" size={35} color="white" />
-            <Ionicons name="notifications" size={35} color="white" />
+            <Ionicons name="star" size={35} color="white" onPress={() => navigation.navigate('FavoriteRecipes')} />
             <Ionicons name="settings" size={35} color="white" onPress={() => navigation.navigate('SettingsScreen')} />
         </View>
     );

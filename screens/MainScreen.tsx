@@ -150,10 +150,27 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
                 <ScrollView style={globalStyles.mealsContainer}>
                     {meals.map(meal => (
-                        <View key={meal.id} style={globalStyles.mealBox}>
+                        <TouchableOpacity
+                            key={meal.id}
+                            style={globalStyles.mealBox}
+                            onPress={() => {
+                                const recipeData = {
+                                    recipeName: meal.name,
+                                    cookingTime: meal.cookingTime,
+                                    calories: meal.calories,
+                                    protein: meal.protein,
+                                    carbs: meal.carbs,
+                                    fat: meal.fat,
+                                    ingredientsAndQuantities: meal.ingredients,
+                                    cookingProcess: meal.cookingProcess
+                                };
+                                console.log('Navigating with recipeData:', recipeData);
+                                navigation.navigate('OpenRecipeDetail', { recipeData });
+                            }}
+                        >
                             <Text style={globalStyles.mealName}>{meal.name}</Text>
                             <Text style={globalStyles.mealCalories}>{meal.calories} kcal</Text>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
                 <TouchableOpacity style={globalStyles.addButton} onPress={() => generateRecipes()}>
