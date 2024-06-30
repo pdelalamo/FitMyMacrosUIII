@@ -155,13 +155,13 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                             style={globalStyles.mealBox}
                             onPress={() => {
                                 const recipeData = {
-                                    recipeName: meal.name,
+                                    name: meal.name,
                                     cookingTime: meal.cookingTime,
                                     calories: meal.calories,
                                     protein: meal.protein,
                                     carbs: meal.carbs,
                                     fat: meal.fat,
-                                    ingredientsAndQuantities: meal.ingredients,
+                                    ingredients: meal.ingredients,
                                     cookingProcess: meal.cookingProcess
                                 };
                                 console.log('Navigating with recipeData:', recipeData);
@@ -169,7 +169,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                             }}
                         >
                             <Text style={globalStyles.mealName}>{meal.name}</Text>
-                            <Text style={globalStyles.mealCalories}>{meal.calories} kcal</Text>
+                            <Text style={globalStyles.mealCalories}>{meal.calories} {energyUnit}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>

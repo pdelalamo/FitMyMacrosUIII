@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { globalStyles } from 'globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Footer from 'utils/Footer';
+import Meal from 'model/Meal';
+import { useIsFocused } from '@react-navigation/native';
 
-const FavoriteRecipes = ({ navigation }) => {
-    const [favoriteMeals, setFavoriteMeals] = useState([]);
+interface Props {
+    navigation: any;
+}
+
+const FavoriteRecipes: React.FC<Props> = ({ navigation }) => {
+    const [favoriteMeals, setFavoriteMeals] = useState<Meal[]>([]);
+    const [energyUnit, setEnergy] = useState<string>('');
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         const loadFavoriteMeals = async () => {
@@ -14,45 +21,42 @@ const FavoriteRecipes = ({ navigation }) => {
                 if (favorites) {
                     setFavoriteMeals(JSON.parse(favorites));
                 }
+                const energy = await AsyncStorage.getItem('measurementEnergy');
+                setEnergy(energy === null ? '' : energy);
             } catch (error) {
                 console.error('Error loading favorite meals', error);
             }
         };
         loadFavoriteMeals();
-    }, []);
+    }, [isFocused]);
 
     return (
         <ScrollView style={globalStyles.mealsContainer}>
-            {favoriteMeals.map((meal, index) => (
+            {favoriteMeals.filter(meal => meal.name !== null && meal.name !== undefined && meal.name !== '').map((meal, index) => (
                 <TouchableOpacity
                     key={index}
                     style={globalStyles.mealBox}
                     onPress={() => {
                         const recipeData = {
-                            recipeName: meal.recipeName,
+                            name: meal.name,
                             cookingTime: meal.cookingTime,
                             calories: meal.calories,
                             protein: meal.protein,
                             carbs: meal.carbs,
                             fat: meal.fat,
-                            ingredientsAndQuantities: meal.ingredientsAndQuantities,
+                            ingredients: meal.ingredients,
                             cookingProcess: meal.cookingProcess
                         };
                         console.log('Navigating with recipeData:', recipeData);
                         navigation.navigate('OpenRecipeDetail', { recipeData });
                     }}
                 >
-                    <Text style={globalStyles.mealName}>{meal.recipeName}</Text>
-                    <Text style={globalStyles.mealCalories}>{meal.calories} kcal</Text>
+                    <Text style={globalStyles.mealName}>{meal.name}</Text>
+                    <Text style={globalStyles.mealCalories}>{meal.calories} {energyUnit}</Text>
                 </TouchableOpacity>
             ))}
-            <Footer navigation={navigation} />
         </ScrollView>
     );
 };
-
-const styles = StyleSheet.create({
-    // Add your styles here if needed
-});
 
 export default FavoriteRecipes;

@@ -9,6 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SecurityApiService from 'services/SecurityApiService';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { BlurView } from 'expo-blur';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 
 interface Props {
     navigation: any;
@@ -20,6 +22,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     const { recipeData, anyIngredientsMode } = route.params;
     const [username, setUsername] = useState<string | null>(null);
     const [energyUnit, setEnergy] = useState('');
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         const loadUsername = async () => {
@@ -31,7 +34,19 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 console.error('Error loading username', error);
             }
         };
+        const checkIfFavorite = async () => {
+            try {
+                const favorites = await AsyncStorage.getItem('favoriteMeals');
+                if (favorites) {
+                    const favoritesArray = JSON.parse(favorites);
+                    setIsFavorite(favoritesArray.some((meal: any) => meal.recipeName === recipeData.recipeName));
+                }
+            } catch (error) {
+                console.error('Error loading favorite meals', error);
+            }
+        };
         loadUsername();
+        checkIfFavorite();
     }, []);
 
     // Debugging: Log the incoming recipeData
@@ -61,6 +76,33 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     const ingredients: [string, string][] = Object.entries(ingredientsAndQuantities).map(
         ([key, value]) => [key, value as string]
     );
+
+    const handleFavoriteToggle = async () => {
+        try {
+            //await AsyncStorage.setItem('favoriteMeals', JSON.stringify([[]]));
+            const favorites = await AsyncStorage.getItem('favoriteMeals');
+            let favoritesArray = favorites ? JSON.parse(favorites) : [];
+
+            if (isFavorite) {
+                favoritesArray = favoritesArray.filter((meal: any) => meal.recipeName !== recipeData.recipeName);
+                Toast.show({
+                    type: 'success',
+                    text1: t('removedRecipe'),
+                });
+            } else {
+                favoritesArray.push(recipeData);
+                Toast.show({
+                    type: 'success',
+                    text1: t('addedRecipe'),
+                });
+            }
+
+            await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error('Error updating favorite meals', error);
+        }
+    };
 
     const renderIngredient = ({ item }: { item: [string, string] }) => (
         <View style={styles.ingredientContainer}>
@@ -183,6 +225,15 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                     <Text style={styles.recipeName}>{recipeName}</Text>
                     <Text style={styles.cookingTime}>{cookingTime}</Text>
                 </View>
+                <View style={styles.headerContainer}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.recipeName}>{recipeName}</Text>
+                        <TouchableOpacity onPress={handleFavoriteToggle}>
+                            <Icon name={isFavorite ? "star" : "star-o"} size={24} color="#FFD700" />
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={styles.cookingTime}>{cookingTime}</Text>
+                </View>
                 <View style={styles.macrosContainer}>
                     <Text style={styles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {caloriesAndMacros.calories}</Text>
                     <Text style={styles.macrosText}>{t('protein')}: {caloriesAndMacros.protein}</Text>
@@ -205,6 +256,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                         keyExtractor={(item, index) => index.toString()}
                     />
                 </View>
+                <Toast />
                 <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => { saveMeal() }}
@@ -229,6 +281,11 @@ const styles = StyleSheet.create({
     headerContainer: {
         alignItems: 'center',
         marginVertical: 20,
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     recipeName: {
         fontSize: 24,
