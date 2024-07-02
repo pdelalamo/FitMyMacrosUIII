@@ -85,12 +85,18 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
 
             if (isFavorite) {
                 favoritesArray = favoritesArray.filter((meal: any) => meal.recipeName !== recipeData.recipeName);
+                setLoading(true);
+                await FitMyMacrosApiService.sendUserData();
+                setLoading(false);
                 Toast.show({
                     type: 'success',
                     text1: t('removedRecipe'),
                 });
             } else {
                 favoritesArray.push(recipeData);
+                setLoading(true);
+                await FitMyMacrosApiService.sendUserData();
+                setLoading(false);
                 Toast.show({
                     type: 'success',
                     text1: t('addedRecipe'),
@@ -172,6 +178,23 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
 
             // Save the updated ingredients back to AsyncStorage
             await AsyncStorage.setItem('ingredients', JSON.stringify(ingredients));
+            // Update local last recipes
+            const previous_recipes = await AsyncStorage.getItem('previous_recipes');
+            let previous_recipesArray = previous_recipes ? JSON.parse(previous_recipes) : [];
+
+            // Add new recipe name to the array
+            previous_recipesArray.push(recipeData.name);
+
+            // Cap the array size at 6
+            const maxSize = 6;
+            if (previous_recipesArray.length > maxSize) {
+                // Remove the oldest elements exceeding the maxSize
+                previous_recipesArray = previous_recipesArray.slice(-maxSize);
+            }
+
+            // Store the updated array in AsyncStorage
+            await AsyncStorage.setItem('previous_recipes', JSON.stringify(previous_recipesArray));
+
             //update ingredients and recipes in dynamoDB
             await updateDynamoIngredients();
 

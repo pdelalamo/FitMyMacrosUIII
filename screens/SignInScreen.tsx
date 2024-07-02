@@ -12,6 +12,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
+import SecurityApiService from 'services/SecurityApiService';
 
 const config = {
     expoClientId: '868426694791-390ntagtjqcln514p6km7q9hr5tm0s5g.apps.googleusercontent.com',
@@ -88,7 +90,9 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await loadDataFromDynamoDB();
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -113,7 +117,9 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await loadDataFromDynamoDB();
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -136,12 +142,53 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             if ((response === 'ok')) {
                 await AsyncStorage.setItem("isUserSignedIn", 'true');
                 await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
+                await loadDataFromDynamoDB();
                 navigation.navigate('MainScreen');
             } else {
                 Alert.alert(t('incorrectPassword'));
             }
         }
     };
+
+    async function loadDataFromDynamoDB() {
+        try {
+            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
+            const token = tokenResponse.body;
+            FitMyMacrosApiService.setAuthToken(token);
+            console.log("calling with email: " + email);
+            const userId = email.replace('@', '-at-').toLowerCase()
+            const userDataResponse = await FitMyMacrosApiService.getUserData({ userId });
+
+            // Check the status code and parse the body if the request was successful
+            if (userDataResponse.statusCode === 200) {
+                const userData = JSON.parse(userDataResponse.body);
+
+                for (const key in userData) {
+                    console.log('userdata entry key: ' + key + ': ' + userData[key]);
+                }
+
+                await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
+                await AsyncStorage.setItem('ingredientsMap', JSON.stringify(userData['food']));
+                await AsyncStorage.setItem('allergiesList', JSON.stringify(userData['allergies-intolerances']));
+                await AsyncStorage.setItem('dietType', userData['dietType']);
+                await AsyncStorage.setItem('equipmentList', JSON.stringify(userData['equipment']));
+                await AsyncStorage.setItem('measurementEnergy', userData['energyUnit']);
+                await AsyncStorage.setItem('measurementSolid', userData['weightUnit']);
+                await AsyncStorage.setItem('measurementFluid', userData['fluidUnit']);
+                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(userData['favoriteMeals']));
+                await AsyncStorage.setItem('previous_recipes', JSON.stringify(userData['previous_recipes']));
+                await AsyncStorage.setItem('targetCalories', userData['targetEnergy']);
+                await AsyncStorage.setItem('proteinPercentage', userData['targetProteinPercentage']);
+                await AsyncStorage.setItem('carbsPercentage', userData['targetCarbsPercentage']);
+                await AsyncStorage.setItem('fatPercentage', userData['targetFatPercentage']);
+            } else {
+                console.error('Failed to fetch user data', userDataResponse);
+            }
+
+        } catch (error) {
+            console.error('Error storing user data in AsyncStorage:', error);
+        }
+    }
 
     async function resetPassword() {
         const userExistsInPool = await checkCognitoUser(resetEmail);

@@ -11,7 +11,7 @@ import SecurityApiService from 'services/SecurityApiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { BlurView } from 'expo-blur';
-import { generateRandomString, getWeightPreference } from 'utils/UtilFunctions';
+import { generateRandomString } from 'utils/UtilFunctions';
 
 interface Props {
     navigation: any;
@@ -111,9 +111,10 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         };
         const loadPreferences = async () => {
             try {
-                setWeightPreference(await getWeightPreference());
                 const energy = await AsyncStorage.getItem('measurementEnergy');
                 setEnergy(energy === null ? '' : energy);
+                const solid = await AsyncStorage.getItem('measurementSolid');
+                setWeightPreference(solid === null ? '' : solid);
             } catch (error) {
                 console.error('Error loading preferences', error);
             }

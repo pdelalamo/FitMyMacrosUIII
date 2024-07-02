@@ -83,6 +83,14 @@ class FitMyMacrosApiService {
             const energy = await AsyncStorage.getItem('measurementEnergy');
             const weight = await AsyncStorage.getItem('measurementSolid');
             const fluid = await AsyncStorage.getItem('measurementFluid');
+            const savedFavoriteMeals = await AsyncStorage.getItem('favoriteMeals');
+            const favoriteMeals = savedFavoriteMeals === null ? [] : JSON.parse(savedFavoriteMeals);
+            const savedPrevRecipes = await AsyncStorage.getItem('previous_recipes');
+            const previous_recipes = savedPrevRecipes === null ? [] : JSON.parse(savedPrevRecipes);
+            const targetEnergy = await AsyncStorage.getItem('targetCalories');
+            const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
+            const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
+            const targetFatPercentage = await AsyncStorage.getItem('fatPercentage');
 
             const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
             parsedMap.forEach((value: string, key: string) => {
@@ -99,7 +107,13 @@ class FitMyMacrosApiService {
                 equipment: equipment,
                 weightUnit: weight,
                 fluidUnit: fluid,
-                energyUnit: energy
+                energyUnit: energy,
+                favoriteMeals: favoriteMeals,
+                targetEnergy: targetEnergy,
+                targetProteinPercentage: targetProteinPercentage,
+                targetCarbsPercentage: targetCarbsPercentage,
+                targetFatPercentage: targetFatPercentage,
+                previous_recipes: previous_recipes
             };
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;
@@ -124,6 +138,33 @@ class FitMyMacrosApiService {
             }
         } catch (error) {
             console.error('Error posting user data:', error);
+            throw error;
+        }
+    }
+
+    public async getUserData(params: Record<string, any>): Promise<any> {
+        try {
+            console.log('Received params:', params);
+
+            // Check if params is an object and iterate over it
+            if (typeof params === 'object' && params !== null) {
+                console.log('Params is a valid object');
+                for (const key in params) {
+                    if (params.hasOwnProperty(key)) {
+                        console.log(`Key: ${key}, Value: ${params[key]}`);
+                    }
+                }
+            } else {
+                console.log('Params is not an object or is null');
+            }
+            const response = await this.client.get('/userData', { params });
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                throw new Error('Failed to get user data');
+            }
+        } catch (error) {
+            console.error('Error getting user data:', error);
             throw error;
         }
     }

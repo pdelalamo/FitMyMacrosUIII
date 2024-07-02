@@ -69,9 +69,9 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         const loadDailyMeals = async () => {
             try {
                 const mealsData = await AsyncStorage.getItem('meals');
-                const measurementSolid = await getWeightPreference();
+                const solid = await AsyncStorage.getItem('measurementSolid');
+                setMeasurement(solid === null ? '' : solid);
                 const energy = await AsyncStorage.getItem('measurementEnergy');
-                setMeasurement(measurementSolid === null ? '' : measurementSolid);
                 setEnergy(energy === null ? '' : energy);
                 if (mealsData) {
                     const parsedMeals: Meal[] = JSON.parse(mealsData);
