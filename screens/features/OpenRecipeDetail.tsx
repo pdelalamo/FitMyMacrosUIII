@@ -59,19 +59,25 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
 
             if (isFavorite) {
                 favoritesArray = favoritesArray.filter((meal: any) => meal.name !== recipeData.name);
+                setLoading(true);
+                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
+                await FitMyMacrosApiService.sendUserData();
+                setLoading(false);
                 Toast.show({
                     type: 'success',
                     text1: t('removedRecipe'),
                 });
             } else {
                 favoritesArray.push(recipeData);
+                setLoading(true);
+                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
+                await FitMyMacrosApiService.sendUserData();
+                setLoading(false);
                 Toast.show({
                     type: 'success',
                     text1: t('addedRecipe'),
                 });
             }
-
-            await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Error updating favorite meals', error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert, Modal } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
@@ -14,6 +14,7 @@ import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import SecurityApiService from 'services/SecurityApiService';
+import { BlurView } from 'expo-blur';
 
 const config = {
     expoClientId: '868426694791-390ntagtjqcln514p6km7q9hr5tm0s5g.apps.googleusercontent.com',
@@ -48,6 +49,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
     const [user, setUserInfo] = useState<any>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const [request, response, promptAsync] = Google.useAuthRequest(config);
     const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
@@ -90,9 +92,11 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        setLoading(true);
                         await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
                         await loadDataFromDynamoDB();
+                        setLoading(false);
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -117,9 +121,11 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     if (!userExistsInPool) {
                         Alert.alert(t('nonExistingUser'));
                     } else {
+                        setLoading(true);
                         await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
                         await loadDataFromDynamoDB();
+                        setLoading(false);
                         navigation.navigate('MainScreen');
                     }
                 }
@@ -140,9 +146,11 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         } else {
             const response = await signInUser(email, password);
             if ((response === 'ok')) {
+                setLoading(true);
                 await AsyncStorage.setItem("isUserSignedIn", 'true');
                 await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                 await loadDataFromDynamoDB();
+                setLoading(false);
                 navigation.navigate('MainScreen');
             } else {
                 Alert.alert(t('incorrectPassword'));
@@ -345,6 +353,15 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
+            {loading && (
+                <View style={styles.loadingOverlay}>
+                    <TouchableWithoutFeedback>
+                        <BlurView intensity={50} style={styles.blurView}>
+                            <ActivityIndicator size="large" color="#0000ff" />
+                        </BlurView>
+                    </TouchableWithoutFeedback>
+                </View>
+            )}
         </I18nextProvider>
     );
 };
@@ -435,6 +452,23 @@ const styles = StyleSheet.create({
         width: '80%',
         height: '20%',
         marginBottom: '3%',
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    blurView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
     },
 });
 

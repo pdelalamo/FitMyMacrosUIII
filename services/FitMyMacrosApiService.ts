@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
 import SecurityApiService from './SecurityApiService';
+import Meal from 'model/Meal';
 
 class FitMyMacrosApiService {
 
@@ -85,8 +86,11 @@ class FitMyMacrosApiService {
             const fluid = await AsyncStorage.getItem('measurementFluid');
             const savedFavoriteMeals = await AsyncStorage.getItem('favoriteMeals');
             const favoriteMeals = savedFavoriteMeals === null ? [] : JSON.parse(savedFavoriteMeals);
+            //const favoriteMealsAsString = favoriteMeals.map((meal: Meal) => JSON.stringify(meal));
+            const favoriteMealsAsString = favoriteMeals.filter((recipe: any) => recipe !== null);;
             const savedPrevRecipes = await AsyncStorage.getItem('previous_recipes');
-            const previous_recipes = savedPrevRecipes === null ? [] : JSON.parse(savedPrevRecipes);
+            let previous_recipes = savedPrevRecipes === null ? [] : JSON.parse(savedPrevRecipes);
+            previous_recipes = previous_recipes.filter((recipe: any) => recipe !== null);
             const targetEnergy = await AsyncStorage.getItem('targetCalories');
             const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
             const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
@@ -108,7 +112,7 @@ class FitMyMacrosApiService {
                 weightUnit: weight,
                 fluidUnit: fluid,
                 energyUnit: energy,
-                favoriteMeals: favoriteMeals,
+                favoriteMeals: favoriteMealsAsString,
                 targetEnergy: targetEnergy,
                 targetProteinPercentage: targetProteinPercentage,
                 targetCarbsPercentage: targetCarbsPercentage,

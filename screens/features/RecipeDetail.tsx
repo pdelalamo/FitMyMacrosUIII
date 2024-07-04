@@ -27,27 +27,37 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     useEffect(() => {
         const loadUsername = async () => {
             try {
-                setUsername(await AsyncStorage.getItem('username'));
+                const storedUsername = await AsyncStorage.getItem('username');
+                setUsername(storedUsername);
                 const energy = await AsyncStorage.getItem('measurementEnergy');
                 setEnergy(energy === null ? '' : energy);
             } catch (error) {
                 console.error('Error loading username', error);
             }
         };
+
         const checkIfFavorite = async () => {
             try {
                 const favorites = await AsyncStorage.getItem('favoriteMeals');
                 if (favorites) {
                     const favoritesArray = JSON.parse(favorites);
-                    setIsFavorite(favoritesArray.some((meal: any) => meal.recipeName === recipeData.recipeName));
+                    const isFavoriteMeal = favoritesArray.some((meal: any) => meal?.name === JSON.parse(recipeData).recipeName);
+                    setIsFavorite(isFavoriteMeal);
+                    console.log('Setting isFavorite to:', isFavoriteMeal);
                 }
             } catch (error) {
                 console.error('Error loading favorite meals', error);
             }
         };
+
         loadUsername();
         checkIfFavorite();
-    }, []);
+    }, [recipeData]);
+
+    // Debugging: Log the isFavorite state
+    useEffect(() => {
+        console.log('isFavorite state:', isFavorite);
+    }, [isFavorite]);
 
     // Debugging: Log the incoming recipeData
     console.log('Received recipeData:', recipeData);
@@ -79,13 +89,13 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
 
     const handleFavoriteToggle = async () => {
         try {
-            //await AsyncStorage.setItem('favoriteMeals', JSON.stringify([[]]));
             const favorites = await AsyncStorage.getItem('favoriteMeals');
             let favoritesArray = favorites ? JSON.parse(favorites) : [];
 
             if (isFavorite) {
-                favoritesArray = favoritesArray.filter((meal: any) => meal.recipeName !== recipeData.recipeName);
+                favoritesArray = favoritesArray.filter((meal: any) => meal?.name !== JSON.parse(recipeData).recipeName);
                 setLoading(true);
+                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
                 await FitMyMacrosApiService.sendUserData();
                 setLoading(false);
                 Toast.show({
@@ -95,6 +105,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             } else {
                 favoritesArray.push(recipeData);
                 setLoading(true);
+                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
                 await FitMyMacrosApiService.sendUserData();
                 setLoading(false);
                 Toast.show({
@@ -102,8 +113,6 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                     text1: t('addedRecipe'),
                 });
             }
-
-            await AsyncStorage.setItem('favoriteMeals', JSON.stringify(favoritesArray));
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Error updating favorite meals', error);
@@ -123,14 +132,9 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         </View>
     );
 
-    /**
-     * This function saves the generated meal to the async storage, and updates the available ingredients and quantities, both
-     * in the async storage and in dynamoDB
-     */
     const saveMeal = async () => {
         try {
             setLoading(true);
-            // Create a new meal object
             const newMeal = new Meal(
                 Date.now().toString(),
                 recipeName,
@@ -143,26 +147,17 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 cookingProcess
             );
 
-            // Retrieve the existing meals from AsyncStorage
             const existingMeals = await AsyncStorage.getItem('meals');
             const meals = existingMeals && existingMeals !== '{}' ? JSON.parse(existingMeals) : [];
-
-            // Add the new meal to the list
             meals.push(newMeal);
-
-            // Save the updated meals list back to AsyncStorage
             await AsyncStorage.setItem('meals', JSON.stringify(meals));
 
-
-            // Retrieve the existing ingredients from AsyncStorage
             const existingIngredients = await AsyncStorage.getItem('ingredientsMap');
             const ingredients = existingIngredients ? JSON.parse(existingIngredients) : {};
 
             if (anyIngredientsMode) {
-                // Subtract the used quantities of the ingredients
                 for (const [ingredient, usedQuantity] of Object.entries(ingredientsAndQuantities)) {
                     if (typeof usedQuantity === 'string') {
-                        // Extract numeric part from the usedQuantity
                         const usedQuantityFloat = parseFloat(usedQuantity.replace(/[^0-9.-]/g, ''));
                         if (!isNaN(usedQuantityFloat)) {
                             if (ingredients[ingredient]) {
@@ -176,30 +171,22 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 }
             }
 
-            // Save the updated ingredients back to AsyncStorage
             await AsyncStorage.setItem('ingredients', JSON.stringify(ingredients));
-            // Update local last recipes
+
             const previous_recipes = await AsyncStorage.getItem('previous_recipes');
             let previous_recipesArray = previous_recipes ? JSON.parse(previous_recipes) : [];
-
-            // Add new recipe name to the array
             previous_recipesArray.push(recipeData.name);
 
-            // Cap the array size at 6
             const maxSize = 6;
             if (previous_recipesArray.length > maxSize) {
-                // Remove the oldest elements exceeding the maxSize
                 previous_recipesArray = previous_recipesArray.slice(-maxSize);
             }
 
-            // Store the updated array in AsyncStorage
             await AsyncStorage.setItem('previous_recipes', JSON.stringify(previous_recipesArray));
 
-            //update ingredients and recipes in dynamoDB
             await updateDynamoIngredients();
 
             setLoading(false);
-            // Navigate to the MainScreen
             navigation.navigate('MainScreen');
 
         } catch (error) {
@@ -208,9 +195,6 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         }
     };
 
-    /**
-     * This function invokes the function that will update the available ingredients and quantities of the user in dynamoDB
-     */
     const updateDynamoIngredients = async () => {
         const data = {
             userId: username,
@@ -244,10 +228,6 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     return (
         <I18nextProvider i18n={i18n}>
             <ScrollView style={globalStyles.containerMainGeneration}>
-                <View style={styles.headerContainer}>
-                    <Text style={styles.recipeName}>{recipeName}</Text>
-                    <Text style={styles.cookingTime}>{cookingTime}</Text>
-                </View>
                 <View style={styles.headerContainer}>
                     <View style={styles.titleContainer}>
                         <Text style={styles.recipeName}>{recipeName}</Text>
