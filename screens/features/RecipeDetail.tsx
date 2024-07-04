@@ -172,16 +172,24 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             }
 
             await AsyncStorage.setItem('ingredients', JSON.stringify(ingredients));
-
             const previous_recipes = await AsyncStorage.getItem('previous_recipes');
             let previous_recipesArray = previous_recipes ? JSON.parse(previous_recipes) : [];
-            previous_recipesArray.push(recipeData.name);
 
+            // Check if the array is empty or null and create it if necessary
+            if (!Array.isArray(previous_recipesArray)) {
+                previous_recipesArray = [];
+            }
+
+            // Push the new recipe name
+            previous_recipesArray.push(recipeData.recipeName);
+
+            // Cap the array size at maxSize
             const maxSize = 6;
             if (previous_recipesArray.length > maxSize) {
                 previous_recipesArray = previous_recipesArray.slice(-maxSize);
             }
 
+            // Store the updated array in AsyncStorage
             await AsyncStorage.setItem('previous_recipes', JSON.stringify(previous_recipesArray));
 
             await updateDynamoIngredients();
