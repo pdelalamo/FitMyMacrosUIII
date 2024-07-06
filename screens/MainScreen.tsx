@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Modal, StyleSheet, Button } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { t } from 'i18next';
 import { globalStyles } from 'globalStyles';
@@ -17,6 +17,8 @@ interface Props {
 
 const MainScreen: React.FC<Props> = ({ navigation }) => {
     const [meals, setMeals] = useState<Meal[]>([]);
+    const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [measurementUnit, setMeasurement] = useState<string>('');
     const [energyUnit, setEnergy] = useState<string>('');
     const [targetCalories, setTargetCalories] = useState<number>(0);
@@ -29,15 +31,6 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     const carbsConsumed = meals.reduce((total, meal) => total + parseFloat(meal.carbs.replace(/[^0-9.-]/g, '')), 0);
     const fatConsumed = meals.reduce((total, meal) => total + parseFloat(meal.fat.replace(/[^0-9.-]/g, '')), 0);
     const isFocused = useIsFocused();
-
-    const getWeightPreference = async () => {
-        const storedPreferences = await AsyncStorage.getItem('userPreferences');
-        if (storedPreferences) {
-            const parsedPreferences = JSON.parse(storedPreferences);
-            return parsedPreferences.measurementPreferences.weight;
-        }
-        return null;
-    };
 
     useEffect(() => {
         const loadTargetCalsAndMacros = async () => {
@@ -84,6 +77,30 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
 
         loadDailyMeals();
     }, [isFocused]);
+
+    const deleteMeal = async (mealToDelete: Meal) => {
+        const updatedMeals = meals.filter(meal => meal.id !== mealToDelete.id);
+        setMeals(updatedMeals);
+        await AsyncStorage.setItem('meals', JSON.stringify(updatedMeals));
+    };
+
+    const confirmDeleteMeal = (meal: Meal) => {
+        setSelectedMeal(meal);
+        setModalVisible(true);
+    };
+
+    const handleDeleteConfirmation = async () => {
+        if (selectedMeal) {
+            await deleteMeal(selectedMeal);
+            setSelectedMeal(null);
+            setModalVisible(false);
+        }
+    };
+
+    const handleCancel = () => {
+        setSelectedMeal(null);
+        setModalVisible(false);
+    };
 
     function generateRecipes() {
         navigation.navigate('RecipeGeneration');
@@ -150,36 +167,91 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
                 <ScrollView style={globalStyles.mealsContainer}>
                     {meals.map(meal => (
-                        <TouchableOpacity
-                            key={meal.id}
-                            style={globalStyles.mealBox}
-                            onPress={() => {
-                                const recipeData = {
-                                    name: meal.name,
-                                    cookingTime: meal.cookingTime,
-                                    calories: meal.calories,
-                                    protein: meal.protein,
-                                    carbs: meal.carbs,
-                                    fat: meal.fat,
-                                    ingredients: meal.ingredients,
-                                    cookingProcess: meal.cookingProcess
-                                };
-                                console.log('Navigating with recipeData:', recipeData);
-                                navigation.navigate('OpenRecipeDetail', { recipeData });
-                            }}
-                        >
-                            <Text style={globalStyles.mealName}>{meal.name}</Text>
-                            <Text style={globalStyles.mealCalories}>{meal.calories} {energyUnit}</Text>
-                        </TouchableOpacity>
+                        <View key={meal.id} style={globalStyles.mealBox}>
+                            <TouchableOpacity
+                                style={{ flex: 1 }}
+                                onPress={() => {
+                                    const recipeData = {
+                                        name: meal.name,
+                                        cookingTime: meal.cookingTime,
+                                        calories: meal.calories,
+                                        protein: meal.protein,
+                                        carbs: meal.carbs,
+                                        fat: meal.fat,
+                                        ingredients: meal.ingredients,
+                                        cookingProcess: meal.cookingProcess
+                                    };
+                                    console.log('Navigating with recipeData:', recipeData);
+                                    navigation.navigate('OpenRecipeDetail', { recipeData });
+                                }}
+                            >
+                                <Text style={globalStyles.mealName}>{meal.name}</Text>
+                                <Text style={globalStyles.mealCalories}>{meal.calories} {energyUnit}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => confirmDeleteMeal(meal)}>
+                                <Ionicons name="trash" size={24} color="red" />
+                            </TouchableOpacity>
+                        </View>
                     ))}
                 </ScrollView>
                 <TouchableOpacity style={globalStyles.addButton} onPress={() => generateRecipes()}>
                     <Text style={globalStyles.addButtonText}>{t('addMeal')}</Text>
                 </TouchableOpacity>
                 <Footer navigation={navigation} />
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        setModalVisible(!modalVisible);
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>{t('confirmDeleteMeal')}</Text>
+                            <View style={styles.buttonContainer}>
+                                <Button title={t('cancel')} onPress={handleCancel} />
+                                <Button title={t('delete')} onPress={handleDeleteConfirmation} color="red" />
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         </I18nextProvider>
     );
 };
+
+const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+});
 
 export default MainScreen;

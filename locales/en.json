@@ -890,6 +890,7 @@
     "passResetError": "There was an error reseting your password. Please try again later or contact technical support.",
     "submit": "Submit",
     "cancel": "Cancel",
+    "delete": "Delete",
     "sendCode": "Send Reset Code",
     "enterCodeNewPassword": "Enter received code and new password",
     "changePassword": "Change Password",
@@ -1008,5 +1009,6 @@
         "targetEnergyMacros": "Target Energy & Macros"
     },
     "removedRecipe": "Recipe removed from favorites",
-    "addedRecipe": "Recipe added to favorites"
+    "addedRecipe": "Recipe added to favorites",
+    "confirmDeleteMeal": "Are you sure you want to delete this meal from today's meals?"
 }
