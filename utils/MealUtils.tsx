@@ -11,6 +11,20 @@ const saveMeals = async (meals: any) => {
     }
 };
 
+const checkAndClearMeals = async () => {
+    try {
+        const lastOpenedDateStr = await AsyncStorage.getItem('lastOpenedDate');
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        if (lastOpenedDateStr !== currentDate) {
+            await clearMeals();
+            await AsyncStorage.setItem('lastOpenedDate', currentDate);
+        }
+    } catch (error) {
+        console.error('Error checking and clearing meals:', error);
+    }
+};
+
 /**
  * This batch job clears the meals of the day at midnight
  */
@@ -25,12 +39,11 @@ const clearMealsAtMidnight = () => {
 };
 
 const clearMeals = async () => {
-    const currentTime = new Date();
     try {
         await AsyncStorage.removeItem('meals');
-        console.log('Meals cleared at midnight.');
+        console.log('Meals cleared for the new day.');
     } catch (error) {
-        console.log('Error clearing meals:', error);
+        console.error('Error clearing meals:', error);
     }
 };
 
@@ -47,4 +60,4 @@ const addMeal = (meal: any) => {
         });
 };
 
-export { saveMeals, clearMealsAtMidnight, addMeal };
+export { saveMeals, checkAndClearMeals, clearMealsAtMidnight, addMeal, clearMeals };

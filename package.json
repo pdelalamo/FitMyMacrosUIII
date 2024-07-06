@@ -25,6 +25,7 @@
     "dotenv": "^16.4.5",
     "expo": "~50.0.15",
     "expo-auth-session": "~5.4.0",
+    "expo-blur": "~12.9.2",
     "expo-crypto": "~12.8.1",
     "expo-dev-client": "~3.3.11",
     "expo-modules-core": "~1.11.13",
@@ -49,11 +50,11 @@
     "react-native-svg": "14.1.0",
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",
-    "react-native-web": "~0.19.6",
-    "expo-blur": "~12.9.2"
+    "react-native-web": "~0.19.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/node-schedule": "^2.1.7",
     "@types/react": "^18.2.75",
     "@types/react-native": "^0.73.0",
     "@types/react-native-dotenv": "^0.2.2",

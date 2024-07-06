@@ -1,39 +1,34 @@
 import * as React from 'react';
 import Navigation from './navigation/Navigation';
 import { RootSiblingParent } from 'react-native-root-siblings';
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
-import { clearMealsAtMidnight } from 'utils/MealUtils';
-// import {
-//   initConnection,
-//   endConnection,
-//   flushFailedPurchasesCachedAsPendingAndroid,
-// } from 'react-native-iap';
+import { useEffect, useState } from 'react';
+import { AppState, Platform } from 'react-native';
+import { checkAndClearMeals, clearMealsAtMidnight } from 'utils/MealUtils';
 
 function App() {
+
+  const [appState, setAppState] = useState(AppState.currentState);
+
+
   useEffect(() => {
-    // Schedule the meals of the day cleaning batch job when the app starts up
     clearMealsAtMidnight();
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    // Initial check when the app is launched
+    checkAndClearMeals();
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
-  // if (Platform.OS === 'android' || Platform.OS === 'ios') {
-  //   useEffect(() => {
-  //     const init = async () => {
-  //       try {
-  //         await initConnection();
-  //         if (Platform.OS === 'android') {
-  //           flushFailedPurchasesCachedAsPendingAndroid();
-  //         }
-  //       }
-  //       catch (error) {
-  //         console.error('Error occurred during initilization', error);
-  //       }
-  //     }
-  //     init();
-  //     return () => {
-  //       endConnection();
-  //     }
-  //   }, [])
-  // }
+
+  const handleAppStateChange = async (nextAppState: any) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      await checkAndClearMeals();
+    }
+    setAppState(nextAppState);
+  };
+
   return (<RootSiblingParent>
     <Navigation />
   </RootSiblingParent>);
