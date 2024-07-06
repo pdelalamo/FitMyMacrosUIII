@@ -155,7 +155,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             const existingIngredients = await AsyncStorage.getItem('ingredientsMap');
             const ingredients = existingIngredients ? JSON.parse(existingIngredients) : {};
 
-            if (anyIngredientsMode) {
+            if (anyIngredientsMode === false) {
                 for (const [ingredient, usedQuantity] of Object.entries(ingredientsAndQuantities)) {
                     if (typeof usedQuantity === 'string') {
                         const usedQuantityFloat = parseFloat(usedQuantity.replace(/[^0-9.-]/g, ''));
@@ -181,7 +181,7 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
             }
 
             // Push the new recipe name
-            previous_recipesArray.push(recipeData.recipeName);
+            previous_recipesArray.push(newMeal.name);
 
             // Cap the array size at maxSize
             const maxSize = 6;

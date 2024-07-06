@@ -87,10 +87,16 @@ class FitMyMacrosApiService {
             const savedFavoriteMeals = await AsyncStorage.getItem('favoriteMeals');
             const favoriteMeals = savedFavoriteMeals === null ? [] : JSON.parse(savedFavoriteMeals);
             //const favoriteMealsAsString = favoriteMeals.map((meal: Meal) => JSON.stringify(meal));
-            const favoriteMealsAsString = favoriteMeals.filter((recipe: any) => recipe !== null);;
+            const favoriteMealsAsString = favoriteMeals.filter((recipe: any) => recipe !== null);
             const savedPrevRecipes = await AsyncStorage.getItem('previous_recipes');
+            console.log('Saved previous recipes:', savedPrevRecipes);
+
             let previous_recipes = savedPrevRecipes === null ? [] : JSON.parse(savedPrevRecipes);
+            console.log('Parsed previous recipes:', previous_recipes);
+
             previous_recipes = previous_recipes.filter((recipe: any) => recipe !== null);
+            console.log('Filtered previous recipes (removed nulls):', previous_recipes);
+
             const targetEnergy = await AsyncStorage.getItem('targetCalories');
             const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
             const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
