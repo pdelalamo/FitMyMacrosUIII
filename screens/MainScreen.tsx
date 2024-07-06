@@ -167,7 +167,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
                 <ScrollView style={globalStyles.mealsContainer}>
                     {meals.map(meal => (
-                        <View key={meal.id} style={globalStyles.mealBox}>
+                        <View key={meal.id} style={globalStyles.mealBox2}>
                             <TouchableOpacity
                                 style={{ flex: 1 }}
                                 onPress={() => {

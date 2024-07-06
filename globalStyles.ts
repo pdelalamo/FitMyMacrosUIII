@@ -253,6 +253,17 @@ export const globalStyles = StyleSheet.create({
         color: '#333',
     },
     mealBox: {
+        padding: 15,
+        marginBottom: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    mealBox2: {
         flexDirection: 'row',
         padding: 15,
         marginBottom: 10,
