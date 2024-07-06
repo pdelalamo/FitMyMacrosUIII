@@ -11,6 +11,7 @@ import { BlurView } from 'expo-blur';
 import SecurityApiService from 'services/SecurityApiService';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import Meal from 'model/Meal';
+import { normalizeUnit } from 'utils/UtilFunctions';
 
 interface Props {
     navigation: any;
@@ -226,9 +227,9 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 </View>
                 <View style={styles.macrosContainer}>
                     <Text style={styles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {calories}</Text>
-                    <Text style={styles.macrosText}>{t('protein')}: {protein}</Text>
-                    <Text style={styles.macrosText}>{t('carbs')}: {carbs}</Text>
-                    <Text style={styles.macrosText}>{t('fat')}: {fat}</Text>
+                    <Text style={styles.macrosText}>{t('protein')}: {normalizeUnit(protein)}</Text>
+                    <Text style={styles.macrosText}>{t('carbs')}: {normalizeUnit(carbs)}</Text>
+                    <Text style={styles.macrosText}>{t('fat')}: {normalizeUnit(fat)}</Text>
                 </View>
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionTitle}>{t('ingredients')}</Text>

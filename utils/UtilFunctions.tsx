@@ -11,6 +11,22 @@ function generateRandomString(length: number) {
     return result;
 }
 
+const normalizeUnit = (value: any) => {
+    if (typeof value !== 'string') return value;
+
+    const replacements = [
+        { long: 'grams', short: 'g' },
+        { long: 'ounces', short: 'oz' },
+    ];
+
+    let normalizedValue = value;
+    replacements.forEach(replacement => {
+        normalizedValue = normalizedValue.replace(new RegExp(replacement.long, 'gi'), replacement.short);
+    });
+
+    return normalizedValue;
+};
+
 const getWeightPreference = async () => {
     const storedPreferences = await AsyncStorage.getItem('userPreferences');
     if (storedPreferences) {
@@ -39,4 +55,4 @@ function removeLeadingTrailingCommasAndQuotes(str: String) {
     return cleanedResponse;
 }
 
-export { generateRandomString, getWeightPreference, removeLeadingTrailingCommasAndQuotes };
+export { generateRandomString, getWeightPreference, removeLeadingTrailingCommasAndQuotes, normalizeUnit };

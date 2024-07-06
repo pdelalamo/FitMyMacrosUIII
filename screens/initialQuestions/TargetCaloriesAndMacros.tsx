@@ -48,6 +48,9 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
     const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
 
     const validatePercentageInput = (text: string) => {
+        if (text === '') {
+            return 0; // Treat empty input as 0
+        }
         const value = parseInt(text, 10);
         return !isNaN(value) && value >= 0 && value <= 100 ? value : proteinPercentage;
     };
@@ -106,7 +109,7 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
                                 <TextInput
                                     style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
                                     keyboardType="numeric"
-                                    value={proteinPercentage.toString()}
+                                    value={proteinPercentage !== 0 ? proteinPercentage.toString() : ''}
                                     onChangeText={(text) => setProteinPercentage(validatePercentageInput(text))}
                                 />
                                 <Slider
@@ -127,7 +130,7 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
                                 <TextInput
                                     style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
                                     keyboardType="numeric"
-                                    value={carbsPercentage.toString()}
+                                    value={carbsPercentage !== 0 ? carbsPercentage.toString() : ''}
                                     onChangeText={(text) => setCarbsPercentage(validatePercentageInput(text))}
                                 />
                                 <Slider
@@ -148,7 +151,7 @@ const TargetCaloriesAndMacros: React.FC<Props> = ({ navigation }) => {
                                 <TextInput
                                     style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
                                     keyboardType="numeric"
-                                    value={fatPercentage.toString()}
+                                    value={fatPercentage !== 0 ? fatPercentage.toString() : ''}
                                     onChangeText={(text) => setFatPercentage(validatePercentageInput(text))}
                                 />
                                 <Slider

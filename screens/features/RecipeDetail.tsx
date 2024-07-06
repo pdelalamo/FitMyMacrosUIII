@@ -11,6 +11,7 @@ import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { BlurView } from 'expo-blur';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
+import { normalizeUnit } from 'utils/UtilFunctions';
 
 interface Props {
     navigation: any;
@@ -247,9 +248,9 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 </View>
                 <View style={styles.macrosContainer}>
                     <Text style={styles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {caloriesAndMacros.calories}</Text>
-                    <Text style={styles.macrosText}>{t('protein')}: {caloriesAndMacros.protein}</Text>
-                    <Text style={styles.macrosText}>{t('carbs')}: {caloriesAndMacros.carbs}</Text>
-                    <Text style={styles.macrosText}>{t('fat')}: {caloriesAndMacros.fat}</Text>
+                    <Text style={styles.macrosText}>{t('protein')}: {normalizeUnit(caloriesAndMacros.protein)}</Text>
+                    <Text style={styles.macrosText}>{t('carbs')}: {normalizeUnit(caloriesAndMacros.carbs)}</Text>
+                    <Text style={styles.macrosText}>{t('fat')}: {normalizeUnit(caloriesAndMacros.fat)}</Text>
                 </View>
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionTitle}>{t('ingredients')}</Text>
