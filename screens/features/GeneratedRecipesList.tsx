@@ -79,7 +79,7 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
         FitMyMacrosApiService.setAuthToken(token);
         //FitMyMacrosApiService.setAsyncInvocationMode(true);
         setOpId(generateRandomString(20));
-        const recipeDetail = await FitMyMacrosApiService.getRecipeDetail({
+        const recipeDetail = await apiCallWithRetry({
             measureUnit,
             calories,
             protein,
@@ -98,6 +98,40 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
         console.log('recipe detail from openAI: ' + removeLeadingTrailingCommasAndQuotes(recipeDetail.body));
         setLoading(false);
         navigation.navigate('RecipeDetail', { recipeData: removeLeadingTrailingCommasAndQuotes(recipeDetail.body), anyIngredientsMode: anyIngredientsMode });
+    };
+
+    const apiCallWithRetry = async (params: Record<string, any>, maxRetries = 3, timeout = 30000): Promise<any> => {
+        const makeApiCall = () => FitMyMacrosApiService.getRecipeDetail(params);
+
+        const callWithTimeout = () => {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error('Request timed out'));
+                }, timeout);
+
+                makeApiCall()
+                    .then((response) => {
+                        clearTimeout(timer);
+                        resolve(response);
+                    })
+                    .catch((error) => {
+                        clearTimeout(timer);
+                        reject(error);
+                    });
+            });
+        };
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await callWithTimeout();
+                return response; // Successful response, return it
+            } catch (error) {
+                console.error(`Attempt ${attempt} failed:`, error);
+                if (attempt === maxRetries) {
+                    throw new Error('All attempts to fetch recipe data');
+                }
+            }
+        }
     };
 
     const renderItem = ({ item }: { item: [string, string] }) => {

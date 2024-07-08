@@ -175,7 +175,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
 
             FitMyMacrosApiService.setAuthToken(token);
             setOpId(generateRandomString(20));
-            const recipesResponse = await FitMyMacrosApiService.getRecipes({
+            const recipesResponse = await apiCallWithRetry({
                 measureUnit: weightPreference,
                 calories: Number(recipeTargetCalories),
                 protein: proteinGrams,
@@ -214,6 +214,40 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 userId: username,
                 precision: 'exactly'
             });
+        }
+    };
+
+    const apiCallWithRetry = async (params: Record<string, any>, maxRetries = 3, timeout = 30000): Promise<any> => {
+        const makeApiCall = () => FitMyMacrosApiService.getRecipes(params);
+
+        const callWithTimeout = () => {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error('Request timed out'));
+                }, timeout);
+
+                makeApiCall()
+                    .then((response) => {
+                        clearTimeout(timer);
+                        resolve(response);
+                    })
+                    .catch((error) => {
+                        clearTimeout(timer);
+                        reject(error);
+                    });
+            });
+        };
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await callWithTimeout();
+                return response; // Successful response, return it
+            } catch (error) {
+                console.error(`Attempt ${attempt} failed:`, error);
+                if (attempt === maxRetries) {
+                    throw new Error('All attempts to fetch recipes failed');
+                }
+            }
         }
     };
 
