@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, TextInput, ScrollView, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, ImageBackground, TextInput, ScrollView, TouchableWithoutFeedback, ActivityIndicator, LayoutAnimation, UIManager, Platform } from 'react-native';
 import { globalStyles } from '../../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n';
@@ -12,6 +12,10 @@ import { settingsStyles } from './settingsStyles';
 import Footer from 'utils/Footer';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { BlurView } from 'expo-blur';
+
+if (Platform.OS === 'android') {
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const ingredientsByType: { [key: string]: string[] } = t('ingredientsByType', { returnObjects: true });
 
@@ -34,6 +38,7 @@ const AvailableIngredientsSettings: React.FC<Props> = ({ navigation }) => {
 
     const { preferences } = useUserPreferences();
     const { measurementPreferences } = preferences;
+    const scrollViewRef = useRef<ScrollView>(null);
 
     useEffect(() => {
         const loadIngredientsMap = async () => {
@@ -56,6 +61,7 @@ const AvailableIngredientsSettings: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleToggleCategory = (category: string) => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setExpandedCategory(expandedCategory === category ? null : category);
     };
 
@@ -100,7 +106,7 @@ const AvailableIngredientsSettings: React.FC<Props> = ({ navigation }) => {
             <ImageBackground source={require('../../assets/images/main_background.png')} resizeMode="cover" style={globalStyles.imageBackground}>
                 <View style={settingsStyles.containerSettings}>
                     <Text style={settingsStyles.titleIngredients}>{t('selectIngredients')}</Text>
-                    <ScrollView contentContainerStyle={settingsStyles.scrollViewContent}>
+                    <ScrollView contentContainerStyle={settingsStyles.scrollViewContent} ref={scrollViewRef}>
                         {Object.entries(ingredientsByType).map(([category, ingredients]) => (
                             <View key={category} style={settingsStyles.scroll}>
                                 <TouchableOpacity onPress={() => handleToggleCategory(category)}>

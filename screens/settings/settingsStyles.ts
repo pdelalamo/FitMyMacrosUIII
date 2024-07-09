@@ -36,6 +36,7 @@ export const settingsStyles = StyleSheet.create({
     categoryTitleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 50,
     },
     arrowIcon: {
         marginLeft: 5,

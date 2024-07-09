@@ -979,7 +979,7 @@
     "selectCookingTime": "Select maximum cooking time",
     "selectOccasion": "Select an occasion",
     "expandIngredients": "Expand Ingredients",
-    "expandIngredientsInfo": "By checking this box, recipes will be generated using any ingredients, not just the ones the user has available at home.",
+    "expandIngredientsInfo": "By checking this box, recipes will be generated using any ingredients, not just the ones the user has available at home. Used ingredients won't be automatically subtracted from the available quantities",
     "generateRecipe": "Generate this recipe",
     "selectRecipe": "Select a Recipe",
     "loading": "Loading...",
