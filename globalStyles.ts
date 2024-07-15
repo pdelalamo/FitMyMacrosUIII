@@ -73,6 +73,10 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: '10%'
     },
+    buttonContainerFeaturesNoMargin: {
+        flexDirection: 'column',
+        justifyContent: 'center'
+    },
     containerFree: {
         flex: 1,
     },

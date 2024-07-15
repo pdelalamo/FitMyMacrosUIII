@@ -33,6 +33,9 @@ import MeasurementSettings from 'screens/settings/MeasurementSettings';
 import TargetEnergyAndMacros from 'screens/settings/TargetEnergyAndMacros';
 import OpenRecipeDetail from 'screens/features/OpenRecipeDetail';
 import FavoriteRecipes from 'screens/features/FavoriteRecipes';
+import RestaurantForm from 'screens/features/restaurant/RestaurantForm';
+import RestaurantRecommender from 'screens/features/restaurant/RestaurantRecommender';
+import RestaurantRecommendationDetail from 'screens/features/restaurant/RestaurantRecommendationDetail';
 
 const Stack = createNativeStackNavigator();
 
@@ -88,6 +91,9 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="TargetEnergyAndMacros" component={TargetEnergyAndMacros} />
                     <Stack.Screen name="OpenRecipeDetail" component={OpenRecipeDetail} />
                     <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipes} />
+                    <Stack.Screen name="RestaurantForm" component={RestaurantForm} />
+                    <Stack.Screen name="RestaurantRecommender" component={RestaurantRecommender} />
+                    <Stack.Screen name="RestaurantRecommendationDetail" component={RestaurantRecommendationDetail} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>

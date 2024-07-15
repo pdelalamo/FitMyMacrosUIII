@@ -193,6 +193,22 @@ class FitMyMacrosApiService {
         }
     }
 
+    public async getRestaurantRecommendation(params: Record<string, any>): Promise<any> {
+        try {
+            const response = await this.client.get('/restaurants', { params });
+            console.log('response status: ' + response.status);
+            console.log('response data: ' + response.data);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                throw new Error('Failed to fetch restaurant recommendation');
+            }
+        } catch (error) {
+            console.error('Error fetching recommendation:', error);
+            throw error;
+        }
+    }
+
 }
 
 export default new FitMyMacrosApiService();

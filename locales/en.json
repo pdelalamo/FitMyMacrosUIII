@@ -2,6 +2,8 @@
     "getStarted": "Get Started",
     "signIn": "Already an user? Sign in",
     "continue": "Continue",
+    "uploadPdf": "Upload PDF",
+    "restaurantRecommender": "Restaurant Recommender",
     "skip": "Skip",
     "recipeFeature": "Instantly tailor-made recipes to suit user preferences and dietary requirements, ensuring a limitless array of personalized meal options at your fingertips.",
     "goalsFeature": "Enjoy customized dishes perfectly calibrated to your unique dietary preferences, including macronutrient balance, calorie targets, cooking duration, and dietary restrictions. Experience culinary delight while staying in sync with your health goals effortlessly.",
@@ -1010,5 +1012,28 @@
     },
     "removedRecipe": "Recipe removed from favorites",
     "addedRecipe": "Recipe added to favorites",
-    "confirmDeleteMeal": "Are you sure you want to delete this meal from today's meals?"
+    "confirmDeleteMeal": "Are you sure you want to delete this meal from today's meals?",
+    "restaurantForm": {
+        "restaurantName": "Restaurant Name (Optional)",
+        "cuisineType": "Cuisine Type",
+        "location": "Location",
+        "mealTime": "Meal Time",
+        "targetCalories": "Target Calories",
+        "targetProtein": "Target Protein ({{unit}})",
+        "targetCarbs": "Target Carbs ({{unit}})",
+        "targetFats": "Target Fats ({{unit}})",
+        "submit": "Submit",
+        "enterRestaurantName": "Enter restaurant name",
+        "enterCuisineType": "Enter cuisine type",
+        "enterLocation": "Enter location",
+        "enterMealTime": "Enter meal time (e.g., Lunch, Dinner)",
+        "enterTargetCalories": "Enter target calories",
+        "enterTargetProtein": "Enter target protein",
+        "enterTargetCarbs": "Enter target carbs",
+        "enterTargetFats": "Enter target fats",
+        "recommendedOptions": "Recommended Options",
+        "error": "Error",
+        "fetchFailed": "Failed to fetch recommendations",
+        "missingFields": "Please fill in all required fields"
+    }
 }
