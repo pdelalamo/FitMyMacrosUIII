@@ -109,11 +109,12 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                 restaurantName,
                 cuisineType,
                 mealTime,
-                targetCalories: parseInt(recipeTargetCalories),
-                targetProtein: proteinGrams,
-                targetCarbs: carbsGrams,
-                targetFats: fatGrams,
-                weightPreference,
+                targetEnergy: recipeTargetCalories,
+                protein: proteinGrams,
+                carbs: carbsGrams,
+                fat: fatGrams,
+                energyUnit,
+                weightUnit: weightPreference
             };
             setLoading(true);
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
@@ -122,6 +123,7 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
 
             FitMyMacrosApiService.setAuthToken(token);
             const restaurantRecommendation = await FitMyMacrosApiService.getRestaurantRecommendation(data);
+            console.log('recommendations: ' + restaurantRecommendation);
             setLoading(false);
             navigation.navigate('RestaurantRecommendationDetail', restaurantRecommendation);
         }
