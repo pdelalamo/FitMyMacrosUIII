@@ -16,6 +16,18 @@ interface Props {
     route: any;
 }
 
+type Macros = {
+    energy: string;
+    protein: string;
+    carbs: string;
+    fat: string;
+};
+
+type Recommendation = {
+    optionName: string;
+    energyAndMacros: Macros;
+};
+
 const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
     const [restaurantName, setRestaurantName] = useState('');
     const [cuisineType, setCuisineType] = useState('');
@@ -122,10 +134,30 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
             console.log('token: ' + token);
 
             FitMyMacrosApiService.setAuthToken(token);
-            const restaurantRecommendation = await FitMyMacrosApiService.getRestaurantRecommendation(data);
-            console.log('recommendations: ' + restaurantRecommendation);
-            setLoading(false);
-            navigation.navigate('RestaurantRecommendationDetail', restaurantRecommendation);
+            const restaurantRecommendationRaw = await FitMyMacrosApiService.getRestaurantRecommendation(data);
+
+            // Check the status code and parse the body if the request was successful
+            if (restaurantRecommendationRaw.statusCode === 200) {
+                const restaurantRecommendation: Recommendation[] = JSON.parse(restaurantRecommendationRaw.body);
+
+                console.log('Recommendations:', restaurantRecommendation);
+                restaurantRecommendation.forEach((recommendation, index) => {
+                    console.log(`Recommendation ${index + 1}:`);
+                    console.log(`Option Name: ${recommendation.optionName}`);
+                    console.log(`Energy: ${recommendation.energyAndMacros.energy}`);
+                    console.log(`Protein: ${recommendation.energyAndMacros.protein}`);
+                    console.log(`Carbs: ${recommendation.energyAndMacros.carbs}`);
+                    console.log(`Fat: ${recommendation.energyAndMacros.fat}`);
+                });
+
+                setLoading(false);
+                navigation.navigate('RestaurantRecommendationDetail', { restaurantRecommendation });
+
+            } else {
+                console.log('failed to load restaurant recommendations');
+                setLoading(false);
+            }
+
         }
 
     };
