@@ -6,6 +6,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../../../i18n';
 import { t } from 'i18next';
 import { Ionicons } from '@expo/vector-icons';
+import Footer from 'utils/Footer';
 
 interface Props {
     navigation: any;
@@ -31,6 +32,7 @@ const RestaurantRecommender: React.FC<Props> = ({ navigation }) => {
                         </View>
                     </View>
                 </ImageBackground>
+                <Footer navigation={navigation} />
             </View>
         </I18nextProvider>
     );

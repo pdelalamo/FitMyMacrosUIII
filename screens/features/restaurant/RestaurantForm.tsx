@@ -10,6 +10,7 @@ import { t } from 'i18next';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import SecurityApiService from 'services/SecurityApiService';
 import { BlurView } from 'expo-blur';
+import Footer from 'utils/Footer';
 
 interface Props {
     navigation: any;
@@ -289,6 +290,7 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                     </TouchableWithoutFeedback>
                 </View>
             )}
+            <Footer navigation={navigation} />
         </I18nextProvider>
     );
 };

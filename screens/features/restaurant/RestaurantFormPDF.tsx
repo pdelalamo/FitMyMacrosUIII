@@ -12,6 +12,7 @@ import SecurityApiService from 'services/SecurityApiService';
 import { BlurView } from 'expo-blur';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import Footer from 'utils/Footer';
 
 interface Props {
     navigation: any;
@@ -293,6 +294,7 @@ const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
                     </TouchableWithoutFeedback>
                 </View>
             )}
+            <Footer navigation={navigation} />
         </I18nextProvider>
     );
 };
