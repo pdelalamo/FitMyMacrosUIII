@@ -48,7 +48,7 @@ const RestaurantRecommendationDetail: React.FC<Props> = ({ navigation, route }) 
             <Text style={styles.optionName}>{item.optionName}</Text>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('energy')}: </Text>
-                <Text style={styles.macroValue}>{item.energyAndMacros.energy} {energyUnit}</Text>
+                <Text style={styles.macroValue}>{item.energyAndMacros.energy} {(item.energyAndMacros.energy.includes('kcal') || item.energyAndMacros.energy.includes('kilojoules') || item.energyAndMacros.energy.includes('kilocalories') || item.energyAndMacros.energy.toLocaleLowerCase().includes('kj')) ? '' : energyUnit}</Text>
             </View>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('protein')}: </Text>
