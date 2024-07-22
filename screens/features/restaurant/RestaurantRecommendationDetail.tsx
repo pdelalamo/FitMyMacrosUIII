@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ListRenderItem } from 'react-native';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import i18n from 'i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
     navigation: any;
@@ -24,24 +25,42 @@ const RestaurantRecommendationDetail: React.FC<Props> = ({ navigation, route }) 
     const { restaurantRecommendation } = route.params;
     const { t } = useTranslation();
 
+    const [weightPreference, setWeightPreference] = useState('');
+    const [energyUnit, setEnergy] = useState<string>('');
+
+    useEffect(() => {
+        const loadPreferences = async () => {
+            console.log('logs work');
+            try {
+                const energy = await AsyncStorage.getItem('measurementEnergy');
+                setEnergy(energy === null ? '' : energy);
+                const solid = await AsyncStorage.getItem('measurementSolid');
+                setWeightPreference(solid === null ? '' : solid);
+            } catch (error) {
+                console.error('Error loading preferences', error);
+            }
+        };
+        loadPreferences();
+    }, []);
+
     const renderRecommendation: ListRenderItem<Recommendation> = ({ item }) => (
         <View style={styles.card}>
             <Text style={styles.optionName}>{item.optionName}</Text>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('energy')}: </Text>
-                <Text style={styles.macroValue}>{item.energyAndMacros.energy}</Text>
+                <Text style={styles.macroValue}>{item.energyAndMacros.energy} {energyUnit}</Text>
             </View>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('protein')}: </Text>
-                <Text style={styles.macroValue}>{item.energyAndMacros.protein}</Text>
+                <Text style={styles.macroValue}>{item.energyAndMacros.protein} {weightPreference}</Text>
             </View>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('carbs')}: </Text>
-                <Text style={styles.macroValue}>{item.energyAndMacros.carbs}</Text>
+                <Text style={styles.macroValue}>{item.energyAndMacros.carbs} {weightPreference}</Text>
             </View>
             <View style={styles.macroContainer}>
                 <Text style={styles.macroLabel}>{t('fat')}: </Text>
-                <Text style={styles.macroValue}>{item.energyAndMacros.fat}</Text>
+                <Text style={styles.macroValue}>{item.energyAndMacros.fat} {weightPreference}</Text>
             </View>
         </View>
     );
