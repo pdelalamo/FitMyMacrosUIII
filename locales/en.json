@@ -2,7 +2,7 @@
     "getStarted": "Get Started",
     "signIn": "Already an user? Sign in",
     "continue": "Continue",
-    "uploadPdf": "Upload PDF",
+    "uploadPdf": "Restaurant Recommender by PDF",
     "restaurantRecommender": "Restaurant Recommender",
     "skip": "Skip",
     "recipeFeature": "Instantly tailor-made recipes to suit user preferences and dietary requirements, ensuring a limitless array of personalized meal options at your fingertips.",
@@ -910,6 +910,7 @@
     "error": "Error",
     "macrosError": "The sum of protein, carbs, and fat percentages should be equal to 100%. Please adjust the values.",
     "dropdownsError": "To continue, first select values ​​for all dropdowns please.",
+    "pdfError": "To continue, first upload a PDF menu.",
     "ok": "OK",
     "generateNewRecipe": "Generate New Recipe",
     "percentageAlert": "Total percentage of protein, carbs, and fat should be 100%.",
@@ -1034,6 +1035,8 @@
         "recommendedOptions": "Recommended Options",
         "error": "Error",
         "fetchFailed": "Failed to fetch recommendations",
-        "missingFields": "Please fill in all required fields"
+        "missingFields": "Please fill in all required fields",
+        "selectPdf": "Select PDF file",
+        "pdfSelected": "File has been selected"
     }
 }

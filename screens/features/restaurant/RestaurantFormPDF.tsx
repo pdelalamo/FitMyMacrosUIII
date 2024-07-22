@@ -10,6 +10,8 @@ import { t } from 'i18next';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import SecurityApiService from 'services/SecurityApiService';
 import { BlurView } from 'expo-blur';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 
 interface Props {
     navigation: any;
@@ -28,9 +30,7 @@ type Recommendation = {
     energyAndMacros: Macros;
 };
 
-const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
-    const [restaurantName, setRestaurantName] = useState('');
-    const [cuisineType, setCuisineType] = useState('');
+const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
     const [mealTime, setMealTime] = useState('');
     const [weightPreference, setWeightPreference] = useState('');
     const [energyUnit, setEnergy] = useState<string>('');
@@ -40,6 +40,7 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
     const [fatPercentage, setFatPercentage] = useState(20);
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
+    const [pdfBase64, setPdfBase64] = useState<string | null>(null);
 
     useEffect(() => {
         const loadUsername = async () => {
@@ -78,8 +79,6 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
     const handleSubmit = async () => {
         console.log('Form Submitted');
         console.log('Current state:', {
-            restaurantName,
-            cuisineType,
             mealTime,
             recipeTargetCalories,
             proteinGrams,
@@ -87,10 +86,10 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
             fatGrams,
             energyUnit,
         });
-        if (!cuisineType || !mealTime || !recipeTargetCalories || !proteinGrams || !carbsGrams || !fatGrams) {
+        if (!mealTime || !recipeTargetCalories || !proteinGrams || !carbsGrams || !fatGrams) {
             Alert.alert(
                 t('error'),
-                t('missingFields'),
+                t('restaurantForm.missingFields'),
                 [{ text: t('ok') }]
             );
             return;
@@ -117,18 +116,24 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                 t('macrosError'),
                 [{ text: t('ok') }]
             );
+        } else if (!pdfBase64) {
+            // Show alert if no file is selected
+            Alert.alert(
+                t('error'),
+                t('pdfError'),
+                [{ text: t('ok') }]
+            );
         } else {
 
             const data = {
-                restaurantName,
-                cuisineType,
                 mealTime,
                 targetEnergy: recipeTargetCalories,
                 protein: proteinGrams,
                 carbs: carbsGrams,
                 fat: fatGrams,
                 energyUnit,
-                weightUnit: weightPreference
+                weightUnit: weightPreference,
+                pdf: pdfBase64
             };
             setLoading(true);
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
@@ -136,29 +141,21 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
             console.log('token: ' + token);
 
             FitMyMacrosApiService.setAuthToken(token);
-            const restaurantRecommendationRaw = await FitMyMacrosApiService.getRestaurantRecommendation(data);
+            const restaurantRecommendationRaw = await FitMyMacrosApiService.getRestaurantRecommendationPDF(data);
+            const restaurantRecommendation: Recommendation[] = JSON.parse(JSON.stringify(restaurantRecommendationRaw, null, 2));
 
-            // Check the status code and parse the body if the request was successful
-            if (restaurantRecommendationRaw.statusCode === 200) {
-                const restaurantRecommendation: Recommendation[] = JSON.parse(restaurantRecommendationRaw.body);
+            console.log('Recommendations:', restaurantRecommendation);
+            restaurantRecommendation.forEach((recommendation, index) => {
+                console.log(`Recommendation ${index + 1}:`);
+                console.log(`Option Name: ${recommendation.optionName}`);
+                console.log(`Energy: ${recommendation.energyAndMacros.energy}`);
+                console.log(`Protein: ${recommendation.energyAndMacros.protein}`);
+                console.log(`Carbs: ${recommendation.energyAndMacros.carbs}`);
+                console.log(`Fat: ${recommendation.energyAndMacros.fat}`);
+            });
 
-                console.log('Recommendations:', restaurantRecommendation);
-                restaurantRecommendation.forEach((recommendation, index) => {
-                    console.log(`Recommendation ${index + 1}:`);
-                    console.log(`Option Name: ${recommendation.optionName}`);
-                    console.log(`Energy: ${recommendation.energyAndMacros.energy}`);
-                    console.log(`Protein: ${recommendation.energyAndMacros.protein}`);
-                    console.log(`Carbs: ${recommendation.energyAndMacros.carbs}`);
-                    console.log(`Fat: ${recommendation.energyAndMacros.fat}`);
-                });
-
-                setLoading(false);
-                navigation.navigate('RestaurantRecommendationDetail', { restaurantRecommendation });
-
-            } else {
-                console.log('failed to load restaurant recommendations');
-                setLoading(false);
-            }
+            setLoading(false);
+            navigation.navigate('RestaurantRecommendationDetail', { restaurantRecommendation });
 
         }
 
@@ -175,24 +172,23 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
         return proteinPercentage;
     };
 
+    const handlePdfPick = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const { uri } = result.assets[0];
+                const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+                setPdfBase64(base64);
+            }
+        } catch (error) {
+            console.error('Error picking PDF:', error);
+        }
+    };
+
     return (
         <I18nextProvider i18n={i18n}>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.label}>{t('restaurantForm.restaurantName')}</Text>
-                <TextInput
-                    style={styles.input}
-                    value={restaurantName}
-                    onChangeText={setRestaurantName}
-                    placeholder={t('restaurantForm.enterRestaurantName')}
-                />
-
-                <Text style={styles.label}>{t('restaurantForm.cuisineType')}</Text>
-                <TextInput
-                    style={styles.input}
-                    value={cuisineType}
-                    onChangeText={setCuisineType}
-                    placeholder={t('restaurantForm.enterCuisineType')}
-                />
 
                 <Text style={styles.label}>{t('restaurantForm.mealTime')}</Text>
                 <TextInput
@@ -286,6 +282,14 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                         {t('percentageAlert')}
                     </Text>
                 )}
+                <TouchableOpacity style={globalStyles.buttonGrey} onPress={handlePdfPick}>
+                    <Text style={globalStyles.buttonText}>{t('restaurantForm.selectPdf')}</Text>
+                </TouchableOpacity>
+                {pdfBase64 && (
+                    <Text style={styles.pdfInfo}>
+                        {t('restaurantForm.pdfSelected')}
+                    </Text>
+                )}
                 <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => handleSubmit()}>
                     <Text style={globalStyles.buttonText}>{t('restaurantForm.submit')}</Text>
                 </TouchableOpacity>
@@ -323,6 +327,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         backgroundColor: '#FFFFFF',
     },
+    pdfInfo: {
+        marginTop: 10,
+        color: '#388E3C',
+        fontSize: 14,
+    },
 });
 
-export default RestaurantForm;
+export default RestaurantFormPDF;

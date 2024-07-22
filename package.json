@@ -28,6 +28,7 @@
     "expo-blur": "~12.9.2",
     "expo-crypto": "~12.8.1",
     "expo-dev-client": "~3.3.11",
+    "expo-document-picker": "~11.10.1",
     "expo-modules-core": "~1.11.13",
     "expo-random": "~13.6.0",
     "expo-status-bar": "~1.11.1",

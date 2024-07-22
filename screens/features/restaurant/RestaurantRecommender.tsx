@@ -22,7 +22,7 @@ const RestaurantRecommender: React.FC<Props> = ({ navigation }) => {
                             <Text style={productFeaturesStyles.featureText}>{t('restaurantFeature')}</Text>
                         </View>
                         <View style={globalStyles.buttonContainerFeaturesNoMargin}>
-                            <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RestaurantForm')}>
+                            <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RestaurantFormPDF')}>
                                 <Text style={globalStyles.buttonText}>{t('uploadPdf')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RestaurantForm')}>

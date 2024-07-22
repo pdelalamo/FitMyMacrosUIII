@@ -34,6 +34,7 @@ import TargetEnergyAndMacros from 'screens/settings/TargetEnergyAndMacros';
 import OpenRecipeDetail from 'screens/features/OpenRecipeDetail';
 import FavoriteRecipes from 'screens/features/FavoriteRecipes';
 import RestaurantForm from 'screens/features/restaurant/RestaurantForm';
+import RestaurantFormPDF from 'screens/features/restaurant/RestaurantFormPDF';
 import RestaurantRecommender from 'screens/features/restaurant/RestaurantRecommender';
 import RestaurantRecommendationDetail from 'screens/features/restaurant/RestaurantRecommendationDetail';
 
@@ -94,6 +95,7 @@ const Navigation: React.FC = () => {
                     <Stack.Screen name="RestaurantForm" component={RestaurantForm} />
                     <Stack.Screen name="RestaurantRecommender" component={RestaurantRecommender} />
                     <Stack.Screen name="RestaurantRecommendationDetail" component={RestaurantRecommendationDetail} />
+                    <Stack.Screen name="RestaurantFormPDF" component={RestaurantFormPDF} />
                 </Stack.Navigator>
             </NavigationContainer>
         </UserPreferencesProvider>
