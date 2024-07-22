@@ -142,16 +142,6 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
             if (restaurantRecommendationRaw.statusCode === 200) {
                 const restaurantRecommendation: Recommendation[] = JSON.parse(restaurantRecommendationRaw.body);
 
-                console.log('Recommendations:', restaurantRecommendation);
-                restaurantRecommendation.forEach((recommendation, index) => {
-                    console.log(`Recommendation ${index + 1}:`);
-                    console.log(`Option Name: ${recommendation.optionName}`);
-                    console.log(`Energy: ${recommendation.energyAndMacros.energy}`);
-                    console.log(`Protein: ${recommendation.energyAndMacros.protein}`);
-                    console.log(`Carbs: ${recommendation.energyAndMacros.carbs}`);
-                    console.log(`Fat: ${recommendation.energyAndMacros.fat}`);
-                });
-
                 setLoading(false);
                 navigation.navigate('RestaurantRecommendationDetail', { restaurantRecommendation });
 
