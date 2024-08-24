@@ -2,7 +2,7 @@ import * as React from 'react';
 import Navigation from './navigation/Navigation';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { useEffect, useState } from 'react';
-import { AppState, Platform } from 'react-native';
+import { AppState, LogBox, Platform } from 'react-native';
 import { checkAndClearMeals, clearMeals, clearMealsAtMidnight } from 'utils/MealUtils';
 import schedule from 'node-schedule';
 

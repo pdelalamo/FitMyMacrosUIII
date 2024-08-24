@@ -12,6 +12,7 @@ import SecurityApiService from 'services/SecurityApiService';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import Meal from 'model/Meal';
 import { normalizeUnit } from 'utils/UtilFunctions';
+import { featuresStyles } from './featuresStyles';
 
 interface Props {
     navigation: any;
@@ -101,15 +102,15 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     );
 
     const renderIngredient = ({ item }: { item: [string, string] }) => (
-        <View style={styles.ingredientContainer}>
-            <Text style={styles.ingredientName}>{item[0]}</Text>
-            <Text style={styles.ingredientQuantity}>{item[1]}</Text>
+        <View style={featuresStyles.ingredientContainer}>
+            <Text style={featuresStyles.ingredientName}>{item[0]}</Text>
+            <Text style={featuresStyles.ingredientQuantity}>{item[1]}</Text>
         </View>
     );
 
     const renderStep = ({ item }: { item: string }) => (
-        <View style={styles.stepContainer}>
-            <Text style={styles.stepText}>{item}</Text>
+        <View style={featuresStyles.stepContainer}>
+            <Text style={featuresStyles.stepText}>{item}</Text>
         </View>
     );
 
@@ -216,31 +217,31 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
     return (
         <I18nextProvider i18n={i18n}>
             <ScrollView style={globalStyles.containerMainGeneration}>
-                <View style={styles.headerContainer}>
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.recipeName}>{name}</Text>
+                <View style={featuresStyles.headerContainer}>
+                    <View style={featuresStyles.titleContainer2}>
+                        <Text style={featuresStyles.recipeName2}>{name}</Text>
                         <TouchableOpacity onPress={handleFavoriteToggle}>
                             <Icon name={isFavorite ? "star" : "star-o"} size={24} color="#FFD700" />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.cookingTime}>{cookingTime}</Text>
+                    <Text style={featuresStyles.cookingTime}>{cookingTime}</Text>
                 </View>
-                <View style={styles.macrosContainer}>
-                    <Text style={styles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {calories}</Text>
-                    <Text style={styles.macrosText}>{t('protein')}: {normalizeUnit(protein)}</Text>
-                    <Text style={styles.macrosText}>{t('carbs')}: {normalizeUnit(carbs)}</Text>
-                    <Text style={styles.macrosText}>{t('fat')}: {normalizeUnit(fat)}</Text>
+                <View style={featuresStyles.macrosContainer}>
+                    <Text style={featuresStyles.macrosText}>{energyUnit === 'kilocalories' ? t('calories') : t('kilojoules')}: {calories}</Text>
+                    <Text style={featuresStyles.macrosText}>{t('protein')}: {normalizeUnit(protein)}</Text>
+                    <Text style={featuresStyles.macrosText}>{t('carbs')}: {normalizeUnit(carbs)}</Text>
+                    <Text style={featuresStyles.macrosText}>{t('fat')}: {normalizeUnit(fat)}</Text>
                 </View>
-                <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionTitle}>{t('ingredients')}</Text>
+                <View style={featuresStyles.sectionContainer}>
+                    <Text style={featuresStyles.sectionTitle}>{t('ingredients')}</Text>
                     <FlatList
                         data={ingredientsAndQuantities}
                         renderItem={renderIngredient}
                         keyExtractor={(item, index) => index.toString()}
                     />
                 </View>
-                <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionTitle}>{t('cookingProcess')}</Text>
+                <View style={featuresStyles.sectionContainer}>
+                    <Text style={featuresStyles.sectionTitle}>{t('cookingProcess')}</Text>
                     <FlatList
                         data={cookingProcess}
                         renderItem={renderStep}
@@ -249,10 +250,10 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 </View>
                 <Toast />
                 <TouchableOpacity
-                    style={styles.backButton}
+                    style={featuresStyles.backButton}
                     onPress={() => { saveMeal() }}
                 >
-                    <Text style={styles.buttonText}>{t('useRecipe')}</Text>
+                    <Text style={featuresStyles.buttonText}>{t('useRecipe')}</Text>
                 </TouchableOpacity>
             </ScrollView>
             {loading && (
@@ -267,81 +268,5 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         </I18nextProvider>
     );
 };
-
-const styles = StyleSheet.create({
-    headerContainer: {
-        marginVertical: 20,
-        paddingHorizontal: 20,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    recipeName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#4CAF50',
-        flex: 1,
-    },
-    cookingTime: {
-        fontSize: 16,
-        color: '#777',
-        marginTop: 10,
-    },
-    macrosContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginVertical: 20,
-    },
-    macrosText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#4CAF50',
-    },
-    sectionContainer: {
-        marginVertical: 20,
-        paddingHorizontal: 20,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#4CAF50',
-        marginBottom: 10,
-    },
-    ingredientContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 5,
-    },
-    ingredientName: {
-        fontSize: 16,
-        color: '#333',
-    },
-    ingredientQuantity: {
-        fontSize: 16,
-        color: '#666',
-    },
-    stepContainer: {
-        marginVertical: 5,
-    },
-    stepText: {
-        fontSize: 16,
-        color: '#333',
-    },
-    backButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 60,
-        marginHorizontal: 20,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-});
 
 export default OpenRecipeDetail;

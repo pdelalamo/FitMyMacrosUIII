@@ -10,6 +10,7 @@ import SecurityApiService from 'services/SecurityApiService';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import { generateRandomString, removeLeadingTrailingCommasAndQuotes } from 'utils/UtilFunctions';
 import { BlurView } from 'expo-blur';
+import { featuresStyles } from './featuresStyles';
 
 interface Props {
     navigation: any;
@@ -138,18 +139,18 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
         const [recipeName, recipeDescription] = item;
 
         return (
-            <View style={styles.itemContainer}>
+            <View style={featuresStyles.itemContainer}>
                 <TouchableOpacity onPress={() => setExpandedRecipe(expandedRecipe === recipeName ? null : recipeName)}>
-                    <Text style={styles.recipeName}>{recipeName}</Text>
+                    <Text style={featuresStyles.recipeName}>{recipeName}</Text>
                 </TouchableOpacity>
                 {expandedRecipe === recipeName && (
                     <>
-                        <Text style={styles.recipeDescription}>{recipeDescription}</Text>
+                        <Text style={featuresStyles.recipeDescription}>{recipeDescription}</Text>
                         <TouchableOpacity
-                            style={styles.generateButton}
+                            style={featuresStyles.generateButton}
                             onPress={() => handleGenerateRecipe(recipeName)}
                         >
-                            <Text style={styles.buttonText}>{t('generateRecipe')}</Text>
+                            <Text style={featuresStyles.buttonText}>{t('generateRecipe')}</Text>
                         </TouchableOpacity>
                     </>
                 )}
@@ -161,15 +162,15 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
     return (
         <I18nextProvider i18n={i18n}>
             <View style={globalStyles.containerMainGeneration}>
-                <View style={styles.titleContainer}>
+                <View style={featuresStyles.titleContainer}>
                     <Ionicons name="fast-food-outline" size={24} />
-                    <Text style={styles.screenTitle}>{t('selectRecipe')}</Text>
+                    <Text style={featuresStyles.screenTitle}>{t('selectRecipe')}</Text>
                 </View>
                 <FlatList
                     data={Object.entries(recipes)}
                     renderItem={renderItem}
                     keyExtractor={(item, index) => index.toString()}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={featuresStyles.listContent}
                 />
                 {loading && (
                     <View style={globalStyles.loadingOverlay}>
@@ -185,56 +186,6 @@ const GeneratedRecipesList: React.FC<Props> = ({ navigation, route }) => {
     );
 
 };
-
-const styles = StyleSheet.create({
-    itemContainer: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: 20,
-        marginVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        minHeight: 120,
-        justifyContent: 'center',
-    },
-    recipeName: {
-        fontSize: 18,
-        marginBottom: 10,
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    recipeDescription: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    generateButton: {
-        backgroundColor: '#4CAF50',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    screenTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
-    listContent: {
-        paddingBottom: 100,
-    },
-});
 
 export default GeneratedRecipesList;
 

@@ -11,6 +11,7 @@ import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import SecurityApiService from 'services/SecurityApiService';
 import { BlurView } from 'expo-blur';
 import Footer from 'utils/Footer';
+import { restaurantStyles } from './restaurantStyles';
 
 interface Props {
     navigation: any;
@@ -168,26 +169,26 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
 
     return (
         <I18nextProvider i18n={i18n}>
-            <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.label}>{t('restaurantForm.restaurantName')}</Text>
+            <ScrollView contentContainerStyle={restaurantStyles.container}>
+                <Text style={restaurantStyles.label}>{t('restaurantForm.restaurantName')}</Text>
                 <TextInput
-                    style={styles.input}
+                    style={restaurantStyles.input}
                     value={restaurantName}
                     onChangeText={setRestaurantName}
                     placeholder={t('restaurantForm.enterRestaurantName')}
                 />
 
-                <Text style={styles.label}>{t('restaurantForm.cuisineType')}</Text>
+                <Text style={restaurantStyles.label}>{t('restaurantForm.cuisineType')}</Text>
                 <TextInput
-                    style={styles.input}
+                    style={restaurantStyles.input}
                     value={cuisineType}
                     onChangeText={setCuisineType}
                     placeholder={t('restaurantForm.enterCuisineType')}
                 />
 
-                <Text style={styles.label}>{t('restaurantForm.mealTime')}</Text>
+                <Text style={restaurantStyles.label}>{t('restaurantForm.mealTime')}</Text>
                 <TextInput
-                    style={styles.input}
+                    style={restaurantStyles.input}
                     value={mealTime}
                     onChangeText={setMealTime}
                     placeholder={t('restaurantForm.enterMealTime')}
@@ -294,27 +295,5 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
         </I18nextProvider>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#388E3C',
-        marginBottom: 8,
-    },
-    input: {
-        height: 40,
-        borderColor: '#388E3C',
-        borderWidth: 1,
-        borderRadius: 4,
-        marginBottom: 16,
-        paddingHorizontal: 8,
-        backgroundColor: '#FFFFFF',
-    },
-});
 
 export default RestaurantForm;

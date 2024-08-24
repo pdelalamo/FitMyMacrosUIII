@@ -13,6 +13,7 @@ import { BlurView } from 'expo-blur';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import Footer from 'utils/Footer';
+import { restaurantStyles } from './restaurantStyles';
 
 interface Props {
     navigation: any;
@@ -179,11 +180,11 @@ const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
 
     return (
         <I18nextProvider i18n={i18n}>
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView contentContainerStyle={restaurantStyles.container}>
 
-                <Text style={styles.label}>{t('restaurantForm.mealTime')}</Text>
+                <Text style={restaurantStyles.label}>{t('restaurantForm.mealTime')}</Text>
                 <TextInput
-                    style={styles.input}
+                    style={restaurantStyles.input}
                     value={mealTime}
                     onChangeText={setMealTime}
                     placeholder={t('restaurantForm.enterMealTime')}
@@ -277,7 +278,7 @@ const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
                     <Text style={globalStyles.buttonText}>{t('restaurantForm.selectPdf')}</Text>
                 </TouchableOpacity>
                 {pdfBase64 && (
-                    <Text style={styles.pdfInfo}>
+                    <Text style={restaurantStyles.pdfInfo}>
                         {t('restaurantForm.pdfSelected')}
                     </Text>
                 )}
@@ -298,32 +299,5 @@ const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
         </I18nextProvider>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#388E3C',
-        marginBottom: 8,
-    },
-    input: {
-        height: 40,
-        borderColor: '#388E3C',
-        borderWidth: 1,
-        borderRadius: 4,
-        marginBottom: 16,
-        paddingHorizontal: 8,
-        backgroundColor: '#FFFFFF',
-    },
-    pdfInfo: {
-        marginTop: 10,
-        color: '#388E3C',
-        fontSize: 14,
-    },
-});
 
 export default RestaurantFormPDF;

@@ -393,5 +393,19 @@ export const globalStyles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-
+    cameraPreview: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    buttonRed: {
+        backgroundColor: 'red',
+        justifyContent: 'center',
+        padding: '3%',
+        borderRadius: 10,
+        margin: '3%',
+        marginBottom: '8%',
+        width: 300,
+        alignSelf: 'center'
+    },
 });

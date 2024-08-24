@@ -13,7 +13,6 @@ const Footer: React.FC<FooterProps> = ({ navigation }) => {
     return (
         <View style={globalStyles.footer}>
             <Ionicons name="home" size={35} color="white" onPress={() => navigation.navigate('MainScreen')} />
-            <Ionicons name="camera-outline" size={35} color="white" />
             <Ionicons name="color-wand-outline" size={35} color="white" onPress={() => navigation.navigate('RestaurantRecommender')} />
             <Ionicons name="star" size={35} color="white" onPress={() => navigation.navigate('FavoriteRecipes')} />
             <Ionicons name="settings" size={35} color="white" onPress={() => navigation.navigate('SettingsScreen')} />
