@@ -5,9 +5,9 @@ import AWS from 'aws-sdk';
 import { makeRedirectUri } from 'expo-auth-session';
 
 const config = {
-    androidClientId: '868426694791-ij8mdj7pfb564t72mlughov5tdbf334i.apps.googleusercontent.com',
-    iosClientId: '868426694791-7hkokdrjblj8juvi4qpbu2s3stgts7fo.apps.googleusercontent.com',
-    webClientId: '868426694791-f8245bib57s9csg4c4ole5higbdqj2c9.apps.googleusercontent.com',
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
 };
 
 class GoogleSignInUtility {
@@ -19,9 +19,8 @@ class GoogleSignInUtility {
     static async signInWithGoogle() {
         WebBrowser.maybeCompleteAuthSession();
         const [request, response, promptAsync] = Google.useAuthRequest({
-            clientId: 'f8245bib57s9csg4c4ole5higbdqj2c9',
-            iosClientId:
-                '7hkokdrjblj8juvi4qpbu2s3stgts7fo',
+            clientId: process.env.EXPO_PUBLIC_GOOGLE_ID!,
+            iosClientId: process.env.EXPO_PUBLIC_IOS_ID!,
             redirectUri: makeRedirectUri()
         });
 
@@ -62,7 +61,7 @@ class GoogleSignInUtility {
         const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
         try {
             const params = {
-                UserPoolId: 'eu-west-3_dczxHeKz4',
+                UserPoolId: process.env.EXPO_PUBLIC_AWS_USER_POOL_ID!,
                 Username: email.replace('@', '-at-'),
             };
             const user = await cognitoIdentityServiceProvider.adminGetUser(params).promise();

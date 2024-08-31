@@ -4,9 +4,9 @@ import { Alert } from 'react-native';
 
 AWS.config.region = 'eu-west-3';
 AWS.config.update({
-    accessKeyId: 'AKIA4CI5KSJHVAMN4IXC',
-    secretAccessKey: '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',
-    region: 'eu-west-3'
+    accessKeyId: process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    region: process.env.EXPO_PUBLIC_AWS_REGION
 });
 
 
@@ -17,7 +17,7 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 const signUpUser = async (email: string, password: string) => {
     try {
         const params = {
-            ClientId: '11tdf482ao63ga4r2katsaedd0',
+            ClientId: process.env.EXPO_PUBLIC_AWS_CLIENT_ID!,
             Username: toUsername(email),
             Password: password,
             UserAttributes: [
@@ -42,7 +42,7 @@ const signInUser = async (email: string, password: string) => {
     try {
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
-            ClientId: '11tdf482ao63ga4r2katsaedd0',
+            ClientId: process.env.EXPO_PUBLIC_AWS_CLIENT_ID!,
             AuthParameters: {
                 'USERNAME': toUsername(email),
                 'PASSWORD': password
@@ -74,7 +74,7 @@ function toEmail(email: string) {
 async function checkCognitoUser(email: string) {
     try {
         const params = {
-            UserPoolId: 'eu-west-3_dczxHeKz4',
+            UserPoolId: process.env.EXPO_PUBLIC_AWS_USER_POOL_ID!,
             Username: toUsername(email),
         };
         const user = await cognitoIdentityServiceProvider.adminGetUser(params).promise();
@@ -90,7 +90,7 @@ async function checkCognitoUser(email: string) {
 
 const verifyEmail = async (email: any) => {
     const params = {
-        UserPoolId: 'eu-west-3_dczxHeKz4',
+        UserPoolId: process.env.EXPO_PUBLIC_AWS_USER_POOL_ID!,
         Username: toUsername(email),
         UserAttributes: [
             {
@@ -112,7 +112,7 @@ const verifyEmail = async (email: any) => {
 
 const confirmAccount = async (email: any) => {
     const params = {
-        UserPoolId: 'eu-west-3_dczxHeKz4',
+        UserPoolId: process.env.EXPO_PUBLIC_AWS_USER_POOL_ID!,
         Username: toUsername(email),
     };
 

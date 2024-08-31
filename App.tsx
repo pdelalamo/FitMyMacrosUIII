@@ -10,7 +10,6 @@ function App() {
 
   const [appState, setAppState] = useState(AppState.currentState);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
     const subscription = AppState.addEventListener('change', handleAppStateChange);
 

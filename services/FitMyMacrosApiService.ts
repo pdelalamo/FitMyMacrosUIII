@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
 import SecurityApiService from './SecurityApiService';
-import Meal from 'model/Meal';
 
 class FitMyMacrosApiService {
 
@@ -10,7 +9,7 @@ class FitMyMacrosApiService {
     //TODO: change dev for prod once this is in production
     constructor() {
         this.client = axios.create({
-            baseURL: 'https://8glhn3t6cf.execute-api.eu-west-3.amazonaws.com/dev'
+            baseURL: process.env.EXPO_PUBLIC_API_URL!
         });
     }
 

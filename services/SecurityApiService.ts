@@ -6,7 +6,7 @@ class SecurityApiService {
 
     constructor() {
         this.client = axios.create({
-            baseURL: 'https://whtwo8alk3.execute-api.eu-west-3.amazonaws.com/prod'
+            baseURL: process.env.EXPO_PUBLIC_SEC_URL!
         });
     }
 

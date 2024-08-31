@@ -11,15 +11,15 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
-import SecurityApiService from 'services/SecurityApiService';
+import FitMyMacrosApiService from '../services/FitMyMacrosApiService';
+import SecurityApiService from '../services/SecurityApiService';
 import { BlurView } from 'expo-blur';
 
 const config = {
-    expoClientId: '868426694791-390ntagtjqcln514p6km7q9hr5tm0s5g.apps.googleusercontent.com',
-    androidClientId: '868426694791-ij8mdj7pfb564t72mlughov5tdbf334i.apps.googleusercontent.com',
-    iosClientId: '868426694791-7hkokdrjblj8juvi4qpbu2s3stgts7fo.apps.googleusercontent.com',
-    webClientId: '868426694791-f8245bib57s9csg4c4ole5higbdqj2c9.apps.googleusercontent.com',
+    expoClientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID!,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID!,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID!,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID!,
 };
 
 WebBrowser.maybeCompleteAuthSession();
@@ -42,7 +42,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
     const [request, response, promptAsync] = Google.useAuthRequest(config);
     const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
-        clientId: "340273652494315",
+        clientId: process.env.EXPO_PUBLIC_FB_AUTH!,
     });
 
     const [allergies, setAllergies] = useState<string[]>([]);
