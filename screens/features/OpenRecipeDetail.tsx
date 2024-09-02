@@ -131,7 +131,8 @@ const OpenRecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 },
                 ingredientsAndQuantities: ingredients,
                 cookingProcess: cookingProcess,
-            }
+            },
+            newRecipe: false
         };
 
         try {

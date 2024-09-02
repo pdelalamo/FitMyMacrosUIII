@@ -68,6 +68,11 @@ export const globalStyles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16
     },
+    buttonTextWhite: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 16
+    },
     buttonContainerFeatures: {
         flexDirection: 'column',
         justifyContent: 'center',
@@ -407,5 +412,11 @@ export const globalStyles = StyleSheet.create({
         marginBottom: '8%',
         width: 300,
         alignSelf: 'center'
+    },
+    buyMoreCreditsButton: {
+        backgroundColor: '#4caf50',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
     },
 });

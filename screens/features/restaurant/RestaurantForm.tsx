@@ -42,6 +42,7 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
     const [fatPercentage, setFatPercentage] = useState(20);
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
+    const [generationsLeft, setGenerationsLeft] = useState<number | null>(null);
 
     useEffect(() => {
         const loadUsername = async () => {
@@ -63,8 +64,21 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                 console.error('Error loading preferences', error);
             }
         };
+        const fetchGenerationsLeft = async () => {
+            try {
+                const value = await AsyncStorage.getItem('generationsLeft');
+                if (value !== null) {
+                    setGenerationsLeft(parseInt(value, 10)); // Parse and store the value
+                } else {
+                    setGenerationsLeft(0); // Default to 0 if no value is found
+                }
+            } catch (error) {
+                console.error("Error retrieving generations left:", error);
+            }
+        };
         loadUsername();
         loadPreferences();
+        fetchGenerationsLeft();
     }, []);
 
     const calculateMacros = () => {
@@ -169,6 +183,21 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
 
     return (
         <I18nextProvider i18n={i18n}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', margin: 10 }}>
+                <Text>{t('monthlyMealGenerationsLeft')}: {generationsLeft}</Text>
+                {generationsLeft === 0 && (
+                    <TouchableOpacity
+                        style={[
+                            globalStyles.buyMoreCreditsButton,
+                            generationsLeft !== 0 && { backgroundColor: 'grey' }, // Change to grey when disabled
+                        ]}
+                        disabled={generationsLeft > 0}
+                        onPress={() => navigation.navigate('PurchaseCredits')}
+                    >
+                        <Text style={globalStyles.buttonTextWhite}>{t('buyMoreCredits')}</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
             <ScrollView contentContainerStyle={restaurantStyles.container}>
                 <Text style={restaurantStyles.label}>{t('restaurantForm.restaurantName')}</Text>
                 <TextInput
@@ -278,7 +307,12 @@ const RestaurantForm: React.FC<Props> = ({ route, navigation }) => {
                         {t('percentageAlert')}
                     </Text>
                 )}
-                <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => handleSubmit()}>
+                <TouchableOpacity style={[
+                    globalStyles.buttonGreen,
+                    generationsLeft === 0 && { backgroundColor: 'grey' },
+                ]}
+                    disabled={generationsLeft === 0}
+                    onPress={() => handleSubmit()}>
                     <Text style={globalStyles.buttonText}>{t('restaurantForm.submit')}</Text>
                 </TouchableOpacity>
             </ScrollView>

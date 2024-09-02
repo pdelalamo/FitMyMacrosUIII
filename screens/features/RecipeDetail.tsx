@@ -219,7 +219,8 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
                 },
                 ingredientsAndQuantities: ingredientsAndQuantities,
                 cookingProcess: cookingProcess,
-            }
+            },
+            newRecipe: true
         };
 
         try {

@@ -41,6 +41,7 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [weightPreference, setWeightPreference] = useState('');
     const [energyUnit, setEnergy] = useState<string>('');
+    const [generationsLeft, setGenerationsLeft] = useState<number | null>(null);
 
     const flavorItems = [
         { label: t('flavors.any'), value: 'any' },
@@ -119,8 +120,21 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 console.error('Error loading preferences', error);
             }
         };
+        const fetchGenerationsLeft = async () => {
+            try {
+                const value = await AsyncStorage.getItem('generationsLeft');
+                if (value !== null) {
+                    setGenerationsLeft(parseInt(value, 10)); // Parse and store the value
+                } else {
+                    setGenerationsLeft(0); // Default to 0 if no value is found
+                }
+            } catch (error) {
+                console.error("Error retrieving generations left:", error);
+            }
+        };
         loadDailyMeals();
         loadPreferences();
+        fetchGenerationsLeft();
     }, []);
 
     const calculateMacros = () => {
@@ -265,6 +279,21 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
     return (
         <I18nextProvider i18n={i18n}>
             <View style={globalStyles.containerMainGeneration}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <Text>{t('monthlyMealGenerationsLeft')}: {generationsLeft}</Text>
+                    {generationsLeft === 0 && (
+                        <TouchableOpacity
+                            style={[
+                                globalStyles.buyMoreCreditsButton,
+                                generationsLeft !== 0 && { backgroundColor: 'grey' }, // Change to grey when disabled
+                            ]}
+                            disabled={generationsLeft > 0}
+                            onPress={() => navigation.navigate('PurchaseCredits')}
+                        >
+                            <Text style={globalStyles.buttonTextWhite}>{t('buyMoreCredits')}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
                 <ScrollView>
                     <DropDownPicker
                         open={cuisineOpen}
@@ -418,7 +447,11 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
 
                 </ScrollView>
                 <TouchableOpacity
-                    style={globalStyles.modalButton}
+                    style={[
+                        globalStyles.modalButton,
+                        generationsLeft === 0 && { backgroundColor: 'grey' },
+                    ]}
+                    disabled={generationsLeft === 0}
                     onPress={() => {
                         handleGenerateRecipes();
                     }}
