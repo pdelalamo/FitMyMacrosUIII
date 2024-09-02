@@ -189,6 +189,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 await AsyncStorage.setItem('proteinPercentage', userData['targetProteinPercentage']);
                 await AsyncStorage.setItem('carbsPercentage', userData['targetCarbsPercentage']);
                 await AsyncStorage.setItem('fatPercentage', userData['targetFatPercentage']);
+                await AsyncStorage.setItem('monthlyGenerations', userData['monthlyGenerations']);
             } else {
                 console.error('Failed to fetch user data', userDataResponse);
             }

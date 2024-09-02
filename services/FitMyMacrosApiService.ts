@@ -100,6 +100,7 @@ class FitMyMacrosApiService {
             const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
             const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
             const targetFatPercentage = await AsyncStorage.getItem('fatPercentage');
+            const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
 
             const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
             parsedMap.forEach((value: string, key: string) => {
@@ -122,7 +123,8 @@ class FitMyMacrosApiService {
                 targetProteinPercentage: targetProteinPercentage,
                 targetCarbsPercentage: targetCarbsPercentage,
                 targetFatPercentage: targetFatPercentage,
-                previous_recipes: previous_recipes
+                previous_recipes: previous_recipes,
+                monthlyGenerations: monthlyGenerations
             };
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;

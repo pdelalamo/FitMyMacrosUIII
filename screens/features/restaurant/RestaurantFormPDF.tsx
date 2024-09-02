@@ -67,7 +67,7 @@ const RestaurantFormPDF: React.FC<Props> = ({ route, navigation }) => {
         };
         const fetchGenerationsLeft = async () => {
             try {
-                const value = await AsyncStorage.getItem('generationsLeft');
+                const value = await AsyncStorage.getItem('monthlyGenerations');
                 if (value !== null) {
                     setGenerationsLeft(parseInt(value, 10)); // Parse and store the value
                 } else {

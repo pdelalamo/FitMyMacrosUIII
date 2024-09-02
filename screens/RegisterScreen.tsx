@@ -52,6 +52,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [energyUnit, setEnergyUnit] = useState('');
     const [weightUnit, setWeightUnit] = useState('');
     const [fluidUnit, setFluidUnit] = useState('');
+    const [monthlyGenerations, setMonthlyGenerations] = useState('0');
 
     useEffect(() => {
         const loadPreferences = async () => {
@@ -59,9 +60,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 const energy = await AsyncStorage.getItem('measurementEnergy');
                 const weight = await AsyncStorage.getItem('measurementSolid');
                 const fluid = await AsyncStorage.getItem('measurementFluid');
+                const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
                 setEnergyUnit(energy || '');
                 setWeightUnit(weight || '');
                 setFluidUnit(fluid || '');
+                setMonthlyGenerations(monthlyGenerations || '');
             } catch (error) {
                 console.error('Error loading ingredients map from AsyncStorage:', error);
             }
@@ -250,7 +253,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 equipment: equipment,
                 weightUnit: weightUnit,
                 fluidUnit: fluidUnit,
-                energyUnit: energyUnit
+                energyUnit: energyUnit,
+                monthlyGenerations: monthlyGenerations
             };
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;
