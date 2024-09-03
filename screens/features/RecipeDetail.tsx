@@ -224,6 +224,11 @@ const RecipeDetail: React.FC<Props> = ({ route, navigation }) => {
         };
 
         try {
+            const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
+            if (monthlyGenerations !== null) {
+                const newMonthlyGenerations = (parseInt(monthlyGenerations, 10) - 1).toString();
+                await AsyncStorage.setItem('monthlyGenerations', newMonthlyGenerations);
+            }
             console.log('username: ' + username);
             const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
             const token = tokenResponse.body;

@@ -232,6 +232,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
     async function sendUserData() {
         try {
+            await AsyncStorage.setItem('monthlyGenerations', '150');
+            setMonthlyGenerations('150');
             const savedMap = await AsyncStorage.getItem('ingredientsMap');
             console.log('savedmap: ' + savedMap);
             const parsedObject = await JSON.parse(savedMap !== null ? savedMap : '{}');
@@ -242,6 +244,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 console.log(key, value);
             });
             const foodObject = Object.fromEntries(parsedMap);
+            const currentDate = new Date();
+            const day = String(currentDate.getDate()).padStart(2, '0'); // Get day and pad with leading zero if necessary
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad with leading zero
+            const year = currentDate.getFullYear(); // Get year
+            const tokenGenerationDate = `${day}/${month}/${year}`; // Something like "25/08/2024"
+            await AsyncStorage.setItem('tokenGenerationDate', tokenGenerationDate);
             const userData = {
                 userId: email.replace('@', '-at-').toLowerCase(),
                 food: foodObject,
@@ -254,7 +262,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 weightUnit: weightUnit,
                 fluidUnit: fluidUnit,
                 energyUnit: energyUnit,
-                monthlyGenerations: monthlyGenerations
+                monthlyGenerations: monthlyGenerations,
+                tokenGenerationDate: tokenGenerationDate
             };
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;

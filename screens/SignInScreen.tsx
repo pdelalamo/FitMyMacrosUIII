@@ -95,6 +95,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                         setLoading(true);
                         await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await AsyncStorage.setItem("username", userInfo.email.replace('@', '-at-').toLowerCase());
+                        setEmail(userInfo.email);
                         await loadDataFromDynamoDB();
                         setLoading(false);
                         navigation.navigate('MainScreen');
@@ -124,6 +126,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                         setLoading(true);
                         await setEmail(userInfo.email);
                         await AsyncStorage.setItem("isUserSignedIn", 'true');
+                        await AsyncStorage.setItem("username", userInfo.email.replace('@', '-at-').toLowerCase());
+                        setEmail(userInfo.email);
                         await loadDataFromDynamoDB();
                         setLoading(false);
                         navigation.navigate('MainScreen');
@@ -189,7 +193,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 await AsyncStorage.setItem('proteinPercentage', userData['targetProteinPercentage']);
                 await AsyncStorage.setItem('carbsPercentage', userData['targetCarbsPercentage']);
                 await AsyncStorage.setItem('fatPercentage', userData['targetFatPercentage']);
-                await AsyncStorage.setItem('monthlyGenerations', userData['monthlyGenerations']);
+                await AsyncStorage.setItem('monthlyGenerations', (userData['monthlyGenerations'] === null || userData['monthlyGenerations'] === '' || userData['monthlyGenerations'] === undefined) ? '150' : userData['monthlyGenerations']);
+                await AsyncStorage.setItem('tokenGenerationDate', (userData['tokenGenerationDate'] === null || userData['tokenGenerationDate'] === '' || userData['tokenGenerationDate'] === undefined) ? new Date().toLocaleDateString('en-GB') : userData['tokenGenerationDate']);
             } else {
                 console.error('Failed to fetch user data', userDataResponse);
             }
