@@ -130,9 +130,9 @@ PODS:
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
   - GTMSessionFetcher/Core (3.5.0)
-  - hermes-engine (0.73.8):
-    - hermes-engine/Pre-built (= 0.73.8)
-  - hermes-engine/Pre-built (0.73.8)
+  - hermes-engine (0.73.9):
+    - hermes-engine/Pre-built (= 0.73.9)
+  - hermes-engine/Pre-built (0.73.9)
   - libevent (2.1.12)
   - RCT-Folly (2022.05.16.00):
     - boost
@@ -1503,7 +1503,7 @@ SPEC CHECKSUMS:
   GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  hermes-engine: b12d9bb1b7cee546f5e48212e7ea7e3c1665a367
+  hermes-engine: ed62e0dcd013bf4a3b487f164feec1c4e705b5b5
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   RCT-Folly: 7169b2b1c44399c76a47b5deaaba715eeeb476c0
   RCTRequired: d362a61864a64315aee00faea8dee6cf5b3f4aad

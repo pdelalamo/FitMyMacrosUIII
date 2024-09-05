@@ -893,6 +893,7 @@
     "passResetError": "There was an error reseting your password. Please try again later or contact technical support.",
     "submit": "Submit",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "delete": "Delete",
     "sendCode": "Send Reset Code",
     "enterCodeNewPassword": "Enter received code and new password",
@@ -1040,6 +1041,9 @@
         "selectPdf": "Select PDF file",
         "pdfSelected": "File has been selected",
         "monthlyMealGenerationsLeft": "Monthly meal generations left",
-        "buyMoreCredits": "Buy more credits"
+        "buyMoreCredits": "Buy more credits",
+        "logOut": "Log Out",
+        "logoutConfirmationTitle": "Confirm Log Out",
+        "logoutConfirmationMessage": "Are you sure you want to log out? Your session will be terminated."
     }
 }

@@ -164,6 +164,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
     async function loadDataFromDynamoDB() {
         try {
+            console.log(email);
             const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
             const token = tokenResponse.body;
             FitMyMacrosApiService.setAuthToken(token);
@@ -180,15 +181,15 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 }
 
                 await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
-                await AsyncStorage.setItem('ingredientsMap', JSON.stringify(userData['food']));
-                await AsyncStorage.setItem('allergiesList', JSON.stringify(userData['allergies-intolerances']));
+                await AsyncStorage.setItem('ingredientsMap', !!JSON.stringify(userData['food']) ? JSON.stringify(userData['food']) : '');
+                await AsyncStorage.setItem('allergiesList', !!JSON.stringify(userData['allergies-intolerances']) ? JSON.stringify(userData['allergies-intolerances']) : '');
                 await AsyncStorage.setItem('dietType', userData['dietType']);
                 await AsyncStorage.setItem('equipmentList', JSON.stringify(userData['equipment']));
                 await AsyncStorage.setItem('measurementEnergy', userData['energyUnit']);
                 await AsyncStorage.setItem('measurementSolid', userData['weightUnit']);
                 await AsyncStorage.setItem('measurementFluid', userData['fluidUnit']);
-                await AsyncStorage.setItem('favoriteMeals', JSON.stringify(userData['favoriteMeals']));
-                await AsyncStorage.setItem('previous_recipes', JSON.stringify(userData['previous_recipes']));
+                await AsyncStorage.setItem('favoriteMeals', !!JSON.stringify(userData['favoriteMeals']) ? JSON.stringify(userData['favoriteMeals']) : '');
+                await AsyncStorage.setItem('previous_recipes', !!JSON.stringify(userData['previous_recipes']) ? JSON.stringify(userData['previous_recipes']) : '');
                 await AsyncStorage.setItem('targetCalories', userData['targetEnergy']);
                 await AsyncStorage.setItem('proteinPercentage', userData['targetProteinPercentage']);
                 await AsyncStorage.setItem('carbsPercentage', userData['targetCarbsPercentage']);

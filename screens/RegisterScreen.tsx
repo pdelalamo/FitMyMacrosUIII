@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from '../services/FitMyMacrosApiService';
 import SecurityApiService from '../services/SecurityApiService';
 import { BlurView } from 'expo-blur';
+import { CommonActions } from '@react-navigation/native';
 
 const config = {
     expoClientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID!,
@@ -52,7 +53,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [energyUnit, setEnergyUnit] = useState('');
     const [weightUnit, setWeightUnit] = useState('');
     const [fluidUnit, setFluidUnit] = useState('');
-    const [monthlyGenerations, setMonthlyGenerations] = useState('0');
+    const [targetEnergy, setTargetEnergy] = useState('');
+    const [targetProteinPercentage, setTargetProteinPercentage] = useState('');
+    const [targetCarbsPercentage, setTargetCarbsPercentage] = useState('');
+    const [targetFatPercentage, setTargetFatPercentage] = useState('');
+    const [monthlyGenerations, setMonthlyGenerations] = useState('150');
 
     useEffect(() => {
         const loadPreferences = async () => {
@@ -61,10 +66,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 const weight = await AsyncStorage.getItem('measurementSolid');
                 const fluid = await AsyncStorage.getItem('measurementFluid');
                 const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
+                const targetEnergy = await AsyncStorage.getItem('targetCalories');
+                const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
+                const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
+                const targetFatPercentage = await AsyncStorage.getItem('fatPercentage');
                 setEnergyUnit(energy || '');
                 setWeightUnit(weight || '');
                 setFluidUnit(fluid || '');
-                setMonthlyGenerations(monthlyGenerations || '');
+                setTargetEnergy(targetEnergy || '');
+                setTargetProteinPercentage(targetProteinPercentage || '');
+                setTargetCarbsPercentage(targetCarbsPercentage || '');
+                setTargetFatPercentage(targetFatPercentage || '');
+                setMonthlyGenerations(monthlyGenerations || '150');
             } catch (error) {
                 console.error('Error loading ingredients map from AsyncStorage:', error);
             }
@@ -145,7 +158,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                         await sendUserData();
                         setLoading(false);
-                        navigation.navigate('MainScreen');
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{ name: 'MainScreen' }],
+                            })
+                        );
                     }
                 }
             } catch (error) {
@@ -172,7 +190,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
                         await sendUserData();
                         setLoading(false);
-                        navigation.navigate('MainScreen');
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{ name: 'MainScreen' }],
+                            })
+                        );
                     }
                 }
             })();
@@ -211,12 +234,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             Alert.alert(t('alreadyExistingUser'));
         } else {
             setLoading(true);
-            await signUpUser(email, generateRandomPassword(10));
+            await signUpUser(email, password);
             await AsyncStorage.setItem("isUserSignedIn", 'true');
             await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
             await sendUserData();
             setLoading(false);
-            navigation.navigate('MainScreen');
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'MainScreen' }],
+                })
+            );
         }
     };
 
@@ -262,6 +290,10 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 weightUnit: weightUnit,
                 fluidUnit: fluidUnit,
                 energyUnit: energyUnit,
+                targetEnergy: targetEnergy,
+                targetProteinPercentage: targetProteinPercentage,
+                targetCarbsPercentage: targetCarbsPercentage,
+                targetFatPercentage: targetFatPercentage,
                 monthlyGenerations: monthlyGenerations,
                 tokenGenerationDate: tokenGenerationDate
             };
@@ -321,16 +353,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                             <Text style={federatedStyles.buttonText}>{t('registerFacebook')}</Text>
                         </View>
                     </TouchableOpacity>
-                    {loading && (
-                        <View style={styles.loadingOverlay}>
-                            <TouchableWithoutFeedback>
-                                <BlurView intensity={50} style={styles.blurView}>
-                                    <ActivityIndicator size="large" color="#0000ff" />
-                                </BlurView>
-                            </TouchableWithoutFeedback>
-                        </View>
-                    )}
                 </View>
+                {loading && (
+                    <View style={styles.loadingOverlay}>
+                        <TouchableWithoutFeedback>
+                            <BlurView intensity={50} style={styles.blurView}>
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            </BlurView>
+                        </TouchableWithoutFeedback>
+                    </View>
+                )}
             </ImageBackground>
         </I18nextProvider>
     );

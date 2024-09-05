@@ -40,6 +40,7 @@ const signUpUser = async (email: string, password: string) => {
 // Function to sign in a user
 const signInUser = async (email: string, password: string) => {
     try {
+        console.log('email: ' + email + ' password: ' + password);
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
             ClientId: process.env.EXPO_PUBLIC_AWS_CLIENT_ID!,

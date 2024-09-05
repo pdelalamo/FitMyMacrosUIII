@@ -21,7 +21,7 @@ const GoalsFeature: React.FC<Props> = ({ navigation }) => {
                             <Text style={productFeaturesStyles.featureText}>{t('goalsFeature')}</Text>
                         </View>
                         <View style={globalStyles.buttonContainerFeatures}>
-                            <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('AiFeature')}>
+                            <TouchableOpacity style={globalStyles.buttonGreen} onPress={() => navigation.navigate('RestaurantFeature')}>
                                 <Text style={globalStyles.buttonText}>{t('continue')}</Text>
                             </TouchableOpacity>
                         </View>
