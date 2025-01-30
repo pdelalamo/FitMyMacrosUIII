@@ -2,64 +2,93 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FitMyMacrosApiService from 'services/FitMyMacrosApiService';
 import SecurityApiService from 'services/SecurityApiService';
 
+// Constants
+const DAYS_IN_MONTH = 30;
+const GENERATIONS_INCREMENT = 150;
+const DATE_FORMAT = 'en-GB';
+
 // Function to invoke when the app is first opened each day
 const handleAppStart = async () => {
-    const userId = await AsyncStorage.getItem('username');
-    if (userId !== null) {
-        const lastCheckedDate = await AsyncStorage.getItem('lastCheckedDate');
-        const todayStr = new Date().toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
+    try {
+        const userId = await getUserId();
+        if (userId) {
+            const lastCheckedDate = await getStoredDate('lastCheckedDate');
+            const todayDate = formatDate(new Date());
 
-        if (lastCheckedDate !== todayStr) {
-            await checkAndUpdateTokenDate(userId);
-            await AsyncStorage.setItem('lastCheckedDate', todayStr); // Store today's date
+            if (lastCheckedDate !== todayDate) {
+                await updateTokenAndGenerations(userId);
+                await setStoredDate('lastCheckedDate', todayDate);
+            }
+        }
+    } catch (error) {
+        console.error('Error during app start:', error);
+    }
+};
+
+const getUserId = async (): Promise<string | null> => {
+    return await AsyncStorage.getItem('username');
+};
+
+const getStoredDate = async (key: string): Promise<string | null> => {
+    return await AsyncStorage.getItem(key);
+};
+
+const setStoredDate = async (key: string, date: string): Promise<void> => {
+    await AsyncStorage.setItem(key, date);
+};
+
+const formatDate = (date: Date): string => {
+    return date.toLocaleDateString(DATE_FORMAT);
+};
+
+const updateTokenAndGenerations = async (userId: string) => {
+    const token = await fetchAuthToken(userId);
+    if (token) {
+        FitMyMacrosApiService.setAuthToken(token);
+        const userData = await fetchUserData(userId);
+
+        if (userData) {
+            const { tokenGenerationDate, monthlyGenerations } = userData;
+            await updateGenerationsIfNeeded(tokenGenerationDate, monthlyGenerations);
         }
     }
 };
 
-const checkAndUpdateTokenDate = async (userId: string) => {
+const fetchAuthToken = async (userId: string): Promise<string | null> => {
     const tokenResponse = await SecurityApiService.getToken(`username=${userId}`);
-    const token = tokenResponse.body;
-    FitMyMacrosApiService.setAuthToken(token);
+    return tokenResponse ? tokenResponse.body : null;
+};
+
+const fetchUserData = async (userId: string): Promise<any> => {
     const userDataResponse = await FitMyMacrosApiService.getUserData({ userId });
+    return userDataResponse.statusCode === 200 ? JSON.parse(userDataResponse.body) : null;
+};
 
-    // Check the status code and parse the body if the request was successful
-    if (userDataResponse.statusCode === 200) {
-        const userData = JSON.parse(userDataResponse.body);
-        const tokenGenerationDate = userData['tokenGenerationDate'];
-        const monthlyGenerations = userData['monthlyGenerations'];
+const updateGenerationsIfNeeded = async (tokenDateStr: string, storedGenerations: string) => {
+    const tokenDate = parseDate(tokenDateStr);
+    const daysPassed = calculateDaysPassed(tokenDate);
 
-        if (tokenGenerationDate && monthlyGenerations) {
-            const tokenDate = parseDate(tokenGenerationDate);
+    if (daysPassed >= DAYS_IN_MONTH) {
+        const generationsToAdd = calculateGenerationsToAdd(daysPassed);
+        const newTokenDate = formatDate(new Date());
 
-            // Calculate the number of days passed since the tokenGenerationDate
-            const daysPassed = calculateDaysPassed(tokenDate);
-
-            if (daysPassed >= 30) {
-                // Determine how many sets of 30 days have passed
-                const setsOf30Days = Math.floor(daysPassed / 30);
-
-                // Calculate the amount to add (150 per every 30 days)
-                const generationsToAdd = setsOf30Days * 150;
-
-                // Update the tokenGenerationDate to today's date
-                const todayStr = new Date().toLocaleDateString('en-GB'); // Outputs as DD/MM/YYYY
-                await AsyncStorage.setItem('tokenGenerationDate', todayStr);
-
-                const storedMonthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
-                if (storedMonthlyGenerations !== null) {
-                    const newMonthlyGenerations = (parseInt(storedMonthlyGenerations, 10) + generationsToAdd).toString();
-                    await AsyncStorage.setItem('monthlyGenerations', newMonthlyGenerations);
-                }
-
-                // Invoke sendUserData if 30 or more days have passed
-                FitMyMacrosApiService.sendUserData();
-            }
-        }
+        await setStoredDate('tokenGenerationDate', newTokenDate);
+        await updateMonthlyGenerations(generationsToAdd, storedGenerations);
+        FitMyMacrosApiService.sendUserData();
     }
-}
+};
 
+const calculateGenerationsToAdd = (daysPassed: number): number => {
+    const setsOfDays = Math.floor(daysPassed / DAYS_IN_MONTH);
+    return setsOfDays * GENERATIONS_INCREMENT;
+};
 
-// Function to convert DD/MM/YYYY string to Date object
+const updateMonthlyGenerations = async (generationsToAdd: number, storedGenerationsStr: string) => {
+    const storedGenerations = parseInt(storedGenerationsStr, 10);
+    const newMonthlyGenerations = (storedGenerations + generationsToAdd).toString();
+    await AsyncStorage.setItem('monthlyGenerations', newMonthlyGenerations);
+};
+
 const parseDate = (dateStr: string): Date => {
     const [day, month, year] = dateStr.split('/').map(Number);
     return new Date(year, month - 1, day); // Month is 0-indexed
@@ -68,8 +97,7 @@ const parseDate = (dateStr: string): Date => {
 const calculateDaysPassed = (tokenDate: Date): number => {
     const currentDate = new Date();
     const timeDifference = currentDate.getTime() - tokenDate.getTime();
-    const daysPassed = Math.floor(timeDifference / (1000 * 3600 * 24));
-    return daysPassed;
+    return Math.floor(timeDifference / (1000 * 3600 * 24));
 };
 
 export { handleAppStart };
