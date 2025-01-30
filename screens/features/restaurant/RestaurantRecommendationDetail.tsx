@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ListRenderItem } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { I18nextProvider, useTranslation } from 'react-i18next';
-import i18n from 'i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { restaurantStyles } from './restaurantStyles';
 
@@ -10,69 +9,70 @@ interface Props {
     route: any;
 }
 
-type Macros = {
+interface Macros {
     energy: string;
     protein: string;
     carbs: string;
     fat: string;
-};
+}
 
-type Recommendation = {
+interface Recommendation {
     optionName: string;
     energyAndMacros: Macros;
-};
+}
 
-const RestaurantRecommendationDetail: React.FC<Props> = ({ navigation, route }) => {
-    const { restaurantRecommendation } = route.params;
+const RestaurantRecommendationDetail: React.FC<Props> = ({ route }) => {
+    const { restaurantRecommendation } = route.params || {};
     const { t } = useTranslation();
 
     const [weightPreference, setWeightPreference] = useState('');
-    const [energyUnit, setEnergy] = useState<string>('');
+    const [energyUnit, setEnergyUnit] = useState<string>('');
 
     useEffect(() => {
-        const loadPreferences = async () => {
-            console.log('logs work');
+        const retrievePreferences = async () => {
             try {
-                const energy = await AsyncStorage.getItem('measurementEnergy');
-                setEnergy(energy === null ? '' : energy);
-                const solid = await AsyncStorage.getItem('measurementSolid');
-                setWeightPreference(solid === null ? '' : solid);
+                const measurementEnergy = await AsyncStorage.getItem('measurementEnergy');
+                setEnergyUnit(measurementEnergy ?? '');
+
+                const measurementSolid = await AsyncStorage.getItem('measurementSolid');
+                setWeightPreference(measurementSolid ?? '');
             } catch (error) {
-                console.error('Error loading preferences', error);
+                console.error('Error retrieving preferences:', error);
             }
         };
-        loadPreferences();
+        retrievePreferences();
     }, []);
 
-    const renderRecommendation: ListRenderItem<Recommendation> = ({ item }) => (
+    const renderRecommendationItem = ({ item }: { item: Recommendation }) => (
         <View style={restaurantStyles.card}>
             <Text style={restaurantStyles.optionName}>{item.optionName}</Text>
-            <View style={restaurantStyles.macroContainer}>
-                <Text style={restaurantStyles.macroLabel}>{t('energy')}: </Text>
-                <Text style={restaurantStyles.macroValue}>{item.energyAndMacros.energy} {(item.energyAndMacros.energy.includes('kcal') || item.energyAndMacros.energy.includes('kilojoules') || item.energyAndMacros.energy.includes('kilocalories') || item.energyAndMacros.energy.toLocaleLowerCase().includes('kj')) ? '' : energyUnit}</Text>
-            </View>
-            <View style={restaurantStyles.macroContainer}>
-                <Text style={restaurantStyles.macroLabel}>{t('protein')}: </Text>
-                <Text style={restaurantStyles.macroValue}>{item.energyAndMacros.protein} {weightPreference}</Text>
-            </View>
-            <View style={restaurantStyles.macroContainer}>
-                <Text style={restaurantStyles.macroLabel}>{t('carbs')}: </Text>
-                <Text style={restaurantStyles.macroValue}>{item.energyAndMacros.carbs} {weightPreference}</Text>
-            </View>
-            <View style={restaurantStyles.macroContainer}>
-                <Text style={restaurantStyles.macroLabel}>{t('fat')}: </Text>
-                <Text style={restaurantStyles.macroValue}>{item.energyAndMacros.fat} {weightPreference}</Text>
-            </View>
+            {renderMacro('energy', item.energyAndMacros.energy, energyUnit)}
+            {renderMacro('protein', item.energyAndMacros.protein, weightPreference)}
+            {renderMacro('carbs', item.energyAndMacros.carbs, weightPreference)}
+            {renderMacro('fat', item.energyAndMacros.fat, weightPreference)}
         </View>
     );
+
+    const renderMacro = (label: string, value: string, unit: string) => (
+        <View style={restaurantStyles.macroContainer}>
+            <Text style={restaurantStyles.macroLabel}>{t(label)}: </Text>
+            <Text style={restaurantStyles.macroValue}>
+                {value} {shouldAppendUnit(value, label, unit) ? unit : ''}
+            </Text>
+        </View>
+    );
+
+    const shouldAppendUnit = (value: string, label: string, unit: string) => {
+        return !value.toLowerCase().includes(label) && !value.toLowerCase().includes(unit.toLowerCase());
+    };
 
     return (
         <I18nextProvider i18n={i18n}>
             <View style={restaurantStyles.container}>
                 <FlatList
                     data={restaurantRecommendation}
-                    renderItem={renderRecommendation}
-                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderRecommendationItem}
+                    keyExtractor={(_, index) => index.toString()}
                 />
             </View>
         </I18nextProvider>
