@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Alert, Dimensions, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 import { t } from 'i18next';
@@ -18,220 +18,149 @@ interface Props {
 }
 
 const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [cuisine, setCuisine] = useState('');
-    const [flavor, setFlavor] = useState('');
-    const [satiety, setSatiety] = useState('');
-    const [recipeTargetCalories, setRecipeTargetCalories] = useState('');
-    const [proteinPercentage, setProteinPercentage] = useState(30);
-    const [carbsPercentage, setCarbsPercentage] = useState(50);
-    const [fatPercentage, setFatPercentage] = useState(20);
-    const [cuisineOpen, setCuisineOpen] = useState(false);
-    const [flavorOpen, setFlavorOpen] = useState(false);
-    const [satietyOpen, setSatietyOpen] = useState(false);
-    const [dietOpen, setDietOpen] = useState(false);
-    const [diet, setDiet] = useState('');
-    const [cookingTimeOpen, setCookingTimeOpen] = useState(false);
-    const [cookingTime, setCookingTime] = useState('');
-    const [occasionOpen, setOccasionOpen] = useState(false);
-    const [occasion, setOccasion] = useState('');
-    const [toggleCheckBox, setToggleCheckBox] = useState(false);
-    const [username, setUsername] = useState('');
-    const [opId, setOpId] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [weightPreference, setWeightPreference] = useState('');
-    const [energyUnit, setEnergy] = useState<string>('');
-    const [generationsLeft, setGenerationsLeft] = useState<number | null>(null);
+    const [state, setState] = useState({
+        modalVisible: false,
+        cuisine: '',
+        flavor: '',
+        satiety: '',
+        recipeTargetCalories: '',
+        proteinPercentage: 30,
+        carbsPercentage: 50,
+        fatPercentage: 20,
+        cuisineOpen: false,
+        flavorOpen: false,
+        satietyOpen: false,
+        dietOpen: false,
+        diet: '',
+        cookingTimeOpen: false,
+        cookingTime: '',
+        occasionOpen: false,
+        occasion: '',
+        toggleCheckBox: false,
+        username: '',
+        opId: '',
+        loading: false,
+        weightPreference: '',
+        energyUnit: '',
+        generationsLeft: null as number | null,
+    });
 
-    const flavorItems = [
-        { label: t('flavors.any'), value: 'any' },
-        { label: t('flavors.spicy'), value: 'spicy' },
-        { label: t('flavors.sweet'), value: 'sweet' },
-        { label: t('flavors.savory'), value: 'savory' },
-        { label: t('flavors.sour'), value: 'sour' },
-        { label: t('flavors.bitter'), value: 'bitter' },
-        { label: t('flavors.umami'), value: 'umami' },
-        { label: t('flavors.salty'), value: 'salty' },
-        { label: t('flavors.fruity'), value: 'fruity' },
-        { label: t('flavors.herby'), value: 'herby' },
-        { label: t('flavors.earthy'), value: 'earthy' },
-    ];
-    const cuisineItems = [
-        { label: t('cuisines.any'), value: 'any' },
-        { label: t('cuisines.african'), value: 'african' },
-        { label: t('cuisines.american'), value: 'american' },
-        { label: t('cuisines.mediterranean'), value: 'mediterranean' },
-        { label: t('cuisines.asian'), value: 'asian' },
-        { label: t('cuisines.european'), value: 'european' },
-        { label: t('cuisines.latinAmerican'), value: 'latinAmerican' },
-        { label: t('cuisines.middleEastern'), value: 'middleEastern' },
-        { label: t('cuisines.indian'), value: 'indian' },
-        { label: t('cuisines.chinese'), value: 'chinese' },
-        { label: t('cuisines.japanese'), value: 'japanese' },
-        { label: t('cuisines.korean'), value: 'korean' },
-        { label: t('cuisines.thai'), value: 'thai' },
-    ];
-    const satietyLevelItems = [
-        { label: t('satietyLevel.any'), value: 'any' },
-        { label: t('satietyLevel.satiating'), value: 'satiating' },
-        { label: t('satietyLevel.nonSatiating'), value: 'nonSatiating' },
-    ];
-    const dietItems = [
-        { label: t('dietaryRestrictions.none'), value: 'none' },
-        { label: t('dietaryRestrictions.vegan'), value: 'vegan' },
-        { label: t('dietaryRestrictions.vegetarian'), value: 'vegetarian' },
-        { label: t('dietaryRestrictions.glutenFree'), value: 'glutenFree' },
-        { label: t('dietaryRestrictions.paleo'), value: 'paleo' },
-        { label: t('dietaryRestrictions.pescatarian'), value: 'pescatarian' },
-        { label: t('dietaryRestrictions.dairyFree'), value: 'dairyFree' },
-        { label: t('dietaryRestrictions.nutFree'), value: 'nutFree' },
-        { label: t('dietaryRestrictions.halal'), value: 'halal' },
-        { label: t('dietaryRestrictions.kosher'), value: 'kosher' },
-    ];
-    const cookingTimeItems = [
-        { label: t('cookingTimes.30min'), value: '30min' },
-        { label: t('cookingTimes.1h'), value: '1h' },
-        { label: t('cookingTimes.moreThan1h'), value: 'moreThan1h' },
-    ];
-    const occasionItems = [
-        { label: t('occasions.breakfast'), value: 'breakfast' },
-        { label: t('occasions.lunch'), value: 'lunch' },
-        { label: t('occasions.snack'), value: 'snack' },
-        { label: t('occasions.dinner'), value: 'dinner' },
-        { label: t('occasions.any'), value: 'any' },
-    ];
-
-    useEffect(() => {
-        const loadDailyMeals = async () => {
-            try {
-                const uname = await AsyncStorage.getItem('username');
-                setUsername(uname === null ? '' : uname);
-            } catch (error) {
-                console.error('Error loading username', error);
-            }
-        };
-        const loadPreferences = async () => {
-            try {
-                const energy = await AsyncStorage.getItem('measurementEnergy');
-                setEnergy(energy === null ? '' : energy);
-                const solid = await AsyncStorage.getItem('measurementSolid');
-                setWeightPreference(solid === null ? '' : solid);
-            } catch (error) {
-                console.error('Error loading preferences', error);
-            }
-        };
-        const fetchGenerationsLeft = async () => {
-            try {
-                const value = await AsyncStorage.getItem('monthlyGenerations');
-                if (value !== null) {
-                    setGenerationsLeft(parseInt(value, 10)); // Parse and store the value
-                } else {
-                    setGenerationsLeft(0); // Default to 0 if no value is found
-                }
-            } catch (error) {
-                console.error("Error retrieving generations left:", error);
-            }
-        };
-        loadDailyMeals();
-        loadPreferences();
-        fetchGenerationsLeft();
-    }, []);
-
-    const calculateMacros = () => {
-        const total = parseInt(recipeTargetCalories, 10) || 0;
-        const proteinGrams = weightPreference === 'grams' ? Math.round((total * proteinPercentage) / 400) : Math.round((total * proteinPercentage) / 400 * 0.03527396195);
-        const carbsGrams = weightPreference === 'grams' ? Math.round((total * carbsPercentage) / 400) : Math.round((total * carbsPercentage) / 400 * 0.03527396195);
-        const fatGrams = weightPreference === 'grams' ? Math.round((total * fatPercentage) / 900) : Math.round((total * fatPercentage) / 900 * 0.03527396195);
-        return { proteinGrams, carbsGrams, fatGrams };
+    const ITEMS = {
+        FLAVORS: [
+            'any', 'spicy', 'sweet', 'savory', 'sour', 'bitter', 'umami', 
+            'salty', 'fruity', 'herby', 'earthy'
+        ],
+        CUISINES: [
+            'any', 'african', 'american', 'mediterranean', 'asian', 
+            'european', 'latinAmerican', 'middleEastern', 'indian', 
+            'chinese', 'japanese', 'korean', 'thai'
+        ],
+        SATIETY_LEVELS: ['any', 'satiating', 'nonSatiating'],
+        DIETS: [
+            'none', 'vegan', 'vegetarian', 'glutenFree', 'paleo', 
+            'pescatarian', 'dairyFree', 'nutFree', 'halal', 'kosher'
+        ],
+        COOKING_TIMES: ['30min', '1h', 'moreThan1h'],
+        OCCASIONS: ['breakfast', 'lunch', 'snack', 'dinner', 'any'],
     };
 
-    const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
+    useEffect(() => {
+        const loadStoredData = async (key: string, fallback: string | null = '') => {
+            try {
+                const value = await AsyncStorage.getItem(key);
+                return value === null ? fallback : value;
+            } catch (error) {
+                console.error(`Error loading ${key}`, error);
+                return fallback;
+            }
+        };
+
+        const initState = async () => {
+            const username = await loadStoredData('username');
+            const energy = await loadStoredData('measurementEnergy');
+            const solid = await loadStoredData('measurementSolid');
+            const generationsStr = await loadStoredData('monthlyGenerations', '0');
+            setState(prevState => ({
+                ...prevState,
+                username,
+                energyUnit: energy,
+                weightPreference: solid,
+                generationsLeft: parseInt(generationsStr, 10),
+            }));
+        };
+
+        initState();
+    }, []);
+
+    const calculateMacros = useCallback(() => {
+        const total = parseInt(state.recipeTargetCalories, 10) || 0;
+        const factor = state.weightPreference === 'grams' ? 1 : 0.03527396195;
+        return {
+            proteinGrams: Math.round((total * state.proteinPercentage) / 400) * factor,
+            carbsGrams: Math.round((total * state.carbsPercentage) / 400) * factor,
+            fatGrams: Math.round((total * state.fatPercentage) / 900) * factor,
+        };
+    }, [state.recipeTargetCalories, state.proteinPercentage, state.carbsPercentage, state.fatPercentage, state.weightPreference]);
 
     const handleGenerateRecipes = async () => {
-        if (energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 200 || Number(recipeTargetCalories) > 5000)) {
-            // Show alert if calories is not a number in between 200 and 5000
-            Alert.alert(
-                t('error'),
-                t('incorrectCaloriesTargetRecipe'),
-                [{ text: t('ok') }]
-            );
-            return;
-        } else if (energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 836 || Number(recipeTargetCalories) > 20900)) {
-            // Show alert if kJ is not a number in between 836 and 20900
-            Alert.alert(
-                t('error'),
-                t('incorrectKilojoulesTargetRecipe'),
-                [{ text: t('ok') }]
-            );
-            return;
-        }
-        const sum = proteinPercentage + carbsPercentage + fatPercentage;
-        if (sum !== 100) {
-            // Show alert if the sum is not equal to 100
-            Alert.alert(
-                t('error'),
-                t('macrosError'),
-                [{ text: t('ok') }]
-            );
-        } else if (cuisine === '' || flavor === '' || satiety === '' || cookingTime === '' || occasion === '') {
-            Alert.alert(
-                t('error'),
-                t('dropdownsError'),
-                [{ text: t('ok') }]
-            );
-        } else {
-            setModalVisible(!modalVisible);
-            console.log('username: ' + username);
-            setLoading(true);
-            const tokenResponse = await SecurityApiService.getToken(`username=${username}`);
+        const totalPercentage = state.proteinPercentage + state.carbsPercentage + state.fatPercentage;
+        if (!validateInputs(totalPercentage)) return;
+        setState(prevState => ({ ...prevState, modalVisible: !prevState.modalVisible, loading: true }));
+
+        try {
+            const tokenResponse = await SecurityApiService.getToken(`username=${state.username}`);
             const token = tokenResponse.body;
-            console.log('token: ' + token);
 
             FitMyMacrosApiService.setAuthToken(token);
-            setOpId(generateRandomString(20));
+            const opId = generateRandomString(20);
+            setState(prevState => ({ ...prevState, opId }));
+
+            // API call logic here
+            const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
             const recipesResponse = await apiCallWithRetry({
-                measureUnit: weightPreference,
-                calories: Number(recipeTargetCalories),
+                measureUnit: state.weightPreference,
+                calories: Number(state.recipeTargetCalories),
                 protein: proteinGrams,
                 carbs: carbsGrams,
                 fat: fatGrams,
-                satietyLevel: satiety,
-                anyIngredientsMode: toggleCheckBox,
+                satietyLevel: state.satiety,
+                anyIngredientsMode: state.toggleCheckBox,
                 expandIngredients: false,
                 glutenFree: false,
                 vegan: false,
                 vegetarian: false,
-                cuisineStyle: cuisine,
-                cookingTime: cookingTime,
-                flavor: flavor,
-                occasion: occasion,
-                userId: username,
+                cuisineStyle: state.cuisine,
+                cookingTime: state.cookingTime,
+                flavor: state.flavor,
+                occasion: state.occasion,
+                userId: state.username,
                 precision: 'exactly',
-                opId: opId
+                opId: state.opId,
             });
-            console.log('recipesResponse: ' + recipesResponse);
-            const recipes = await JSON.parse(recipesResponse.body);
+            const recipes = JSON.parse(recipesResponse.body);
             await AsyncStorage.setItem('recipesList', JSON.stringify(recipes));
-            console.log('recipes: ' + recipes);
-            setLoading(false);
+            setState(prevState => ({ ...prevState, loading: false }));
             navigation.navigate('GeneratedRecipesList', {
-                measureUnit: weightPreference,
-                calories: Number(recipeTargetCalories),
+                ...state,
+                calories: Number(state.recipeTargetCalories),
                 protein: proteinGrams,
                 carbs: carbsGrams,
                 fat: fatGrams,
-                anyIngredientsMode: toggleCheckBox,
+                anyIngredientsMode: state.toggleCheckBox,
                 glutenFree: false,
                 vegan: false,
                 vegetarian: false,
-                cookingTime: cookingTime,
-                userId: username,
-                precision: 'exactly'
+                cookingTime: state.cookingTime,
+                userId: state.username,
+                precision: 'exactly',
             });
+        } catch (error) {
+            console.error('Error generating recipes:', error);
+            setState(prevState => ({ ...prevState, loading: false }));
         }
     };
 
-    const apiCallWithRetry = async (params: Record<string, any>, maxRetries = 3, timeout = 30000): Promise<any> => {
+    const apiCallWithRetry = async (params: Record<string, any>, maxRetries = 3, timeout = 30000) => {
         const makeApiCall = () => FitMyMacrosApiService.getRecipes(params);
 
         const callWithTimeout = () => {
@@ -241,11 +170,11 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                 }, timeout);
 
                 makeApiCall()
-                    .then((response) => {
+                    .then(response => {
                         clearTimeout(timer);
                         resolve(response);
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         clearTimeout(timer);
                         reject(error);
                     });
@@ -265,29 +194,35 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
         }
     };
 
-    const validatePercentageInput = (text: string): number => {
-        if (text === '') {
-            return 0; // Treat empty input as 0
+    const validateInputs = (totalPercentage: number): boolean => {
+        const isValid = (unit: string, min: number, max: number) => {
+            const value = Number(state.recipeTargetCalories);
+            return !isNaN(value) && value >= min && value <= max;
+        };
+
+        if ((state.energyUnit === 'kilocalories' && !isValid('kilocalories', 200, 5000)) ||
+            (state.energyUnit === 'kilojoules' && !isValid('kilojoules', 836, 20900))) {
+            Alert.alert(t('error'), state.energyUnit === 'kilocalories' ? t('incorrectCaloriesTargetRecipe') : t('incorrectKilojoulesTargetRecipe'), [{ text: t('ok') }]);
+            return false;
+        } else if (totalPercentage !== 100) {
+            Alert.alert(t('error'), t('macrosError'), [{ text: t('ok') }]);
+            return false;
+        } else if ([state.cuisine, state.flavor, state.satiety, state.cookingTime, state.occasion].includes('')) {
+            Alert.alert(t('error'), t('dropdownsError'), [{ text: t('ok') }]);
+            return false;
         }
-        const value = parseInt(text, 10);
-        if (!isNaN(value) && value >= 0 && value <= 100) {
-            return value;
-        }
-        return proteinPercentage;
+        return true;
     };
 
     return (
         <I18nextProvider i18n={i18n}>
             <View style={globalStyles.containerMainGeneration}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <Text>{t('monthlyMealGenerationsLeft')}: {generationsLeft}</Text>
-                    {generationsLeft === 0 && (
+                <View style={styles.header}>
+                    <Text>{`${t('monthlyMealGenerationsLeft')}: ${state.generationsLeft}`}</Text>
+                    {state.generationsLeft === 0 && (
                         <TouchableOpacity
-                            style={[
-                                globalStyles.buyMoreCreditsButton,
-                                generationsLeft !== 0 && { backgroundColor: 'grey' }, // Change to grey when disabled
-                            ]}
-                            disabled={generationsLeft > 0}
+                            style={[globalStyles.buyMoreCreditsButton, state.generationsLeft !== 0 && { backgroundColor: 'grey' }]}
+                            disabled={state.generationsLeft > 0}
                             onPress={() => navigation.navigate('PurchaseCredits')}
                         >
                             <Text style={globalStyles.buttonTextWhite}>{t('buyMoreCredits')}</Text>
@@ -295,170 +230,47 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
                     )}
                 </View>
                 <ScrollView>
-                    <DropDownPicker
-                        open={cuisineOpen}
-                        value={cuisine}
-                        items={cuisineItems}
-                        setOpen={setCuisineOpen}
-                        setValue={setCuisine}
-                        placeholder={t('selectCuisineStyle')}
-                        containerStyle={globalStyles.dropdown}
-                        zIndex={5000}
-                    />
-                    <DropDownPicker
-                        open={flavorOpen}
-                        value={flavor}
-                        items={flavorItems}
-                        setOpen={setFlavorOpen}
-                        placeholder={t('selectFlavorProfile')}
-                        setValue={setFlavor}
-                        containerStyle={globalStyles.dropdown}
-                        zIndex={4000}
-                    />
-                    <DropDownPicker
-                        open={satietyOpen}
-                        value={satiety}
-                        items={satietyLevelItems}
-                        setOpen={setSatietyOpen}
-                        placeholder={t('selectSatietyLevel')}
-                        setValue={setSatiety}
-                        containerStyle={globalStyles.dropdown}
-                        zIndex={3000}
-                    />
-
-                    <DropDownPicker
-                        open={cookingTimeOpen}
-                        value={cookingTime}
-                        items={cookingTimeItems}
-                        setOpen={setCookingTimeOpen}
-                        setValue={setCookingTime}
-                        placeholder={t('selectCookingTime')}
-                        containerStyle={globalStyles.dropdown}
-                        zIndex={2000}
-                    />
-                    <DropDownPicker
-                        open={occasionOpen}
-                        value={occasion}
-                        items={occasionItems}
-                        setOpen={setOccasionOpen}
-                        setValue={setOccasion}
-                        placeholder={t('selectOccasion')}
-                        containerStyle={globalStyles.dropdown}
-                        zIndex={1000}
-                    />
+                    {createDropDown('cuisine', ITEMS.CUISINES, 5000)}
+                    {createDropDown('flavor', ITEMS.FLAVORS, 4000)}
+                    {createDropDown('satiety', ITEMS.SATIETY_LEVELS, 3000)}
+                    {createDropDown('cookingTime', ITEMS.COOKING_TIMES, 2000)}
+                    {createDropDown('occasion', ITEMS.OCCASIONS, 1000)}
                     <TextInput
                         style={globalStyles.inputRecipe}
-                        placeholder={energyUnit === 'kilocalories' ? t('targetCalories') : t('targetKj')}
+                        placeholder={state.energyUnit === 'kilocalories' ? t('targetCalories') : t('targetKj')}
                         keyboardType="numeric"
-                        value={recipeTargetCalories}
-                        onChangeText={text => setRecipeTargetCalories(text)}
+                        value={state.recipeTargetCalories}
+                        onChangeText={text => setState(prev => ({ ...prev, recipeTargetCalories: text }))}
                     />
-                    {(energyUnit === 'kilocalories' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 200 || Number(recipeTargetCalories) > 3000)) && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectCaloriesTargetRecipe')}</Text>
-                    )}
-                    {(energyUnit === 'kilojoules' && (recipeTargetCalories === '' || isNaN(Number(recipeTargetCalories)) || Number(recipeTargetCalories) < 836 || Number(recipeTargetCalories) > 12540)) && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>{t('incorrectKilojoulesTargetRecipe')}</Text>
-                    )}
-                    <View style={globalStyles.sliderContainer}>
-                        <Text style={{ flex: 1 }}>{t('protein')} (%)</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                            <TextInput
-                                style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
-                                keyboardType="numeric"
-                                value={proteinPercentage !== 0 ? proteinPercentage.toString() : ''}
-                                onChangeText={(text) => setProteinPercentage(validatePercentageInput(text))}
-                            />
-                            <Slider
-                                style={{ flex: 3, marginLeft: 10 }}
-                                minimumValue={0}
-                                maximumValue={100}
-                                value={proteinPercentage}
-                                onValueChange={value => setProteinPercentage(value)}
-                                step={1}
-                                thumbTintColor="#337010"
-                                minimumTrackTintColor="#337010"
-                            />
-                        </View>
-                    </View>
-                    <View style={globalStyles.sliderContainer}>
-                        <Text>{t('carbs')} (%)</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                            <TextInput
-                                style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
-                                keyboardType="numeric"
-                                value={carbsPercentage !== 0 ? carbsPercentage.toString() : ''}
-                                onChangeText={(text) => setCarbsPercentage(validatePercentageInput(text))}
-                            />
-                            <Slider
-                                style={{ flex: 3, marginLeft: 10 }}
-                                minimumValue={0}
-                                maximumValue={100}
-                                value={carbsPercentage}
-                                onValueChange={value => setCarbsPercentage(value)}
-                                step={1}
-                                thumbTintColor="#337010"
-                                minimumTrackTintColor="#337010"
-                            />
-                        </View>
-                    </View>
-                    <View style={globalStyles.sliderContainer}>
-                        <Text>{t('fat')} (%)</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                            <TextInput
-                                style={{ flex: 1, borderWidth: 1, borderColor: 'gray', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 5 }}
-                                keyboardType="numeric"
-                                value={fatPercentage !== 0 ? fatPercentage.toString() : ''}
-                                onChangeText={(text) => setFatPercentage(validatePercentageInput(text))}
-                            />
-                            <Slider
-                                style={{ flex: 3, marginLeft: 10 }}
-                                minimumValue={0}
-                                maximumValue={100}
-                                value={fatPercentage}
-                                onValueChange={value => setFatPercentage(value)}
-                                step={1}
-                                thumbTintColor="#337010"
-                                minimumTrackTintColor="#337010"
-                            />
-                        </View>
-                    </View>
-                    <Text>{t('protein')}: {proteinGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
-                    <Text>{t('carbs')}: {carbsGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
-                    <Text>{t('fat')}: {fatGrams} {weightPreference === 'grams' ? 'g' : 'oz'}</Text>
-                    {proteinPercentage + carbsPercentage + fatPercentage !== 100 && (
-                        <Text style={{ color: 'red', marginTop: 10 }}>
-                            {t('percentageAlert')}
-                        </Text>
+                    {!validateCaloriesInput() && <Text style={{ color: 'red', marginTop: 10 }}>{state.energyUnit === 'kilocalories' ? t('incorrectCaloriesTargetRecipe') : t('incorrectKilojoulesTargetRecipe')}</Text>}
+                    {createMacroSlider('protein', state.proteinPercentage, value => setState(prev => ({ ...prev, proteinPercentage: value })))}
+                    {createMacroSlider('carbs', state.carbsPercentage, value => setState(prev => ({ ...prev, carbsPercentage: value })))}
+                    {createMacroSlider('fat', state.fatPercentage, value => setState(prev => ({ ...prev, fatPercentage: value })))}
+                    {renderMacroPercentages()}
+                    {state.proteinPercentage + state.carbsPercentage + state.fatPercentage !== 100 && (
+                        <Text style={{ color: 'red', marginTop: 10 }}>{t('percentageAlert')}</Text>
                     )}
                     <View style={globalStyles.checkboxContainer}>
                         <View style={globalStyles.checkboxRow}>
                             <CheckBox
-                                style={{ marginBottom: '30%', marginLeft: '10%' }}
+                                style={styles.checkbox}
                                 disabled={false}
-                                value={toggleCheckBox}
-                                onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                                value={state.toggleCheckBox}
+                                onValueChange={newValue => setState(prev => ({ ...prev, toggleCheckBox: newValue }))}
                             />
                             <Text style={globalStyles.modalText}>{t('expandIngredients')}</Text>
                         </View>
-                        <Text style={globalStyles.expandIngredientsInfo}>
-                            {t('expandIngredientsInfo')}
-                        </Text>
+                        <Text style={globalStyles.expandIngredientsInfo}>{t('expandIngredientsInfo')}</Text>
                     </View>
-
                 </ScrollView>
                 <TouchableOpacity
-                    style={[
-                        globalStyles.modalButton,
-                        generationsLeft === 0 && { backgroundColor: 'grey' },
-                    ]}
-                    disabled={generationsLeft === 0}
-                    onPress={() => {
-                        handleGenerateRecipes();
-                    }}
+                    style={[globalStyles.modalButton, state.generationsLeft === 0 && { backgroundColor: 'grey' }]}
+                    disabled={state.generationsLeft === 0}
+                    onPress={handleGenerateRecipes}
                 >
                     <Text style={globalStyles.modalButtonText}>{t('generateRecipes')}</Text>
                 </TouchableOpacity>
-                {loading && (
+                {state.loading && (
                     <View style={globalStyles.loadingOverlay}>
                         <TouchableWithoutFeedback>
                             <BlurView intensity={50} style={globalStyles.blurView}>
@@ -470,7 +282,90 @@ const RecipeGeneration: React.FC<Props> = ({ navigation }) => {
             </View>
         </I18nextProvider>
     );
+
+    function createDropDown(name: string, items: string[], zIndex: number) {
+        const openStateName = `${name}Open`;
+        const setOpenState = (open: boolean) => setState(prev => ({ ...prev, [openStateName]: open }));
+        const setValueState = (value: string) => setState(prev => ({ ...prev, [name]: value }));
+        return (
+            <DropDownPicker
+                open={state[openStateName]}
+                value={state[name]}
+                items={items.map(item => ({ label: t(`${name}.${item}`), value: item }))}
+                setOpen={(open) => setOpenState(open)}
+                setValue={(value) => setValueState(value)}
+                placeholder={t(`select${capitalize(name)}`)}
+                containerStyle={globalStyles.dropdown}
+                zIndex={zIndex}
+            />
+        );
+    }
+
+    function createMacroSlider(name: 'protein' | 'carbs' | 'fat', value: number, setValue: (value: number) => void) {
+        return (
+            <View style={globalStyles.sliderContainer}>
+                <Text style={globalStyles.sliderLabel}>{t(name)} (%)</Text>
+                <View style={globalStyles.sliderRow}>
+                    <TextInput
+                        style={globalStyles.sliderInput}
+                        keyboardType="numeric"
+                        value={(value !== 0) ? value.toString() : ''}
+                        onChangeText={(text) => setValue(validatePercentageInput(text))}
+                    />
+                    <Slider
+                        style={globalStyles.slider}
+                        minimumValue={0}
+                        maximumValue={100}
+                        value={value}
+                        onValueChange={setValue}
+                        step={1}
+                        thumbTintColor="#337010"
+                        minimumTrackTintColor="#337010"
+                    />
+                </View>
+            </View>
+        );
+    }
+
+    function validateCaloriesInput() {
+        const calories = Number(state.recipeTargetCalories);
+        const kilocaloriesRange = (calories >= 200 && calories <= 3000);
+        const kilojoulesRange = (calories >= 836 && calories <= 12540);
+        return (
+            (state.energyUnit === 'kilocalories' && kilocaloriesRange) ||
+            (state.energyUnit === 'kilojoules' && kilojoulesRange)
+        );
+    }
+
+    function validatePercentageInput(text: string): number {
+        const value = parseInt(text, 10);
+        if (!isNaN(value) && value >= 0 && value <= 100) return value;
+        return state.proteinPercentage;
+    }
+
+    function renderMacroPercentages() {
+        const { proteinGrams, carbsGrams, fatGrams } = calculateMacros();
+        return (
+            <>
+                <Text>{t('protein')}: {proteinGrams} {state.weightPreference === 'grams' ? 'g' : 'oz'}</Text>
+                <Text>{t('carbs')}: {carbsGrams} {state.weightPreference === 'grams' ? 'g' : 'oz'}</Text>
+                <Text>{t('fat')}: {fatGrams} {state.weightPreference === 'grams' ? 'g' : 'oz'}</Text>
+            </>
+        )
+    }
+
+    function capitalize(text: string) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+};
+
+const styles = {
+    header: {
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10
+    },
+    checkbox: {
+        marginBottom: '30%', marginLeft: '10%'
+    }
 };
 
 export default RecipeGeneration;
-
