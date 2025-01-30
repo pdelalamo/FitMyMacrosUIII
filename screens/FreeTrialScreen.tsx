@@ -14,15 +14,12 @@ interface Props {
 const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    // const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setLoading] = useState(true);
-    // Check if running on iOS emulator
     const isIOSEmulator = Platform.OS === 'ios' && Platform.constants.interfaceIdiom === 'handset';
 
-    // Check if running on Android emulator
     const isAndroidEmulator = Platform.OS === 'android' && (
-        Platform.constants.Model.includes('sdk') || // Android emulator model name
-        Platform.constants.Manufacturer.toLowerCase() === 'generic' // Generic manufacturer name
+        Platform.constants.Model.includes('sdk') || 
+        Platform.constants.Manufacturer.toLowerCase() === 'generic'
     );
 
     const handleOptionPress = (option: string) => {
@@ -31,46 +28,6 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
 
     function setPurchaseLoading(arg0: boolean) {
         throw new Error('Function not implemented.');
-    }
-
-    if (!isIOSEmulator && !isAndroidEmulator) {
-        // useEffect(() => {
-        //     if (Platform.OS === 'android' || Platform.OS === 'ios') {
-        //         const purchaseUpdateSubscription = purchaseUpdatedListener(
-        //             async (purchase) => {
-        //                 if (Platform.OS === 'android' || Platform.OS === 'ios') {
-        //                     const receipt = purchase.transactionReceipt;
-        //                     if (receipt) {
-        //                         try {
-        //                             await finishTransaction({ purchase, isConsumable: false });
-        //                         } catch (error) {
-        //                             console.error("An error occurred while completing transaction", error);
-        //                         }
-        //                         notifySuccessfulPurchase();
-        //                     }
-        //                 }
-        //             });
-        //         const purchaseErrorSubscription = purchaseErrorListener((error: { message: any; }) =>
-        //             console.error('Purchase error', error.message));
-        //         const fetchProducts = async () => {
-        //             if (Platform.OS === 'android' || Platform.OS === 'ios') {
-        //                 try {
-        //                     const result = await getProducts({ skus: constants.productSkus! });
-        //                     setProducts(result);
-        //                     setLoading(false);
-        //                 }
-        //                 catch (error) {
-        //                     Alert.alert('Error fetching products')
-        //                 }
-        //             }
-        //         }
-        //         fetchProducts();
-        //         return () => {
-        //             purchaseUpdateSubscription.remove();
-        //             purchaseErrorSubscription.remove();
-        //         }
-        //     }
-        // }, [])
     }
 
     const notifySuccessfulPurchase = () => {
@@ -87,16 +44,9 @@ const FreeTrialScreen: React.FC<Props> = ({ navigation }) => {
             Alert.alert('Please, select one plan')
         }
         else {
-            //TODO: Load the Products array in the modal, instead of the manual touchables that I created
             setModalVisible(false);
             setLoading(true)
-            try {
-                // await requestPurchase({ skus: [productId] });
-            } catch (error) {
-                Alert.alert('Error occurred while making purchase')
-            }
             finally {
-                //TODO: implement the loading spinner if it's not already implemented
                 setLoading(false);
             }
         }
