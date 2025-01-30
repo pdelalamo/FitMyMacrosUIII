@@ -3,13 +3,15 @@ import axios, { AxiosInstance } from 'axios';
 import SecurityApiService from './SecurityApiService';
 
 class FitMyMacrosApiService {
-
     private client: AxiosInstance;
+    private static BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
+    private static RECIPES_ENDPOINT = '/recipes';
+    private static USER_DATA_ENDPOINT = '/userData';
+    private static RESTAURANTS_ENDPOINT = '/restaurants';
 
-    //TODO: change dev for prod once this is in production
     constructor() {
         this.client = axios.create({
-            baseURL: process.env.EXPO_PUBLIC_API_URL!
+            baseURL: FitMyMacrosApiService.BASE_URL
         });
     }
 
@@ -18,84 +20,75 @@ class FitMyMacrosApiService {
     }
 
     setAsyncInvocationMode(async: boolean) {
-        if (async)
-            this.client.defaults.headers.common['InvocationType'] = 'Event';
+        this.client.defaults.headers.common['InvocationType'] = async ? 'Event' : '';
+    }
+
+    private async handleApiCall(method: string, url: string, data: any = null, params: any = null) {
+        try {
+            const response = await this.client.request({
+                method,
+                url,
+                data,
+                params
+            });
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to fetch resource from ${url}`);
+            }
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching resource from ${url}:`, error);
+            throw error;
+        }
     }
 
     public async getRecipes(params: Record<string, any>): Promise<any> {
-        try {
-            const response = await this.client.get('/recipes', { params });
-            console.log('response status: ' + response.status);
-            console.log('response data: ' + response.data);
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to fetch recipes');
-            }
-        } catch (error) {
-            console.error('Error fetching recipes:', error);
-            throw error;
-        }
-    }
-
-    public async getRecipesFromDynamoDB(params: Record<string, any>): Promise<any> {
-        try {
-            const response = await this.client.get('/recipes', { params });
-            console.log('response status: ' + response.status);
-            console.log('response data: ' + response.data);
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to fetch recipes');
-            }
-        } catch (error) {
-            console.error('Error fetching recipes:', error);
-            throw error;
-        }
+        return this.handleApiCall('get', FitMyMacrosApiService.RECIPES_ENDPOINT, null, params);
     }
 
     public async getRecipeDetail(params: Record<string, any>): Promise<any> {
-        try {
-            const response = await this.client.get('/recipes/detail', { params });
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to fetch recipe detail');
-            }
-        } catch (error) {
-            console.error('Error fetching recipe detail:', error);
-            throw error;
-        }
+        return this.handleApiCall('get', `${FitMyMacrosApiService.RECIPES_ENDPOINT}/detail`, null, params);
+    }
+
+    public async getRestaurantRecommendation(params: Record<string, any>): Promise<any> {
+        return this.handleApiCall('get', FitMyMacrosApiService.RESTAURANTS_ENDPOINT, null, params);
+    }
+
+    public async getRestaurantRecommendationPDF(params: Record<string, any>): Promise<any> {
+        console.log('Entering getRestaurantRecommendationPDF');
+        return this.handleApiCall('post', `${FitMyMacrosApiService.RESTAURANTS_ENDPOINT}/pdf`, params);
+    }
+
+    public async updateRecipes(data: Record<string, any>): Promise<any> {
+        return this.handleApiCall('put', FitMyMacrosApiService.RECIPES_ENDPOINT, data);
+    }
+
+    public async getUserData(params: Record<string, any>): Promise<any> {
+        console.log('Received params:', params);
+        return this.handleApiCall('get', FitMyMacrosApiService.USER_DATA_ENDPOINT, null, params);
+    }
+
+    public async updateUserData(data: Record<string, any>): Promise<any> {
+        return this.handleApiCall('post', FitMyMacrosApiService.USER_DATA_ENDPOINT, data);
+    }
+
+    private async getStoredDataItem(key: string): Promise<any> {
+        const item = await AsyncStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
     }
 
     public async sendUserData() {
         try {
-            const asyncEmail = await AsyncStorage.getItem("username");
-            const email = asyncEmail === null ? '' : asyncEmail.toLowerCase()
-            const savedMap = await AsyncStorage.getItem('ingredientsMap');
-            const parsedObject = await JSON.parse(savedMap !== null ? savedMap : '{}');
-            const savedAllergies = await AsyncStorage.getItem('allergiesList');
-            const allergies = savedAllergies === null ? [] : JSON.parse(savedAllergies);
-            const diet = await AsyncStorage.getItem('dietType');
-            const dietType = diet === null ? '' : diet;
-            const savedAEq = await AsyncStorage.getItem('equipmentList');
-            const equipment = savedAEq === null ? [] : JSON.parse(savedAEq);
+            const email = await this.getStoredDataItem('username') || '';
+            const parsedObject = await this.getStoredDataItem('ingredientsMap') || {};
+            const allergies = await this.getStoredDataItem('allergiesList') || [];
+            const dietType = await this.getStoredDataItem('dietType') || '';
+            const equipment = await this.getStoredDataItem('equipmentList') || [];
             const energy = await AsyncStorage.getItem('measurementEnergy');
             const weight = await AsyncStorage.getItem('measurementSolid');
             const fluid = await AsyncStorage.getItem('measurementFluid');
-            const savedFavoriteMeals = await AsyncStorage.getItem('favoriteMeals');
-            const favoriteMeals = savedFavoriteMeals === null ? [] : JSON.parse(savedFavoriteMeals);
-            //const favoriteMealsAsString = favoriteMeals.map((meal: Meal) => JSON.stringify(meal));
-            const favoriteMealsAsString = favoriteMeals.filter((recipe: any) => recipe !== null);
-            const savedPrevRecipes = await AsyncStorage.getItem('previous_recipes');
-            console.log('Saved previous recipes:', savedPrevRecipes);
-
-            let previous_recipes = savedPrevRecipes === null ? [] : JSON.parse(savedPrevRecipes);
-            console.log('Parsed previous recipes:', previous_recipes);
-
-            previous_recipes = previous_recipes.filter((recipe: any) => recipe !== null);
-            console.log('Filtered previous recipes (removed nulls):', previous_recipes);
-
+            const favoriteMeals = await this.getStoredDataItem('favoriteMeals') || [];
+            const savedPrevRecipes = await this.getStoredDataItem('previous_recipes') || [];
             const targetEnergy = await AsyncStorage.getItem('targetCalories');
             const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
             const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
@@ -103,13 +96,9 @@ class FitMyMacrosApiService {
             const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
             const tokenGenerationDate = await AsyncStorage.getItem('tokenGenerationDate');
 
-            const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
-            parsedMap.forEach((value: string, key: string) => {
-                console.log(key, value);
-            });
-            const foodObject = Object.fromEntries(parsedMap);
+            const foodObject = parsedObject;
             const userData = {
-                userId: email,
+                userId: email.toLowerCase(),
                 food: foodObject,
                 "allergies-intolerances": allergies,
                 vegan: dietType === 'Vegan',
@@ -119,117 +108,31 @@ class FitMyMacrosApiService {
                 weightUnit: weight,
                 fluidUnit: fluid,
                 energyUnit: energy,
-                favoriteMeals: favoriteMealsAsString,
+                favoriteMeals: favoriteMeals.filter((meal: any) => meal !== null),
                 targetEnergy: targetEnergy,
                 targetProteinPercentage: targetProteinPercentage,
                 targetCarbsPercentage: targetCarbsPercentage,
                 targetFatPercentage: targetFatPercentage,
-                previous_recipes: previous_recipes,
+                previous_recipes: savedPrevRecipes.filter((recipe: any) => recipe !== null),
                 monthlyGenerations: monthlyGenerations,
                 tokenGenerationDate: tokenGenerationDate
             };
-            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
-            const token = tokenResponse.body;
-            console.log('token: ' + token);
 
-            this.setAuthToken(token);
-            const result = await this.updateUserData(userData);
-            console.log('User data updated successfully:', result);
+            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
+            const token = tokenResponse?.body;
+            console.log('Token:', token);
+
+            if (token) {
+                this.setAuthToken(token);
+                const result = await this.updateUserData(userData);
+                console.log('User data updated successfully:', result);
+            } else {
+                console.error('Failed to retrieve token');
+            }
         } catch (error) {
             console.error('Failed to update user data:', error);
         }
     }
-
-    public async updateUserData(data: Record<string, any>): Promise<any> {
-        try {
-            console.log('user data:', JSON.stringify(data, null, 2)); // Pretty print with indentation
-            const response = await this.client.post('/userData', data);
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to post user data');
-            }
-        } catch (error) {
-            console.error('Error posting user data:', error);
-            throw error;
-        }
-    }
-
-    public async getUserData(params: Record<string, any>): Promise<any> {
-        try {
-            console.log('Received params:', params);
-
-            // Check if params is an object and iterate over it
-            if (typeof params === 'object' && params !== null) {
-                console.log('Params is a valid object');
-                for (const key in params) {
-                    if (params.hasOwnProperty(key)) {
-                        console.log(`Key: ${key}, Value: ${params[key]}`);
-                    }
-                }
-            } else {
-                console.log('Params is not an object or is null');
-            }
-            const response = await this.client.get('/userData', { params });
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to get user data');
-            }
-        } catch (error) {
-            console.error('Error getting user data:', error);
-            throw error;
-        }
-    }
-
-    public async updateRecipes(data: Record<string, any>): Promise<any> {
-        try {
-            const response = await this.client.put('/recipes', data);
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to update recipe');
-            }
-        } catch (error) {
-            console.error('Error updating recipe:', error);
-            throw error;
-        }
-    }
-
-    public async getRestaurantRecommendation(params: Record<string, any>): Promise<any> {
-        try {
-            const response = await this.client.get('/restaurants', { params });
-            console.log('response status: ' + response.status);
-            console.log('response data: ' + response.data);
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to fetch restaurant recommendation');
-            }
-        } catch (error) {
-            console.error('Error fetching recommendation:', error);
-            throw error;
-        }
-    }
-
-    public async getRestaurantRecommendationPDF(params: Record<string, any>): Promise<any> {
-        try {
-            console.log('entering get pdf recommendation');
-            const response = await this.client.post('/restaurants/pdf', params);
-            console.log('response status: ' + response.status);
-            // Convert the response data to a JSON string for readable logging
-            console.log('response data: ' + JSON.stringify(response.data, null, 2));
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Failed to fetch restaurant recommendation');
-            }
-        } catch (error) {
-            console.error('Error fetching recommendation:', error);
-            throw error;
-        }
-    }
-
 }
 
 export default new FitMyMacrosApiService();
