@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Text, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import {
+    View,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    ImageBackground,
+    Text,
+    Alert,
+    ActivityIndicator,
+    TouchableWithoutFeedback
+} from 'react-native';
 import { globalStyles } from '../globalStyles';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import { t } from 'i18next';
-import { AntDesign, FontAwesome, Entypo } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { federatedStyles } from '../federatedStyles';
-import { checkCognitoUser, signUpUser, verifyEmail } from '../utils/AWSCognito';
+import { checkCognitoUser, signUpUser } from '../utils/AWSCognito';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CommonActions } from '@react-navigation/native';
 import FitMyMacrosApiService from '../services/FitMyMacrosApiService';
 import SecurityApiService from '../services/SecurityApiService';
 import { BlurView } from 'expo-blur';
-import { CommonActions } from '@react-navigation/native';
-
-const config = {
-    expoClientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID!,
-    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID!,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID!,
-    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID!,
-};
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -30,22 +33,13 @@ interface Props {
 }
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+    // State Hooks
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showEmailPasswordFields, setShowEmailPasswordFields] = useState(false);
-
-    const toggleEmailPasswordFields = () => {
-        setShowEmailPasswordFields(!showEmailPasswordFields);
-    };
     const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
     const [user, setUserInfo] = useState<any>(null);
-
-    const [request, response, promptAsync] = Google.useAuthRequest(config);
-    const [requestF, responseF, promptAsyncF] = Facebook.useAuthRequest({
-        clientId: process.env.EXPO_PUBLIC_FB_AUTH!,
-    });
-
     const [allergies, setAllergies] = useState<string[]>([]);
     const [equipment, setEquipment] = useState<string[]>([]);
     const [dietType, setDietType] = useState<string | null>('');
@@ -59,82 +53,114 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const [targetFatPercentage, setTargetFatPercentage] = useState('');
     const [monthlyGenerations, setMonthlyGenerations] = useState('150');
 
-    useEffect(() => {
-        const loadPreferences = async () => {
-            try {
-                const energy = await AsyncStorage.getItem('measurementEnergy');
-                const weight = await AsyncStorage.getItem('measurementSolid');
-                const fluid = await AsyncStorage.getItem('measurementFluid');
-                const monthlyGenerations = await AsyncStorage.getItem('monthlyGenerations');
-                const targetEnergy = await AsyncStorage.getItem('targetCalories');
-                const targetProteinPercentage = await AsyncStorage.getItem('proteinPercentage');
-                const targetCarbsPercentage = await AsyncStorage.getItem('carbsPercentage');
-                const targetFatPercentage = await AsyncStorage.getItem('fatPercentage');
-                setEnergyUnit(energy || '');
-                setWeightUnit(weight || '');
-                setFluidUnit(fluid || '');
-                setTargetEnergy(targetEnergy || '');
-                setTargetProteinPercentage(targetProteinPercentage || '');
-                setTargetCarbsPercentage(targetCarbsPercentage || '');
-                setTargetFatPercentage(targetFatPercentage || '');
-                setMonthlyGenerations(monthlyGenerations || '150');
-            } catch (error) {
-                console.error('Error loading ingredients map from AsyncStorage:', error);
-            }
-        };
-        const loadAllergies = async () => {
-            try {
-                const savedAllergies = await AsyncStorage.getItem('allergiesList');
-                if (savedAllergies) {
-                    setAllergies(JSON.parse(savedAllergies));
-                }
-            } catch (error) {
-                console.error('Error loading allergies list from AsyncStorage:', error);
-            }
-        };
-        const loadDietType = async () => {
-            try {
-                const diet = await AsyncStorage.getItem('dietType');
-                setDietType(diet);
-            } catch (error) {
-                console.error('Error loading diet type list from AsyncStorage:', error);
-            }
-        };
-        const loadEquipment = async () => {
-            try {
-                const savedAEq = await AsyncStorage.getItem('equipmentList');
-                if (savedAEq) {
-                    setEquipment(JSON.parse(savedAEq));
-                }
-            } catch (error) {
-                console.error('Error loading equipment list from AsyncStorage:', error);
-            }
-        };
+    // Auth Request Hooks
+    const [googleRequest, googleResponse, promptGoogle] = Google.useAuthRequest({
+        expoClientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID!,
+        androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID!,
+        iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID!,
+        webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID!,
+    });
+    
+    const [facebookRequest, facebookResponse, promptFacebook] = Facebook.useAuthRequest({
+        clientId: process.env.EXPO_PUBLIC_FB_AUTH!,
+    });
 
-        loadDietType();
-        loadAllergies();
-        loadEquipment();
-        loadPreferences();
+    useEffect(() => {
+        initializeData();
     }, []);
 
     useEffect(() => {
         handleGoogleSignIn();
-    }, [response]);
-
-    async function handleGoogleSignIn() {
-        if (response?.type === 'success' && response.authentication) {
-            console.log("response token : " + response.authentication.accessToken);
-            setGoogleAccessToken(response.authentication.accessToken);
-            await fetchUserInfo();
-        } else {
-            return;
-        }
-    };
+    }, [googleResponse]);
 
     useEffect(() => {
         handleFacebookLogin();
-    }, [responseF]);
+    }, [facebookResponse]);
 
+    const initializeData = async () => {
+        await loadAsyncData();
+    };
+
+    const loadAsyncData = async () => {
+        try {
+            await loadPreferences();
+            await loadAllergies();
+            await loadDietType();
+            await loadEquipment();
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    };
+
+    const loadPreferences = async () => {
+        try {
+            const measurementPrefs = await AsyncStorage.multiGet([
+                'measurementEnergy',
+                'measurementSolid',
+                'measurementFluid',
+                'monthlyGenerations',
+                'targetCalories',
+                'proteinPercentage',
+                'carbsPercentage',
+                'fatPercentage'
+            ]);
+
+            setEnergyUnit(measurementPrefs[0][1] || '');
+            setWeightUnit(measurementPrefs[1][1] || '');
+            setFluidUnit(measurementPrefs[2][1] || '');
+            setTargetEnergy(measurementPrefs[4][1] || '');
+            setTargetProteinPercentage(measurementPrefs[5][1] || '');
+            setTargetCarbsPercentage(measurementPrefs[6][1] || '');
+            setTargetFatPercentage(measurementPrefs[7][1] || '');
+            setMonthlyGenerations(measurementPrefs[3][1] || '150');
+        } catch (error) {
+            console.error('Error loading preferences from AsyncStorage:', error);
+        }
+    };
+
+    const loadAllergies = async () => {
+        try {
+            const savedAllergies = await AsyncStorage.getItem('allergiesList');
+            if (savedAllergies) {
+                setAllergies(JSON.parse(savedAllergies));
+            }
+        } catch (error) {
+            console.error('Error loading allergies from AsyncStorage:', error);
+        }
+    };
+
+    const loadDietType = async () => {
+        try {
+            const diet = await AsyncStorage.getItem('dietType');
+            setDietType(diet);
+        } catch (error) {
+            console.error('Error loading diet type from AsyncStorage:', error);
+        }
+    };
+
+    const loadEquipment = async () => {
+        try {
+            const savedEquipment = await AsyncStorage.getItem('equipmentList');
+            if (savedEquipment) {
+                setEquipment(JSON.parse(savedEquipment));
+            }
+        } catch (error) {
+            console.error('Error loading equipment from AsyncStorage:', error);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        if (googleResponse?.type === 'success' && googleResponse.authentication) {
+            setGoogleAccessToken(googleResponse.authentication.accessToken);
+            await fetchUserInfo();
+        }
+    };
+
+    const handleFacebookLogin = async () => {
+        if (facebookResponse?.type === 'success' && facebookResponse.authentication) {
+            await fetchFacebookUserInfo();
+        }
+    };
 
     const fetchUserInfo = async () => {
         if (googleAccessToken) {
@@ -143,171 +169,136 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     headers: { Authorization: `Bearer ${googleAccessToken}` },
                 });
                 const userInfo = await response.json();
-                await AsyncStorage.setItem("@user", JSON.stringify(userInfo));
                 setUserInfo(userInfo);
-                console.log("email from user from google: " + user.email);
-                if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((userExistsInPool)) {
-                        console.log("user aalready exists");
-                        Alert.alert(t('alreadyExistingUser'));
-                    } else {
-                        setLoading(true);
-                        signUpUser(user.email, generateRandomPassword(10));
-                        await AsyncStorage.setItem("isUserSignedIn", 'true');
-                        await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
-                        await sendUserData();
-                        setLoading(false);
-                        navigation.dispatch(
-                            CommonActions.reset({
-                                index: 0,
-                                routes: [{ name: 'MainScreen' }],
-                            })
-                        );
-                    }
-                }
+                handleUserSignUp(userInfo.email);
             } catch (error) {
                 console.error('Failed to fetch user data:', error);
             }
         }
     };
 
-    async function handleFacebookLogin() {
-        if (responseF?.type === 'success' && responseF.authentication) {
-            (async () => {
-                const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${responseF.authentication?.accessToken}&fields=id,email,name,picture.type(large)`);
-                const userInfo = await userInfoResponse.json();
-                setUserInfo(userInfo);
-                if (userInfo) {
-                    const userExistsInPool = await checkCognitoUser(user.email);
-                    if ((userExistsInPool)) {
-                        console.log("Already registered user");
-                        Alert.alert(t('alreadyExistingUser'));
-                    } else {
-                        setLoading(true);
-                        signUpUser(user.email, generateRandomPassword(10));
-                        await AsyncStorage.setItem("isUserSignedIn", 'true');
-                        await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
-                        await sendUserData();
-                        setLoading(false);
-                        navigation.dispatch(
-                            CommonActions.reset({
-                                index: 0,
-                                routes: [{ name: 'MainScreen' }],
-                            })
-                        );
-                    }
-                }
-            })();
+    const fetchFacebookUserInfo = async () => {
+        try {
+            const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${facebookResponse.authentication?.accessToken}&fields=id,email,name,picture.type(large)`);
+            const userInfo = await userInfoResponse.json();
+            setUserInfo(userInfo);
+            handleUserSignUp(userInfo.email);
+        } catch (error) {
+            console.error('Failed to fetch Facebook user data:', error);
         }
     };
 
-    const handleAppleLogin = async () => {
-        // Implement Apple Sign-In and federatedSignIn with AWS Cognito
+    const handleUserSignUp = async (userEmail: string) => {
+        try {
+            const userExistsInPool = await checkCognitoUser(userEmail);
+            if (userExistsInPool) {
+                Alert.alert(t('alreadyExistingUser'));
+            } else {
+                setLoading(true);
+                await signUpUser(userEmail, generateRandomPassword(10));
+                await AsyncStorage.setItem("isUserSignedIn", 'true');
+                await AsyncStorage.setItem("username", userEmail.replace('@', '-at-').toLowerCase());
+                await sendUserData(userEmail);
+                setLoading(false);
+                navigateToMain();
+            }
+        } catch (error) {
+            console.error('Error during user sign-up:', error);
+        }
     };
 
-    async function registerWithEmailPassword() {
+    const navigateToMain = () => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'MainScreen' }],
+            })
+        );
+    };
+
+    const registerWithEmailPassword = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!fieldsAreValid(email, password, confirmPassword, emailRegex)) {
+            return;
+        }
+
+        try {
+            const userExistsInPool = await checkCognitoUser(email);
+            if (userExistsInPool) {
+                Alert.alert(t('alreadyExistingUser'));
+            } else {
+                setLoading(true);
+                await signUpUser(email, password);
+                await AsyncStorage.setItem("isUserSignedIn", 'true');
+                await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
+                await sendUserData(email);
+                setLoading(false);
+                navigateToMain();
+            }
+        } catch (error) {
+            console.error('Error during email/password sign-up:', error);
+        }
+    };
+
+    const fieldsAreValid = (email: string, password: string, confirmPassword: string, emailRegex: RegExp): boolean => {
         if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
             Alert.alert(t('emptyAlert'));
-            return;
-        }
-        else if (!emailRegex.test(email)) {
+        } else if (!emailRegex.test(email)) {
             Alert.alert(t('invalidEmailFormat'));
-            return;
-        }
-        else if (email.trim() && password.trim() && !confirmPassword.trim()) {
-            Alert.alert(t('confirmPassword'));
-            return;
-        }
-        else if (password.length < 8) {
+        } else if (password.length < 8) {
             Alert.alert(t('passwordTooShort'));
-            return;
-        }
-        else if (password !== confirmPassword) {
+        } else if (password !== confirmPassword) {
             Alert.alert(t('nMatchPwd'));
-            return;
-        }
-        const userExistsInPool = await checkCognitoUser(email);
-        if ((userExistsInPool)) {
-            console.log("user already exists");
-            Alert.alert(t('alreadyExistingUser'));
         } else {
-            setLoading(true);
-            await signUpUser(email, password);
-            await AsyncStorage.setItem("isUserSignedIn", 'true');
-            await AsyncStorage.setItem("username", email.replace('@', '-at-').toLowerCase());
-            await sendUserData();
-            setLoading(false);
-            navigation.dispatch(
-                CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: 'MainScreen' }],
-                })
-            );
+            return true;
         }
+        return false;
     };
 
-    function generateRandomPassword(length: number) {
+    const generateRandomPassword = (length: number): string => {
         const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
-        let password = '';
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * charset.length);
-            password += charset[randomIndex];
-        }
-        return password;
-    }
+        return Array.from({ length }, () => charset[Math.floor(Math.random() * charset.length)]).join('');
+    };
 
-    async function sendUserData() {
+    const sendUserData = async (userEmail: string) => {
         try {
             await AsyncStorage.setItem('monthlyGenerations', '150');
-            setMonthlyGenerations('150');
             const savedMap = await AsyncStorage.getItem('ingredientsMap');
-            console.log('savedmap: ' + savedMap);
-            const parsedObject = await JSON.parse(savedMap !== null ? savedMap : '{}');
-            console.log('parsed object: ' + JSON.stringify(parsedObject, null, 2));
-
-            const parsedMap: Map<string, string> = new Map(Object.entries(parsedObject));
-            parsedMap.forEach((value: string, key: string) => {
-                console.log(key, value);
-            });
-            const foodObject = Object.fromEntries(parsedMap);
+            const parsedObject = savedMap ? JSON.parse(savedMap) : {};
+            const foodObject = Object.fromEntries(new Map(Object.entries(parsedObject)));
             const currentDate = new Date();
-            const day = String(currentDate.getDate()).padStart(2, '0'); // Get day and pad with leading zero if necessary
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad with leading zero
-            const year = currentDate.getFullYear(); // Get year
-            const tokenGenerationDate = `${day}/${month}/${year}`; // Something like "25/08/2024"
+            const tokenGenerationDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
             await AsyncStorage.setItem('tokenGenerationDate', tokenGenerationDate);
+
             const userData = {
-                userId: email.replace('@', '-at-').toLowerCase(),
+                userId: userEmail.replace('@', '-at-').toLowerCase(),
                 food: foodObject,
                 "allergies-intolerances": [...new Set(allergies)],
                 "previous_recipes": [],
                 vegan: dietType === 'Vegan',
                 vegetarian: dietType === 'Vegetarian',
-                dietType: dietType,
-                equipment: equipment,
-                weightUnit: weightUnit,
-                fluidUnit: fluidUnit,
-                energyUnit: energyUnit,
-                targetEnergy: targetEnergy,
-                targetProteinPercentage: targetProteinPercentage,
-                targetCarbsPercentage: targetCarbsPercentage,
-                targetFatPercentage: targetFatPercentage,
-                monthlyGenerations: monthlyGenerations,
-                tokenGenerationDate: tokenGenerationDate
+                dietType,
+                equipment,
+                weightUnit,
+                fluidUnit,
+                energyUnit,
+                targetEnergy,
+                targetProteinPercentage,
+                targetCarbsPercentage,
+                targetFatPercentage,
+                monthlyGenerations,
+                tokenGenerationDate
             };
-            const tokenResponse = await SecurityApiService.getToken(`username=${email.replace('@', '-at-').toLowerCase()}`);
-            const token = tokenResponse.body;
-            console.log('token: ' + token);
 
+            const tokenResponse = await SecurityApiService.getToken(`username=${userEmail.replace('@', '-at-').toLowerCase()}`);
+            const token = tokenResponse.body;
             FitMyMacrosApiService.setAuthToken(token);
-            const result = await FitMyMacrosApiService.updateUserData(userData);
-            console.log('User data updated successfully:', result);
+            await FitMyMacrosApiService.updateUserData(userData);
         } catch (error) {
             console.error('Failed to update user data:', error);
         }
-    }
+    };
 
     return (
         <I18nextProvider i18n={i18n}>
@@ -341,13 +332,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                         <Text style={federatedStyles.orText}>{t('or')}</Text>
                         <View style={federatedStyles.line} />
                     </View>
-                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#DB4437' }]} onPress={() => { promptAsync() }}>
+                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#DB4437' }]} onPress={promptGoogle}>
                         <View style={federatedStyles.buttonContent}>
                             <AntDesign name="google" size={24} color="#fff" style={federatedStyles.icon} />
                             <Text style={federatedStyles.buttonText}>{t('registerGoogle')}</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#1877f2' }]} onPress={() => { promptAsyncF() }}>
+                    <TouchableOpacity style={[federatedStyles.button, { backgroundColor: '#1877f2' }]} onPress={promptFacebook}>
                         <View style={federatedStyles.buttonContent}>
                             <FontAwesome name="facebook" size={24} color="#fff" style={federatedStyles.icon} />
                             <Text style={federatedStyles.buttonText}>{t('registerFacebook')}</Text>
